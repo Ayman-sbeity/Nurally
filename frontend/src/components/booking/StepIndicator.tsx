@@ -17,7 +17,9 @@ export function StepIndicator({ current }: { current: number }) {
             <span className="nu-step__num" aria-hidden="true">
               {index < current ? '✓' : index + 1}
             </span>
-            <span>{label}</span>
+            {/* On narrow screens only the current step keeps its label, so the
+                row fits instead of clipping the last word. */}
+            <span className="nu-step__label">{label}</span>
           </li>
         </Fragment>
       ))}

@@ -655,6 +655,9 @@
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-2xl);
   line-height: 1;
+  /* Cormorant defaults to old-style figures, where 0 reads as "O" and 1 as
+     "I". Anywhere a number carries meaning we force lining, tabular digits. */
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .nu-stat__label {

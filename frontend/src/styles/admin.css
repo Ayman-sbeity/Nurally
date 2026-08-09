@@ -257,6 +257,7 @@
 }
 
 .nu-cal__label {
+  font-variant-numeric: lining-nums tabular-nums;
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-xl);
   min-width: 12rem;
@@ -316,6 +317,7 @@
 }
 
 .nu-cal__daynum {
+  font-variant-numeric: lining-nums tabular-nums;
   display: grid;
   place-items: center;
   width: 1.6rem;
@@ -432,13 +434,18 @@
 .nu-agenda__time {
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-md);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .nu-agenda__who {
   min-width: 0;
+  /* The name and service are spans; without this they run together on one
+     line and the ellipsis rules below never apply. */
+  display: block;
 }
 
 .nu-agenda__name {
+  display: block;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -446,6 +453,7 @@
 }
 
 .nu-agenda__service {
+  display: block;
   font-size: var(--nu-text-xs);
   color: var(--nu-text-muted);
   overflow: hidden;

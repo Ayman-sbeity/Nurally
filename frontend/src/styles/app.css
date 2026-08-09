@@ -239,6 +239,7 @@
 }
 
 .nu-appt__time {
+  font-variant-numeric: lining-nums tabular-nums;
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-xl);
   color: var(--nu-ink);
@@ -329,6 +330,21 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 520px) {
+  .nu-step:not(.is-current) .nu-step__label {
+    /* Hidden visually, still read out by screen readers. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .nu-steps {
+    gap: var(--nu-space-3);
+  }
+}
+
 /* --- Date strip ----------------------------------------------------------- */
 .nu-dates {
   display: grid;
@@ -363,6 +379,7 @@
 }
 
 .nu-date__num {
+  font-variant-numeric: lining-nums tabular-nums;
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-lg);
 }

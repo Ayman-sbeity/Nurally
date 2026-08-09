@@ -13,6 +13,18 @@ export function Hero() {
     animate: { opacity: 1, y: 0 },
   };
 
+  /**
+   * Entrance timing. The stagger is deliberately short — the primary CTA is the
+   * most important element on the page and must not be invisible for a second
+   * and a half. Under `prefers-reduced-motion` the whole sequence collapses to
+   * near-instant, matching the CSS duration tokens.
+   */
+  const enter = (order: number) => ({
+    duration: reduceMotion ? 0.01 : 0.7,
+    delay: reduceMotion ? 0 : order * 0.08,
+    ease: [0.22, 1, 0.36, 1] as const,
+  });
+
   return (
     <section className="nu-hero">
       <motion.div className="nu-hero__media" style={{ y }}>
@@ -30,7 +42,7 @@ export function Hero() {
           <motion.p
             className="nu-hero__eyebrow"
             {...fadeUp}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(0)}
           >
             {HERO.eyebrow}
           </motion.p>
@@ -38,7 +50,7 @@ export function Hero() {
           <motion.h1
             className="nu-hero__title"
             {...fadeUp}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(1)}
           >
             {HERO.title}
           </motion.h1>
@@ -46,7 +58,7 @@ export function Hero() {
           <motion.p
             className="nu-hero__subtitle"
             {...fadeUp}
-            transition={{ duration: 0.9, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(2)}
           >
             {HERO.subtitle}
           </motion.p>
@@ -54,7 +66,7 @@ export function Hero() {
           <motion.p
             className="nu-hero__body"
             {...fadeUp}
-            transition={{ duration: 0.9, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(3)}
           >
             {HERO.body}
           </motion.p>
@@ -62,7 +74,7 @@ export function Hero() {
           <motion.p
             className="nu-hero__statement"
             {...fadeUp}
-            transition={{ duration: 0.9, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(4)}
           >
             {HERO.statement}
           </motion.p>
@@ -70,7 +82,7 @@ export function Hero() {
           <motion.div
             className="nu-hero__actions"
             {...fadeUp}
-            transition={{ duration: 0.9, delay: 0.52, ease: [0.22, 1, 0.36, 1] }}
+            transition={enter(5)}
           >
             <Link to="/booking" className="nu-btn nu-btn--on-dark">
               {HERO.primaryCta}
