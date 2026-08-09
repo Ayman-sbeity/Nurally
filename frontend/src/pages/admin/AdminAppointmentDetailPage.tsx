@@ -1,0 +1,385 @@
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminApi } from '@/api/admin.api';
+import { ApiRequestError } from '@/api/client';
+import { Button } from '@/components/ui/Button';
+import { Seo } from '@/components/ui/Seo';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { ErrorState, LoadingState } from '@/components/ui/States';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { SlotPickerDialog } from '@/components/admin/SlotPickerDialog';
+import { clientOf } from '@/components/client/AppointmentCard';
+import { useAppointment } from '@/hooks/queries';
+import { useToast } from '@/context/ToastContext';
+import {
+  STATUS_LABEL,
+  formatDateTime,
+  formatDuration,
+  formatShortDateTime,
+} from '@/utils/format';
+
+type DialogKind = 'reject' | 'cancel' | 'complete' | 'noShow' | 'offer' | 'reschedule' | null;
+
+export function AdminAppointmentDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
+  const { notify } = useToast();
+  const [dialog, setDialog] = useState<DialogKind>(null);
+
+  const { data, isPending, isError, error, refetch } = useAppointment(id, true);
+
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['admin'] });
+    void queryClient.invalidateQueries({ queryKey: ['availability'] });
+  };
+
+  const onError = (mutationError: unknown) =>
+    notify(
+      mutationError instanceof ApiRequestError
+        ? mutationError.message
+        : 'That action could not be completed.',
+      'error',
+    );
+
+  const onDone = (message: string) => () => {
+    setDialog(null);
+    notify(message, 'success');
+    refresh();
+  };
+
+  const approve = useMutation({
+    mutationFn: () => adminApi.approve(id as string),
+    onSuccess: onDone('Appointment confirmed.'),
+    onError,
+  });
+  const reject = useMutation({
+    mutationFn: (reason?: string) => adminApi.reject(id as string, reason),
+    onSuccess: onDone('Request declined.'),
+    onError,
+  });
+  const cancel = useMutation({
+    mutationFn: (reason?: string) => adminApi.cancel(id as string, reason),
+    onSuccess: onDone('Appointment cancelled.'),
+    onError,
+  });
+  const complete = useMutation({
+    mutationFn: () => adminApi.complete(id as string),
+    onSuccess: onDone('Marked as completed.'),
+    onError,
+  });
+  const noShow = useMutation({
+    mutationFn: () => adminApi.noShow(id as string),
+    onSuccess: onDone('Marked as a no-show.'),
+    onError,
+  });
+  const offerTime = useMutation({
+    mutationFn: (payload: { startAt: string; message?: string }) =>
+      adminApi.offerTime(id as string, payload),
+    onSuccess: onDone('New time offered to the client.'),
+    onError,
+  });
+  const reschedule = useMutation({
+    mutationFn: (payload: { startAt: string; message?: string }) =>
+      adminApi.reschedule(id as string, payload),
+    onSuccess: onDone('Appointment rescheduled.'),
+    onError,
+  });
+  const approveReschedule = useMutation({
+    mutationFn: () => adminApi.approveReschedule(id as string),
+    onSuccess: onDone('Reschedule approved.'),
+    onError,
+  });
+
+  if (isPending) return <LoadingState />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
+
+  const { appointment } = data;
+  const client = clientOf(appointment);
+  const serviceId =
+    typeof appointment.service === 'object' ? appointment.service._id : appointment.service;
+
+  const { status } = appointment;
+  const isPendingRequest = status === 'PENDING';
+  const isReschedule = status === 'RESCHEDULE_REQUESTED';
+
+  return (
+    <>
+      <Seo title={`${appointment.serviceNameSnapshot} — Nurella Admin`} noIndex />
+
+      <nav aria-label="Breadcrumb" style={{ marginBottom: 'var(--nu-space-4)' }}>
+        <Link to="/admin/appointments" className="nu-eyebrow">
+          ← All appointments
+        </Link>
+      </nav>
+
+      <div className="nu-admin-head">
+        <div>
+          <h1 className="nu-admin-head__title">{appointment.serviceNameSnapshot}</h1>
+          <p className="nu-admin-head__sub">{formatDateTime(appointment.startAt)}</p>
+        </div>
+        <StatusBadge status={status} />
+      </div>
+
+      <div className="nu-detail">
+        <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          {isReschedule && appointment.rescheduleRequest && (
+            <div className="nu-notice nu-notice--info">
+              <div>
+                <p style={{ fontWeight: 500 }}>The client asked to move this appointment.</p>
+                <p style={{ marginTop: 'var(--nu-space-2)' }}>
+                  Proposed: {formatDateTime(appointment.rescheduleRequest.proposedStartAt)}
+                </p>
+                {appointment.rescheduleRequest.message && (
+                  <p style={{ marginTop: 'var(--nu-space-2)' }}>
+                    “{appointment.rescheduleRequest.message}”
+                  </p>
+                )}
+                <div className="nu-row" style={{ marginTop: 'var(--nu-space-4)', gap: 'var(--nu-space-2)' }}>
+                  <Button
+                    size="sm"
+                    loading={approveReschedule.isPending}
+                    onClick={() => approveReschedule.mutate()}
+                  >
+                    Approve proposed time
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setDialog('offer')}>
+                    Offer a different time
+                  </Button>
+                </div>
+                {/* The client keeps their original slot until this is resolved. */}
+                <p className="nu-hint" style={{ marginTop: 'var(--nu-space-3)' }}>
+                  Their original time ({formatShortDateTime(appointment.startAt)}) is still held.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {status === 'TIME_OFFERED' && appointment.offer && (
+            <div className="nu-notice nu-notice--warn">
+              <div>
+                <p style={{ fontWeight: 500 }}>Awaiting the client's answer.</p>
+                <p style={{ marginTop: 'var(--nu-space-2)' }}>
+                  Offered {formatDateTime(appointment.offer.startAt)} · expires{' '}
+                  {formatShortDateTime(appointment.offer.expiresAt)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <section className="nu-panel">
+            <div className="nu-panel__head">
+              <h2 className="nu-panel__title">Appointment</h2>
+            </div>
+            <div className="nu-panel__body">
+              <dl className="nu-deflist">
+                <div className="nu-deflist__row">
+                  <dt className="nu-deflist__key">Treatment</dt>
+                  <dd>{appointment.serviceNameSnapshot}</dd>
+                </div>
+                <div className="nu-deflist__row">
+                  <dt className="nu-deflist__key">Requested date</dt>
+                  <dd>{formatDateTime(appointment.requestedStartAt)}</dd>
+                </div>
+                <div className="nu-deflist__row">
+                  <dt className="nu-deflist__key">Current time</dt>
+                  <dd>{formatDateTime(appointment.startAt)}</dd>
+                </div>
+                <div className="nu-deflist__row">
+                  <dt className="nu-deflist__key">Duration</dt>
+                  <dd>{formatDuration(appointment.durationMinutes)}</dd>
+                </div>
+                <div className="nu-deflist__row">
+                  <dt className="nu-deflist__key">Booking notes</dt>
+                  <dd>{appointment.clientNotes || '—'}</dd>
+                </div>
+                {appointment.cancellationReason && (
+                  <div className="nu-deflist__row">
+                    <dt className="nu-deflist__key">Reason</dt>
+                    <dd>{appointment.cancellationReason}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          </section>
+
+          <section className="nu-panel">
+            <div className="nu-panel__head">
+              <h2 className="nu-panel__title">History</h2>
+            </div>
+            <div className="nu-panel__body">
+              <ol className="nu-timeline">
+                {appointment.history.map((entry, index) => (
+                  <li key={`${entry.at}-${index}`} className="nu-timeline__item">
+                    <p style={{ fontWeight: 500 }}>{STATUS_LABEL[entry.status]}</p>
+                    <p className="nu-timeline__when">
+                      {formatShortDateTime(entry.at)} · {entry.byRole.toLowerCase()}
+                    </p>
+                    {entry.note && <p className="nu-hint">{entry.note}</p>}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+        </div>
+
+        <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          <section className="nu-panel">
+            <div className="nu-panel__head">
+              <h2 className="nu-panel__title">Client</h2>
+            </div>
+            <div className="nu-panel__body nu-stack">
+              <p style={{ fontWeight: 500 }}>{client?.fullName ?? '—'}</p>
+              {client?.phone && (
+                <a className="nu-link" href={`tel:${client.phone.replace(/\s/g, '')}`}>
+                  {client.phone}
+                </a>
+              )}
+              {client?.email && (
+                <a className="nu-link" href={`mailto:${client.email}`}>
+                  {client.email}
+                </a>
+              )}
+
+              <div className="nu-row nu-row--wrap" style={{ marginTop: 'var(--nu-space-3)' }}>
+                {client?.phone && (
+                  <a
+                    className="nu-btn nu-btn--outline nu-btn--sm"
+                    href={`tel:${client.phone.replace(/\s/g, '')}`}
+                  >
+                    Call client
+                  </a>
+                )}
+                {client && (
+                  <Link to={`/admin/clients/${client._id}`} className="nu-btn nu-btn--ghost nu-btn--sm">
+                    View profile
+                  </Link>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section className="nu-panel">
+            <div className="nu-panel__head">
+              <h2 className="nu-panel__title">Actions</h2>
+            </div>
+            <div className="nu-panel__body">
+              {/* The action set is driven by the status, mirroring the
+                  server-side state machine — nothing invalid is offered. */}
+              <div className="nu-actions">
+                {isPendingRequest && (
+                  <Button loading={approve.isPending} onClick={() => approve.mutate()}>
+                    Approve
+                  </Button>
+                )}
+                {(isPendingRequest || status === 'TIME_OFFERED' || isReschedule) && (
+                  <Button variant="danger" onClick={() => setDialog('reject')}>
+                    Reject
+                  </Button>
+                )}
+                {(isPendingRequest || status === 'CONFIRMED' || isReschedule) && (
+                  <Button variant="outline" onClick={() => setDialog('offer')}>
+                    Offer another time
+                  </Button>
+                )}
+                {status === 'CONFIRMED' && (
+                  <>
+                    <Button variant="outline" onClick={() => setDialog('reschedule')}>
+                      Reschedule
+                    </Button>
+                    <Button variant="outline" onClick={() => setDialog('complete')}>
+                      Mark completed
+                    </Button>
+                    <Button variant="outline" onClick={() => setDialog('noShow')}>
+                      Mark no-show
+                    </Button>
+                  </>
+                )}
+                {['PENDING', 'CONFIRMED', 'TIME_OFFERED', 'RESCHEDULE_REQUESTED'].includes(status) && (
+                  <Button variant="danger" onClick={() => setDialog('cancel')}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
+
+              {['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(status) && (
+                <p className="nu-hint">
+                  This appointment is closed. No further changes are possible.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={dialog === 'reject'}
+        onClose={() => setDialog(null)}
+        title="Reject this request?"
+        description="The client is told the request was not accepted and the time is released."
+        confirmLabel="Reject request"
+        confirmVariant="danger"
+        withReason
+        loading={reject.isPending}
+        onConfirm={(reason) => reject.mutate(reason)}
+      />
+
+      <ConfirmDialog
+        open={dialog === 'cancel'}
+        onClose={() => setDialog(null)}
+        title="Cancel this appointment?"
+        description="The client is notified and the time is released for other bookings."
+        confirmLabel="Cancel appointment"
+        confirmVariant="danger"
+        withReason
+        loading={cancel.isPending}
+        onConfirm={(reason) => cancel.mutate(reason)}
+      />
+
+      <ConfirmDialog
+        open={dialog === 'complete'}
+        onClose={() => setDialog(null)}
+        title="Mark as completed?"
+        description="This closes the appointment. It cannot be reopened."
+        confirmLabel="Mark completed"
+        loading={complete.isPending}
+        onConfirm={() => complete.mutate()}
+      />
+
+      <ConfirmDialog
+        open={dialog === 'noShow'}
+        onClose={() => setDialog(null)}
+        title="Mark as a no-show?"
+        description="This closes the appointment and keeps the time reserved in the record."
+        confirmLabel="Mark no-show"
+        confirmVariant="danger"
+        loading={noShow.isPending}
+        onConfirm={() => noShow.mutate()}
+      />
+
+      <SlotPickerDialog
+        open={dialog === 'offer'}
+        onClose={() => setDialog(null)}
+        title="Offer another time"
+        description="The client can accept or decline. The chosen slot is held until they respond."
+        confirmLabel="Send offer"
+        serviceId={serviceId}
+        loading={offerTime.isPending}
+        onConfirm={(startAt, message) => offerTime.mutate({ startAt, message })}
+      />
+
+      <SlotPickerDialog
+        open={dialog === 'reschedule'}
+        onClose={() => setDialog(null)}
+        title="Reschedule appointment"
+        description="Moves this confirmed appointment directly. The client is notified."
+        confirmLabel="Move appointment"
+        serviceId={serviceId}
+        loading={reschedule.isPending}
+        onConfirm={(startAt, message) => reschedule.mutate({ startAt, message })}
+      />
+    </>
+  );
+}
+
+export default AdminAppointmentDetailPage;

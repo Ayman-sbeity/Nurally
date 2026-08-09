@@ -1,0 +1,27 @@
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Uploads (runtime user content)
+backend/uploads/
+
+# PWA build output
+frontend/dev-dist/

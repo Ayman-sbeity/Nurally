@@ -1,0 +1,553 @@
+/* ==========================================================================
+   ADMIN DASHBOARD — dense, functional, fast to scan
+   ========================================================================== */
+
+.nu-admin {
+  min-height: 100dvh;
+  display: flex;
+  background: var(--nu-bg);
+}
+
+/* --- Sidebar -------------------------------------------------------------- */
+.nu-admin__sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--nu-z-nav);
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+  transform: translateX(-100%);
+  transition: transform var(--nu-duration) var(--nu-ease);
+}
+
+.nu-admin__sidebar.is-open {
+  transform: translateX(0);
+}
+
+.nu-admin__sidebar-head {
+  padding: var(--nu-space-5);
+  border-bottom: 1px solid rgba(250, 247, 242, 0.12);
+}
+
+.nu-admin__nav {
+  flex: 1;
+  padding: var(--nu-space-4) var(--nu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.nu-admin__navlink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding: 0.7rem var(--nu-space-4);
+  border-radius: var(--nu-radius);
+  font-size: var(--nu-text-sm);
+  color: rgba(250, 247, 242, 0.68);
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-admin__navlink:hover {
+  background: rgba(250, 247, 242, 0.08);
+  color: var(--nu-cream);
+}
+
+.nu-admin__navlink.is-active {
+  background: rgba(201, 166, 107, 0.18);
+  color: var(--nu-champagne-soft);
+}
+
+.nu-admin__count {
+  min-width: 1.4rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--nu-radius-pill);
+  background: var(--nu-champagne-deep);
+  color: var(--nu-white);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.nu-admin__sidebar-foot {
+  padding: var(--nu-space-5);
+  border-top: 1px solid rgba(250, 247, 242, 0.12);
+  font-size: var(--nu-text-sm);
+}
+
+.nu-admin__user {
+  font-weight: 500;
+}
+
+.nu-admin__sidebar-foot .nu-hint {
+  color: rgba(250, 247, 242, 0.5);
+}
+
+.nu-admin__sidebar-foot .nu-btn--ghost {
+  --btn-fg: rgba(250, 247, 242, 0.75);
+}
+
+.nu-admin__sidebar-foot .nu-btn--ghost:hover {
+  --btn-fg: var(--nu-ink);
+  --btn-bg: var(--nu-cream);
+}
+
+.nu-admin__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--nu-z-nav) - 1);
+  background: var(--nu-overlay);
+  border: 0;
+}
+
+/* --- Body ----------------------------------------------------------------- */
+.nu-admin__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nu-admin__topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-3);
+  height: 3.5rem;
+  padding-inline: var(--nu-space-4);
+  background: var(--nu-surface);
+  border-bottom: 1px solid var(--nu-line);
+  position: sticky;
+  top: 0;
+  z-index: var(--nu-z-header);
+}
+
+.nu-admin__topbar-title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-md);
+  letter-spacing: 0.06em;
+}
+
+.nu-burger--dark {
+  color: var(--nu-ink);
+}
+
+.nu-admin__main {
+  flex: 1;
+  padding: var(--nu-space-5) var(--nu-space-4) var(--nu-space-8);
+  max-width: 90rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .nu-admin__sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    transform: none;
+  }
+  .nu-admin__topbar {
+    display: none;
+  }
+  .nu-admin__main {
+    padding: var(--nu-space-6);
+  }
+  .nu-admin__scrim {
+    display: none;
+  }
+}
+
+/* --- Page header ---------------------------------------------------------- */
+.nu-admin-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--nu-space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-admin-head__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-2xl);
+  font-weight: 300;
+}
+
+.nu-admin-head__sub {
+  color: var(--nu-text-muted);
+  font-size: var(--nu-text-sm);
+}
+
+/* --- Stat grid ------------------------------------------------------------ */
+.nu-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--nu-space-3);
+  margin-bottom: var(--nu-space-6);
+}
+
+.nu-panels {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+@media (min-width: 1100px) {
+  .nu-panels--split {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.nu-panel {
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  overflow: hidden;
+}
+
+.nu-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-4) var(--nu-space-5);
+  border-bottom: 1px solid var(--nu-line);
+  flex-wrap: wrap;
+}
+
+.nu-panel__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-lg);
+}
+
+.nu-panel__body {
+  padding: var(--nu-space-5);
+}
+
+.nu-panel__body--flush {
+  padding: 0;
+}
+
+/* --- Filter bar ----------------------------------------------------------- */
+.nu-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-3);
+  align-items: flex-end;
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-filters .nu-field {
+  min-width: 12rem;
+  flex: 1 1 12rem;
+}
+
+/* --- Calendar ------------------------------------------------------------- */
+.nu-cal__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-cal__label {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-xl);
+  min-width: 12rem;
+}
+
+.nu-cal__month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  overflow: hidden;
+  background: var(--nu-surface);
+}
+
+.nu-cal__dow {
+  padding: var(--nu-space-3) var(--nu-space-2);
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  text-align: center;
+  border-bottom: 1px solid var(--nu-line);
+  background: var(--nu-surface-alt);
+}
+
+.nu-cal__cell {
+  min-height: 6.5rem;
+  padding: var(--nu-space-2);
+  border-right: 1px solid var(--nu-line);
+  border-bottom: 1px solid var(--nu-line);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  align-items: stretch;
+  background: var(--nu-surface);
+  transition: background-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-cal__cell:hover {
+  background: var(--nu-surface-alt);
+}
+
+.nu-cal__cell:nth-child(7n + 7) {
+  border-right: none;
+}
+
+.nu-cal__cell.is-outside {
+  background: var(--nu-surface-alt);
+  color: var(--nu-ink-faint);
+}
+
+.nu-cal__cell.is-today .nu-cal__daynum {
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+  border-radius: 50%;
+}
+
+.nu-cal__daynum {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.nu-cal__chip {
+  display: block;
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: var(--nu-radius-sm);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-left: 3px solid currentColor;
+  background: var(--nu-surface-alt);
+}
+
+.nu-cal__chip--PENDING {
+  background: var(--nu-status-pending-bg);
+  color: var(--nu-status-pending);
+}
+.nu-cal__chip--CONFIRMED {
+  background: var(--nu-status-confirmed-bg);
+  color: var(--nu-status-confirmed);
+}
+.nu-cal__chip--TIME_OFFERED {
+  background: var(--nu-status-offered-bg);
+  color: var(--nu-status-offered);
+}
+.nu-cal__chip--RESCHEDULE_REQUESTED {
+  background: var(--nu-status-reschedule-bg);
+  color: var(--nu-status-reschedule);
+}
+.nu-cal__chip--COMPLETED {
+  background: var(--nu-status-completed-bg);
+  color: var(--nu-status-completed);
+}
+.nu-cal__chip--CANCELLED {
+  background: var(--nu-status-cancelled-bg);
+  color: var(--nu-status-cancelled);
+}
+.nu-cal__chip--REJECTED {
+  background: var(--nu-status-rejected-bg);
+  color: var(--nu-status-rejected);
+}
+.nu-cal__chip--NO_SHOW {
+  background: var(--nu-status-noshow-bg);
+  color: var(--nu-status-noshow);
+}
+
+.nu-cal__more {
+  font-size: 0.625rem;
+  color: var(--nu-text-muted);
+  padding-left: 6px;
+}
+
+/* Week view: a column per day. */
+.nu-cal__week {
+  display: grid;
+  gap: var(--nu-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.nu-cal__daycol {
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+  padding: var(--nu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  min-height: 8rem;
+}
+
+.nu-cal__daycol-head {
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  padding-bottom: var(--nu-space-2);
+  border-bottom: 1px solid var(--nu-line);
+}
+
+/* Day/agenda view and the mobile fallback for month view. */
+.nu-agenda {
+  display: grid;
+  gap: var(--nu-space-2);
+}
+
+.nu-agenda__item {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: center;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-3) var(--nu-space-4);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+  text-align: left;
+  transition: border-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-agenda__item:hover {
+  border-color: var(--nu-champagne);
+}
+
+.nu-agenda__time {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-md);
+}
+
+.nu-agenda__who {
+  min-width: 0;
+}
+
+.nu-agenda__name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nu-agenda__service {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  /* A desktop month grid is unusable on a phone — the list takes over. */
+  .nu-cal__month {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .nu-cal__month-fallback {
+    display: none;
+  }
+}
+
+/* --- Detail layout -------------------------------------------------------- */
+.nu-detail {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+@media (min-width: 1000px) {
+  .nu-detail {
+    grid-template-columns: 1.6fr 1fr;
+    align-items: start;
+  }
+}
+
+.nu-deflist {
+  display: grid;
+  gap: var(--nu-space-3);
+}
+
+.nu-deflist__row {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: var(--nu-space-3);
+  font-size: var(--nu-text-sm);
+  align-items: baseline;
+}
+
+.nu-deflist__key {
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+@media (max-width: 560px) {
+  .nu-deflist__row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+.nu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-3);
+}
+
+/* --- Working hours editor ------------------------------------------------- */
+.nu-hours-row {
+  display: grid;
+  grid-template-columns: 8rem auto 1fr;
+  gap: var(--nu-space-4);
+  align-items: center;
+  padding-block: var(--nu-space-4);
+  border-bottom: 1px solid var(--nu-line);
+}
+
+.nu-hours-row:last-child {
+  border-bottom: none;
+}
+
+.nu-hours-row__day {
+  font-weight: 500;
+}
+
+.nu-hours-row__times {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  flex-wrap: wrap;
+}
+
+.nu-hours-row input[type='time'] {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--nu-line-strong);
+  border-radius: var(--nu-radius-sm);
+  background: var(--nu-surface);
+  font-size: var(--nu-text-sm);
+}
+
+@media (max-width: 720px) {
+  .nu-hours-row {
+    grid-template-columns: 1fr;
+    gap: var(--nu-space-3);
+  }
+}

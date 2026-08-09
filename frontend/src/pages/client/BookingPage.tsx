@@ -1,0 +1,259 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { bookingApi } from '@/api/booking.api';
+import { ApiRequestError } from '@/api/client';
+import { catalogueApi } from '@/api/catalogue.api';
+import { Button } from '@/components/ui/Button';
+import { TextAreaField } from '@/components/ui/Field';
+import { Seo } from '@/components/ui/Seo';
+import { BOOKING_STEPS, StepIndicator } from '@/components/booking/StepIndicator';
+import { ServiceStep } from '@/components/booking/ServiceStep';
+import { DateStep } from '@/components/booking/DateStep';
+import { TimeStep } from '@/components/booking/TimeStep';
+import { qk } from '@/hooks/queries';
+import type { Appointment, Service } from '@/types/api';
+import { formatDateTime, formatDuration } from '@/utils/format';
+
+type Step = 0 | 1 | 2 | 3;
+
+export function BookingPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [step, setStep] = useState<Step>(0);
+  const [service, setService] = useState<Service | null>(null);
+  const [date, setDate] = useState<string | null>(null);
+  const [slot, setSlot] = useState<string | null>(null);
+  const [notes, setNotes] = useState('');
+  const [conflict, setConflict] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<Appointment | null>(null);
+
+  // Deep link from the landing page: /app/book?serviceId=…
+  const presetServiceId = searchParams.get('serviceId');
+  useEffect(() => {
+    if (!presetServiceId || service) return;
+    let cancelled = false;
+    catalogueApi
+      .getService(presetServiceId)
+      .then(({ service: found }) => {
+        if (cancelled) return;
+        setService(found);
+        setStep(1);
+      })
+      .catch(() => {
+        // An unknown or inactive service simply starts the flow at step one.
+        if (!cancelled) setSearchParams({}, { replace: true });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [presetServiceId, service, setSearchParams]);
+
+  const createBooking = useMutation({
+    mutationFn: () =>
+      bookingApi.create({
+        serviceId: service!._id,
+        startAt: slot!,
+        ...(notes.trim() ? { clientNotes: notes.trim() } : {}),
+      }),
+    onSuccess: ({ appointment }) => {
+      setSubmitted(appointment);
+      void queryClient.invalidateQueries({ queryKey: ['my-appointments'] });
+      void queryClient.invalidateQueries({ queryKey: qk.notifications });
+    },
+    onError: (error) => {
+      if (
+        error instanceof ApiRequestError &&
+        (error.code === 'BOOKING_CONFLICT' || error.code === 'SLOT_UNAVAILABLE')
+      ) {
+        // Someone took the slot while this client was reviewing. Send them
+        // back to a freshly loaded slot list rather than failing silently.
+        setConflict(error.message);
+        setSlot(null);
+        setStep(2);
+        void queryClient.invalidateQueries({ queryKey: ['availability'] });
+      }
+    },
+  });
+
+  // --- Step 6: confirmation ------------------------------------------------
+  if (submitted) {
+    return (
+      <>
+        <Seo title="Request submitted — Nurella" noIndex />
+        <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          <div className="nu-page-head">
+            <h1 className="nu-page-head__title">Your appointment request has been submitted.</h1>
+          </div>
+
+          <div className="nu-notice nu-notice--warn" role="status">
+            <div>
+              <p style={{ fontWeight: 500 }}>Pending approval</p>
+              <p style={{ marginTop: 'var(--nu-space-2)' }}>
+                Your appointment is <strong>not confirmed</strong> until Nurella Beauty Lounge
+                approves it. We will let you know as soon as it is reviewed.
+              </p>
+            </div>
+          </div>
+
+          <div className="nu-summary">
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">Treatment</span>
+              <span className="nu-summary__value">{submitted.serviceNameSnapshot}</span>
+            </div>
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">Requested time</span>
+              <span className="nu-summary__value">{formatDateTime(submitted.startAt)}</span>
+            </div>
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">Duration</span>
+              <span className="nu-summary__value">{formatDuration(submitted.durationMinutes)}</span>
+            </div>
+          </div>
+
+          <div className="nu-row" style={{ gap: 'var(--nu-space-3)' }}>
+            <Link to={`/app/appointments/${submitted._id}`} className="nu-btn nu-btn--primary" style={{ flex: 1 }}>
+              View request
+            </Link>
+            <Link to="/app" className="nu-btn nu-btn--outline" style={{ flex: 1 }}>
+              Done
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const canContinue =
+    (step === 0 && service) || (step === 1 && date) || (step === 2 && slot) || step === 3;
+
+  return (
+    <>
+      <Seo title="Book an appointment — Nurella" noIndex />
+
+      <div className="nu-page-head">
+        <h1 className="nu-page-head__title">Book an appointment</h1>
+        <p className="nu-page-head__sub">
+          Requests are reviewed by the lounge before they are confirmed.
+        </p>
+      </div>
+
+      <StepIndicator current={step} />
+
+      {conflict && (
+        <div className="nu-notice nu-notice--danger" role="alert" style={{ marginBottom: 'var(--nu-space-5)' }}>
+          {conflict}
+        </div>
+      )}
+
+      {createBooking.isError && !conflict && (
+        <div className="nu-notice nu-notice--danger" role="alert" style={{ marginBottom: 'var(--nu-space-5)' }}>
+          {createBooking.error instanceof ApiRequestError
+            ? createBooking.error.message
+            : 'We could not submit your request. Please try again.'}
+        </div>
+      )}
+
+      {step === 0 && (
+        <ServiceStep
+          selectedId={service?._id ?? null}
+          onSelect={(selected) => {
+            setService(selected);
+            setDate(null);
+            setSlot(null);
+            setStep(1);
+          }}
+        />
+      )}
+
+      {step === 1 && service && (
+        <DateStep
+          serviceId={service._id}
+          selectedDate={date}
+          onSelect={(selected) => {
+            setDate(selected);
+            setSlot(null);
+            setConflict(null);
+            setStep(2);
+          }}
+        />
+      )}
+
+      {step === 2 && service && date && (
+        <TimeStep
+          serviceId={service._id}
+          date={date}
+          selectedSlot={slot}
+          onChangeDate={() => setStep(1)}
+          onSelect={(selected) => {
+            setSlot(selected);
+            setConflict(null);
+            setStep(3);
+          }}
+        />
+      )}
+
+      {step === 3 && service && slot && (
+        <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          <div className="nu-summary">
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">Treatment</span>
+              <span className="nu-summary__value">{service.name}</span>
+            </div>
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">When</span>
+              <span className="nu-summary__value">{formatDateTime(slot)}</span>
+            </div>
+            <div className="nu-summary__row">
+              <span className="nu-summary__label">Duration</span>
+              <span className="nu-summary__value">{formatDuration(service.durationMinutes)}</span>
+            </div>
+          </div>
+
+          <TextAreaField
+            label="Anything we should know? (optional)"
+            value={notes}
+            maxLength={1000}
+            onChange={(event) => setNotes(event.target.value)}
+            hint="Allergies, preferences, or a note for your consultation."
+          />
+
+          <div className="nu-notice">
+            Submitting sends a request. Nurella Beauty Lounge will approve it, propose another time,
+            or contact you.
+          </div>
+
+          <Button
+            block
+            loading={createBooking.isPending}
+            onClick={() => createBooking.mutate()}
+          >
+            Submit request
+          </Button>
+        </div>
+      )}
+
+      <div className="nu-row nu-row--between" style={{ marginTop: 'var(--nu-space-6)' }}>
+        <Button
+          variant="ghost"
+          onClick={() => (step === 0 ? navigate('/app') : setStep((step - 1) as Step))}
+        >
+          {step === 0 ? 'Cancel' : 'Back'}
+        </Button>
+        {step < 3 && (
+          <Button
+            variant="outline"
+            disabled={!canContinue}
+            onClick={() => setStep((step + 1) as Step)}
+          >
+            Continue to {BOOKING_STEPS[step + 1]}
+          </Button>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default BookingPage;

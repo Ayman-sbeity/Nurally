@@ -1,0 +1,141 @@
+/* ==========================================================================
+   NURELLA DESIGN SYSTEM — TOKENS
+   One brand, three experiences: an editorial landing page, a simple client
+   PWA, and a dense admin dashboard. They share this palette and type scale so
+   the product reads as one thing.
+   ========================================================================== */
+
+:root {
+  /* --- Brand ------------------------------------------------------------ */
+  --nu-ink: #1c1714;
+  --nu-ink-soft: #3a322c;
+  --nu-ink-muted: #6b5f56;
+  --nu-ink-faint: #9b8e83;
+
+  --nu-cream: #faf7f2;
+  --nu-sand: #f2ece3;
+  --nu-sand-deep: #e6dccf;
+  --nu-white: #ffffff;
+
+  --nu-champagne: #c9a66b;
+  --nu-champagne-deep: #a8813f;
+  --nu-champagne-soft: #e8d9bd;
+  --nu-blush: #e7d3cb;
+  --nu-blush-deep: #cdb0a5;
+
+  --nu-line: rgba(28, 23, 20, 0.1);
+  --nu-line-strong: rgba(28, 23, 20, 0.18);
+  --nu-overlay: rgba(28, 23, 20, 0.55);
+
+  /* --- Semantic surfaces ------------------------------------------------ */
+  --nu-bg: var(--nu-cream);
+  --nu-surface: var(--nu-white);
+  --nu-surface-alt: var(--nu-sand);
+  --nu-text: var(--nu-ink);
+  --nu-text-muted: var(--nu-ink-muted);
+  --nu-accent: var(--nu-champagne-deep);
+
+  /* --- Appointment status ----------------------------------------------- */
+  --nu-status-pending: #b57d1a;
+  --nu-status-pending-bg: #fdf3e0;
+  --nu-status-confirmed: #2f6b4f;
+  --nu-status-confirmed-bg: #e6f2ec;
+  --nu-status-offered: #6a5099;
+  --nu-status-offered-bg: #efe9f8;
+  --nu-status-reschedule: #1f6a86;
+  --nu-status-reschedule-bg: #e2f1f7;
+  --nu-status-completed: #4a5a63;
+  --nu-status-completed-bg: #eaeff1;
+  --nu-status-cancelled: #6b6259;
+  --nu-status-cancelled-bg: #efece8;
+  --nu-status-rejected: #a63a2f;
+  --nu-status-rejected-bg: #fbe9e6;
+  --nu-status-noshow: #8a5a1f;
+  --nu-status-noshow-bg: #f8ecdd;
+
+  --nu-danger: #a63a2f;
+  --nu-danger-bg: #fbe9e6;
+  --nu-success: #2f6b4f;
+
+  /* --- Type ------------------------------------------------------------- */
+  --nu-font-display: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+  --nu-font-sans: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --nu-text-xs: 0.75rem;
+  --nu-text-sm: 0.8125rem;
+  --nu-text-base: 0.9375rem;
+  --nu-text-md: 1.0625rem;
+  --nu-text-lg: 1.25rem;
+  --nu-text-xl: 1.5rem;
+  --nu-text-2xl: 2rem;
+  --nu-text-3xl: 2.75rem;
+  /* Fluid display sizes: large on desktop, still readable on a phone. */
+  --nu-text-display: clamp(2.75rem, 7vw, 5.5rem);
+  --nu-text-section: clamp(2rem, 4.5vw, 3.5rem);
+
+  --nu-tracking-wide: 0.18em;
+  --nu-tracking-wider: 0.3em;
+
+  /* --- Space (4px base) ------------------------------------------------- */
+  --nu-space-1: 0.25rem;
+  --nu-space-2: 0.5rem;
+  --nu-space-3: 0.75rem;
+  --nu-space-4: 1rem;
+  --nu-space-5: 1.5rem;
+  --nu-space-6: 2rem;
+  --nu-space-7: 3rem;
+  --nu-space-8: 4rem;
+  --nu-space-9: 6rem;
+  --nu-space-10: 8rem;
+
+  --nu-section-y: clamp(4rem, 9vw, 8rem);
+  --nu-gutter: clamp(1.25rem, 5vw, 4rem);
+  --nu-max-width: 1240px;
+  --nu-max-width-narrow: 760px;
+
+  /* --- Radius ----------------------------------------------------------- */
+  --nu-radius-sm: 4px;
+  --nu-radius: 8px;
+  --nu-radius-lg: 14px;
+  --nu-radius-xl: 22px;
+  --nu-radius-pill: 999px;
+
+  /* --- Elevation -------------------------------------------------------- */
+  --nu-shadow-sm: 0 1px 2px rgba(28, 23, 20, 0.06);
+  --nu-shadow: 0 4px 16px rgba(28, 23, 20, 0.07);
+  --nu-shadow-lg: 0 18px 48px rgba(28, 23, 20, 0.12);
+  --nu-shadow-xl: 0 32px 80px rgba(28, 23, 20, 0.18);
+
+  /* --- Motion ----------------------------------------------------------- */
+  --nu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --nu-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --nu-duration-fast: 160ms;
+  --nu-duration: 280ms;
+  --nu-duration-slow: 620ms;
+
+  /* --- Layering --------------------------------------------------------- */
+  --nu-z-header: 100;
+  --nu-z-nav: 200;
+  --nu-z-dialog: 300;
+  --nu-z-toast: 400;
+
+  /* --- Client PWA chrome ------------------------------------------------ */
+  --nu-tabbar-height: 4.25rem;
+  --nu-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nu-safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* The admin dashboard trades editorial airiness for density. */
+[data-surface='admin'] {
+  --nu-bg: #f6f4f1;
+  --nu-text-base: 0.875rem;
+  --nu-section-y: var(--nu-space-6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --nu-duration-fast: 1ms;
+    --nu-duration: 1ms;
+    --nu-duration-slow: 1ms;
+  }
+}

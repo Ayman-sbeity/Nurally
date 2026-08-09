@@ -1,0 +1,677 @@
+/* ==========================================================================
+   DESIGN SYSTEM COMPONENTS
+   Every reusable surface in the product is defined once, here.
+   ========================================================================== */
+
+/* --- Layout helpers ------------------------------------------------------ */
+.nu-container {
+  width: 100%;
+  max-width: var(--nu-max-width);
+  margin-inline: auto;
+  padding-inline: var(--nu-gutter);
+}
+
+.nu-container--narrow {
+  max-width: var(--nu-max-width-narrow);
+}
+
+.nu-section {
+  padding-block: var(--nu-section-y);
+}
+
+.nu-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-4);
+}
+
+.nu-row {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-3);
+}
+
+.nu-row--between {
+  justify-content: space-between;
+}
+
+.nu-row--wrap {
+  flex-wrap: wrap;
+}
+
+.nu-grid {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+/* --- Eyebrow / section heading ------------------------------------------ */
+.nu-eyebrow {
+  font-size: var(--nu-text-xs);
+  letter-spacing: var(--nu-tracking-wider);
+  text-transform: uppercase;
+  color: var(--nu-champagne-deep);
+  font-weight: 500;
+}
+
+.nu-heading {
+  font-size: var(--nu-text-section);
+  font-family: var(--nu-font-display);
+  font-weight: 300;
+}
+
+.nu-lede {
+  font-size: var(--nu-text-md);
+  color: var(--nu-text-muted);
+  max-width: 62ch;
+}
+
+.nu-rule {
+  height: 1px;
+  background: var(--nu-line);
+  border: 0;
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+.nu-btn {
+  --btn-bg: var(--nu-ink);
+  --btn-fg: var(--nu-cream);
+  --btn-border: var(--nu-ink);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nu-space-2);
+  padding: 0.875rem 1.75rem;
+  min-height: 3rem;
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--nu-tracking-wide);
+  text-transform: uppercase;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--nu-radius-pill);
+  transition:
+    transform var(--nu-duration) var(--nu-ease),
+    box-shadow var(--nu-duration) var(--nu-ease),
+    background-color var(--nu-duration) var(--nu-ease),
+    color var(--nu-duration) var(--nu-ease);
+  white-space: nowrap;
+}
+
+.nu-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--nu-shadow-lg);
+}
+
+.nu-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.nu-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.nu-btn--primary {
+  --btn-bg: var(--nu-ink);
+  --btn-fg: var(--nu-cream);
+  --btn-border: var(--nu-ink);
+}
+
+.nu-btn--gold {
+  --btn-bg: var(--nu-champagne-deep);
+  --btn-fg: var(--nu-white);
+  --btn-border: var(--nu-champagne-deep);
+}
+
+.nu-btn--outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--nu-ink);
+  --btn-border: var(--nu-line-strong);
+}
+
+.nu-btn--outline:hover:not(:disabled) {
+  --btn-bg: var(--nu-ink);
+  --btn-fg: var(--nu-cream);
+  --btn-border: var(--nu-ink);
+}
+
+.nu-btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--nu-text-muted);
+  --btn-border: transparent;
+  box-shadow: none;
+}
+
+.nu-btn--ghost:hover:not(:disabled) {
+  --btn-fg: var(--nu-ink);
+  --btn-bg: var(--nu-sand);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Destructive actions must never be mistaken for a safe one. */
+.nu-btn--danger {
+  --btn-bg: transparent;
+  --btn-fg: var(--nu-danger);
+  --btn-border: var(--nu-danger);
+}
+
+.nu-btn--danger:hover:not(:disabled) {
+  --btn-bg: var(--nu-danger);
+  --btn-fg: var(--nu-white);
+}
+
+.nu-btn--on-dark {
+  --btn-bg: var(--nu-cream);
+  --btn-fg: var(--nu-ink);
+  --btn-border: var(--nu-cream);
+}
+
+.nu-btn--on-dark-outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--nu-cream);
+  --btn-border: rgba(250, 247, 242, 0.4);
+}
+
+.nu-btn--on-dark-outline:hover:not(:disabled) {
+  --btn-bg: var(--nu-cream);
+  --btn-fg: var(--nu-ink);
+}
+
+.nu-btn--sm {
+  padding: 0.5rem 1rem;
+  min-height: 2.25rem;
+  font-size: 0.6875rem;
+}
+
+.nu-btn--block {
+  width: 100%;
+}
+
+/* --- Text link ----------------------------------------------------------- */
+.nu-link {
+  color: var(--nu-champagne-deep);
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--nu-duration) var(--nu-ease);
+}
+
+.nu-link:hover {
+  border-bottom-color: currentColor;
+}
+
+/* --- Cards --------------------------------------------------------------- */
+.nu-card {
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  padding: var(--nu-space-5);
+}
+
+.nu-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.nu-card--interactive {
+  transition:
+    transform var(--nu-duration) var(--nu-ease),
+    box-shadow var(--nu-duration) var(--nu-ease),
+    border-color var(--nu-duration) var(--nu-ease);
+}
+
+.nu-card--interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--nu-shadow-lg);
+  border-color: var(--nu-champagne-soft);
+}
+
+.nu-card__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-lg);
+  line-height: 1.25;
+}
+
+.nu-card__meta {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* --- Badges -------------------------------------------------------------- */
+.nu-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.7rem;
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--nu-radius-pill);
+  background: var(--nu-sand);
+  color: var(--nu-ink-soft);
+  white-space: nowrap;
+}
+
+.nu-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.nu-badge--plain::before {
+  display: none;
+}
+
+.nu-badge--PENDING {
+  background: var(--nu-status-pending-bg);
+  color: var(--nu-status-pending);
+}
+.nu-badge--CONFIRMED {
+  background: var(--nu-status-confirmed-bg);
+  color: var(--nu-status-confirmed);
+}
+.nu-badge--TIME_OFFERED {
+  background: var(--nu-status-offered-bg);
+  color: var(--nu-status-offered);
+}
+.nu-badge--RESCHEDULE_REQUESTED {
+  background: var(--nu-status-reschedule-bg);
+  color: var(--nu-status-reschedule);
+}
+.nu-badge--COMPLETED {
+  background: var(--nu-status-completed-bg);
+  color: var(--nu-status-completed);
+}
+.nu-badge--CANCELLED {
+  background: var(--nu-status-cancelled-bg);
+  color: var(--nu-status-cancelled);
+}
+.nu-badge--REJECTED {
+  background: var(--nu-status-rejected-bg);
+  color: var(--nu-status-rejected);
+}
+.nu-badge--NO_SHOW {
+  background: var(--nu-status-noshow-bg);
+  color: var(--nu-status-noshow);
+}
+
+/* --- Forms --------------------------------------------------------------- */
+.nu-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+}
+
+.nu-label {
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+.nu-input,
+.nu-textarea,
+.nu-select {
+  width: 100%;
+  padding: 0.8125rem 1rem;
+  font-size: var(--nu-text-base);
+  color: var(--nu-ink);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line-strong);
+  border-radius: var(--nu-radius);
+  transition:
+    border-color var(--nu-duration-fast) var(--nu-ease),
+    box-shadow var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-input:focus,
+.nu-textarea:focus,
+.nu-select:focus {
+  outline: none;
+  border-color: var(--nu-champagne-deep);
+  box-shadow: 0 0 0 3px rgba(201, 166, 107, 0.18);
+}
+
+.nu-input[aria-invalid='true'],
+.nu-textarea[aria-invalid='true'] {
+  border-color: var(--nu-danger);
+}
+
+.nu-textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.nu-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236b5f56' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  padding-right: 2.5rem;
+}
+
+.nu-error {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-danger);
+}
+
+.nu-hint {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}
+
+.nu-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nu-space-3);
+  cursor: pointer;
+  font-size: var(--nu-text-sm);
+}
+
+.nu-checkbox input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  accent-color: var(--nu-champagne-deep);
+  flex-shrink: 0;
+}
+
+/* --- Alerts / notices ---------------------------------------------------- */
+.nu-notice {
+  display: flex;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-4);
+  border-radius: var(--nu-radius);
+  border: 1px solid var(--nu-line);
+  background: var(--nu-sand);
+  font-size: var(--nu-text-sm);
+}
+
+.nu-notice--info {
+  background: var(--nu-status-reschedule-bg);
+  border-color: transparent;
+  color: var(--nu-status-reschedule);
+}
+
+.nu-notice--warn {
+  background: var(--nu-status-pending-bg);
+  border-color: transparent;
+  color: var(--nu-status-pending);
+}
+
+.nu-notice--danger {
+  background: var(--nu-danger-bg);
+  border-color: transparent;
+  color: var(--nu-danger);
+}
+
+.nu-notice--success {
+  background: var(--nu-status-confirmed-bg);
+  border-color: transparent;
+  color: var(--nu-status-confirmed);
+}
+
+/* --- States -------------------------------------------------------------- */
+.nu-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-8) var(--nu-space-4);
+  text-align: center;
+  color: var(--nu-text-muted);
+}
+
+.nu-state__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-xl);
+  color: var(--nu-ink);
+}
+
+.nu-spinner {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--nu-line-strong);
+  border-top-color: var(--nu-champagne-deep);
+  border-radius: 50%;
+  animation: nu-spin 720ms linear infinite;
+}
+
+.nu-spinner--sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+@keyframes nu-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.nu-skeleton {
+  background: linear-gradient(90deg, var(--nu-sand) 25%, var(--nu-sand-deep) 50%, var(--nu-sand) 75%);
+  background-size: 200% 100%;
+  animation: nu-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--nu-radius);
+}
+
+@keyframes nu-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* --- Dialog -------------------------------------------------------------- */
+.nu-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--nu-z-dialog);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: var(--nu-overlay);
+  backdrop-filter: blur(3px);
+}
+
+.nu-dialog {
+  width: 100%;
+  max-width: 34rem;
+  max-height: 92dvh;
+  overflow-y: auto;
+  background: var(--nu-surface);
+  border-radius: var(--nu-radius-xl) var(--nu-radius-xl) 0 0;
+  padding: var(--nu-space-6);
+  padding-bottom: calc(var(--nu-space-6) + var(--nu-safe-bottom));
+  box-shadow: var(--nu-shadow-xl);
+}
+
+@media (min-width: 640px) {
+  .nu-dialog-backdrop {
+    align-items: center;
+    padding: var(--nu-space-5);
+  }
+  .nu-dialog {
+    border-radius: var(--nu-radius-xl);
+    padding-bottom: var(--nu-space-6);
+  }
+}
+
+.nu-dialog__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-xl);
+  margin-bottom: var(--nu-space-2);
+}
+
+.nu-dialog__actions {
+  display: flex;
+  gap: var(--nu-space-3);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: var(--nu-space-6);
+}
+
+/* --- Toast --------------------------------------------------------------- */
+.nu-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nu-space-5) + var(--nu-safe-bottom));
+  transform: translateX(-50%);
+  z-index: var(--nu-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  width: min(26rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.nu-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-4);
+  border-radius: var(--nu-radius);
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+  box-shadow: var(--nu-shadow-lg);
+  font-size: var(--nu-text-sm);
+  pointer-events: auto;
+  animation: nu-toast-in var(--nu-duration) var(--nu-ease);
+}
+
+.nu-toast--error {
+  background: var(--nu-danger);
+}
+
+.nu-toast--success {
+  background: var(--nu-status-confirmed);
+}
+
+@keyframes nu-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* --- Tables -------------------------------------------------------------- */
+.nu-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  background: var(--nu-surface);
+}
+
+.nu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--nu-text-sm);
+  min-width: 40rem;
+}
+
+.nu-table th {
+  text-align: left;
+  font-size: var(--nu-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  padding: var(--nu-space-3) var(--nu-space-4);
+  border-bottom: 1px solid var(--nu-line);
+  white-space: nowrap;
+}
+
+.nu-table td {
+  padding: var(--nu-space-4);
+  border-bottom: 1px solid var(--nu-line);
+  vertical-align: middle;
+}
+
+.nu-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.nu-table tbody tr {
+  transition: background-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-table tbody tr:hover {
+  background: var(--nu-sand);
+}
+
+/* --- Tabs / segmented control -------------------------------------------- */
+.nu-segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius-pill);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.nu-segmented button {
+  padding: 0.5rem 1rem;
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  border-radius: var(--nu-radius-pill);
+  white-space: nowrap;
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-segmented button[aria-selected='true'] {
+  background: var(--nu-surface);
+  color: var(--nu-ink);
+  box-shadow: var(--nu-shadow-sm);
+}
+
+/* --- Stat tile ----------------------------------------------------------- */
+.nu-stat {
+  padding: var(--nu-space-5);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+}
+
+.nu-stat__value {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-2xl);
+  line-height: 1;
+}
+
+.nu-stat__label {
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  margin-top: var(--nu-space-2);
+}
+
+/* --- Pagination ---------------------------------------------------------- */
+.nu-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding-top: var(--nu-space-4);
+  font-size: var(--nu-text-sm);
+  color: var(--nu-text-muted);
+}

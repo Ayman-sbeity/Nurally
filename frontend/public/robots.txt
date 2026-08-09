@@ -1,0 +1,14 @@
+# Nurella Beauty Lounge
+User-agent: *
+Allow: /
+
+# Authenticated areas hold no public content and must not be indexed.
+Disallow: /app
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# Replace with the production domain before launch.
+Sitemap: http://localhost:5173/sitemap.xml

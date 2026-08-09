@@ -1,0 +1,135 @@
+/**
+ * NURELLA BRAND CONTENT — SOURCE OF TRUTH
+ *
+ * Every headline, paragraph and label below is reproduced exactly as supplied
+ * by the lounge. Do not reword, shorten or embellish. Anything Nurella has not
+ * provided (address, phone number, prices, staff, reviews, statistics) is
+ * deliberately absent rather than invented — see `MISSING_INFORMATION`.
+ */
+
+export const BRAND = {
+  name: 'NURELLA BEAUTY LOUNGE',
+  tagline: 'Advanced Aesthetics • Skin • Beauty',
+  instagramHandle: import.meta.env.VITE_INSTAGRAM_HANDLE ?? 'nurella_beauty_lounge',
+} as const;
+
+export const instagramUrl = `https://instagram.com/${BRAND.instagramHandle}`;
+
+export const HERO = {
+  eyebrow: BRAND.name,
+  title: 'Beauty, Refined.',
+  subtitle:
+    'Where advanced aesthetics meet elegance, precision, and personalized care.',
+  body: 'At Nurella Beauty Lounge, every treatment is thoughtfully selected to enhance your natural features while preserving your individuality.',
+  statement: 'Natural Results. Refined Beauty. Personalized Care.',
+  primaryCta: 'BOOK YOUR APPOINTMENT',
+  secondaryCta: 'Explore treatments',
+} as const;
+
+export const ABOUT = {
+  eyebrow: 'ABOUT NURELLA',
+  title: 'The Art of Natural Enhancement',
+  paragraphs: [
+    'Welcome to Nurella Beauty Lounge, a destination dedicated to advanced aesthetics, skin rejuvenation, and beauty.',
+    'Our philosophy is simple:',
+  ],
+  pullQuote: 'Enhance, never change.',
+  paragraphsAfter: [
+    'Every face is unique. That is why each treatment begins with a personalized consultation and a carefully designed plan based on your features, skin needs, and desired results.',
+    'From facial rejuvenation and contouring to advanced skin and collagen treatments, our approach combines experience, precision, and attention to detail to create elegant, natural-looking results.',
+  ],
+} as const;
+
+export const PHILOSOPHY = {
+  eyebrow: 'OUR PHILOSOPHY',
+  title: 'You, Only Enhanced.',
+  paragraphs: [
+    'Beauty should never look artificial.',
+    'At Nurella, our goal is to enhance what is already beautiful — respecting your facial proportions, individuality, and personal style.',
+  ],
+  closing: 'Subtle. Elegant. Timeless.',
+} as const;
+
+export const BOOKING_CTA = {
+  eyebrow: 'BOOK YOUR APPOINTMENT',
+  title: 'Your Beauty Journey Starts Here.',
+  body: 'Book your personalized consultation at Nurella Beauty Lounge and discover a treatment plan created specifically for you.',
+  cta: 'BOOK NOW',
+} as const;
+
+/** Section intro for the Collagen & Biostimulation category. */
+export const COLLAGEN_INTRO = {
+  title: 'Restore. Regenerate. Rejuvenate.',
+  body: 'Advanced treatments designed to support collagen production and gradually improve skin firmness, texture, and overall quality.',
+} as const;
+
+export const CONCERNS = {
+  title: 'Not sure which treatment is right for you?',
+  intro: 'Explore our treatments according to your concern:',
+  outcome:
+    'A personalized consultation will help determine the most appropriate treatment plan for you.',
+  items: [
+    'Fine Lines & Wrinkles',
+    'Facial Volume & Definition',
+    'Sagging & Loss of Firmness',
+    'Dark Circles & Tired Eyes',
+    'Dull & Dehydrated Skin',
+    'Acne & Acne Scars',
+    'Pigmentation & Uneven Tone',
+    'Large Pores & Skin Texture',
+    'Facial Contouring',
+    'Skin Rejuvenation',
+  ],
+} as const;
+
+/**
+ * Maps a concern to the service categories most relevant to it, so the
+ * interactive section can link into the real catalogue. This is navigation
+ * only — it makes no clinical claim and always ends at a consultation.
+ */
+export const CONCERN_CATEGORIES: Record<string, string[]> = {
+  'Fine Lines & Wrinkles': ['facial-aesthetics', 'advanced-skin-treatments'],
+  'Facial Volume & Definition': ['facial-aesthetics', 'collagen-biostimulation'],
+  'Sagging & Loss of Firmness': ['lifting-contouring', 'collagen-biostimulation'],
+  'Dark Circles & Tired Eyes': ['facial-aesthetics', 'skin-boosters-rejuvenation'],
+  'Dull & Dehydrated Skin': ['skin-boosters-rejuvenation', 'skin-care'],
+  'Acne & Acne Scars': ['advanced-skin-treatments', 'skin-care'],
+  'Pigmentation & Uneven Tone': ['advanced-skin-treatments', 'laser'],
+  'Large Pores & Skin Texture': ['advanced-skin-treatments', 'skin-care'],
+  'Facial Contouring': ['lifting-contouring', 'facial-aesthetics'],
+  'Skin Rejuvenation': ['skin-boosters-rejuvenation', 'collagen-biostimulation'],
+};
+
+/** Section intros keyed by category slug, using the lounge's own wording. */
+export const CATEGORY_INTROS: Partial<Record<string, string>> = {
+  'collagen-biostimulation': COLLAGEN_INTRO.body,
+};
+
+export const CATEGORY_ORDER = [
+  'laser',
+  'skin-care',
+  'permanent-makeup',
+  'nails',
+  'facial-aesthetics',
+  'collagen-biostimulation',
+  'skin-boosters-rejuvenation',
+  'advanced-skin-treatments',
+  'lifting-contouring',
+  'beauty-nails',
+] as const;
+
+/**
+ * CONFIGURATION PLACEHOLDERS.
+ *
+ * Nurella did not supply these details. They are listed explicitly instead of
+ * being filled with plausible-looking fiction. Add them here (and to the
+ * footer / structured data) once the real values are known.
+ */
+export const MISSING_INFORMATION = [
+  'Street address',
+  'Phone number',
+  'Contact email',
+  'Opening hours shown publicly (the booking engine uses the admin-configured schedule)',
+  'Service pricing',
+  'Team members',
+] as const;
