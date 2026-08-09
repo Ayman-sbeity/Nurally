@@ -2,9 +2,11 @@ import { Router } from 'express';
 import * as adminController from '../controllers/admin.controller';
 import * as appointmentController from '../controllers/appointment.controller';
 import * as availabilityController from '../controllers/availability.controller';
+import * as clientAssetController from '../controllers/clientAsset.controller';
 import * as galleryController from '../controllers/gallery.controller';
 import * as serviceController from '../controllers/service.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { singleUpload } from '../middleware/upload';
 import { validate } from '../middleware/validate';
 import { UserRole } from '../types/domain';
 import {
@@ -29,6 +31,15 @@ import {
   updateGalleryImageSchema,
   updateServiceSchema,
 } from '../validators/catalogue.validators';
+import {
+  assetIdParamSchema,
+  createClientSchema,
+  createPhotoSetSchema,
+  setIdParamSchema,
+  updatePhotoSetSchema,
+  uploadDocumentSchema,
+  uploadPhotoSchema,
+} from '../validators/clientAsset.validators';
 
 const router = Router();
 
@@ -93,11 +104,68 @@ router.post(
 
 // --- Clients ---------------------------------------------------------------
 router.get('/clients', validate({ query: listClientsQuerySchema }), adminController.listClients);
+router.post('/clients', validate({ body: createClientSchema }), clientAssetController.createClient);
 router.get('/clients/:id', validate({ params: idParamSchema }), adminController.getClient);
 router.patch(
   '/clients/:id',
   validate({ params: idParamSchema, body: updateClientSchema }),
   adminController.updateClient,
+);
+
+// --- Client media ----------------------------------------------------------
+// Before/after records group the photographs for one treatment, so consent and
+// context are recorded once for the pair rather than per image.
+router.get(
+  '/clients/:id/photo-sets',
+  validate({ params: idParamSchema }),
+  clientAssetController.listPhotoSets,
+);
+router.post(
+  '/clients/:id/photo-sets',
+  validate({ params: idParamSchema, body: createPhotoSetSchema }),
+  clientAssetController.createPhotoSet,
+);
+router.patch(
+  '/photo-sets/:setId',
+  validate({ params: setIdParamSchema, body: updatePhotoSetSchema }),
+  clientAssetController.updatePhotoSet,
+);
+router.delete(
+  '/photo-sets/:setId',
+  validate({ params: setIdParamSchema }),
+  clientAssetController.removePhotoSet,
+);
+
+// `singleUpload` runs before `validate` so multipart text fields are parsed and
+// available on req.body by the time the schema sees them.
+router.post(
+  '/clients/:id/photo-sets/:setId/photos',
+  singleUpload('file'),
+  validate({ body: uploadPhotoSchema }),
+  clientAssetController.uploadPhoto,
+);
+
+router.get(
+  '/clients/:id/documents',
+  validate({ params: idParamSchema }),
+  clientAssetController.listDocuments,
+);
+router.post(
+  '/clients/:id/documents',
+  singleUpload('file'),
+  validate({ body: uploadDocumentSchema }),
+  clientAssetController.uploadDocument,
+);
+
+router.get(
+  '/assets/:assetId/file',
+  validate({ params: assetIdParamSchema }),
+  clientAssetController.streamAsset,
+);
+router.delete(
+  '/assets/:assetId',
+  validate({ params: assetIdParamSchema }),
+  clientAssetController.removeAsset,
 );
 
 // --- Services --------------------------------------------------------------

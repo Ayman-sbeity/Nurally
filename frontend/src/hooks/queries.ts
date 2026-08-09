@@ -26,6 +26,8 @@ export const qk = {
   adminClient: (id: string) => ['admin', 'client', id] as const,
   workingHours: ['admin', 'working-hours'] as const,
   blockedPeriods: (params: Record<string, unknown>) => ['admin', 'blocked', params] as const,
+  clientPhotoSets: (clientId: string) => ['admin', 'client', clientId, 'photo-sets'] as const,
+  clientDocuments: (clientId: string) => ['admin', 'client', clientId, 'documents'] as const,
 };
 
 export function useServices(params?: { category?: string; includeInactive?: boolean }) {
@@ -145,6 +147,22 @@ export function useAdminClient(id: string | undefined) {
     queryKey: qk.adminClient(id ?? ''),
     queryFn: () => adminApi.getClient(id as string),
     enabled: Boolean(id),
+  });
+}
+
+export function useClientPhotoSets(clientId: string | undefined) {
+  return useQuery({
+    queryKey: qk.clientPhotoSets(clientId ?? ''),
+    queryFn: () => adminApi.listPhotoSets(clientId as string),
+    enabled: Boolean(clientId),
+  });
+}
+
+export function useClientDocuments(clientId: string | undefined) {
+  return useQuery({
+    queryKey: qk.clientDocuments(clientId ?? ''),
+    queryFn: () => adminApi.listDocuments(clientId as string),
+    enabled: Boolean(clientId),
   });
 }
 

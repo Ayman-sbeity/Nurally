@@ -559,3 +559,208 @@
     gap: var(--nu-space-3);
   }
 }
+
+/* --- Client media: before/after records and files ------------------------ */
+
+.nu-photoset-list {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+.nu-photoset {
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  padding: var(--nu-space-4);
+  background: var(--nu-surface-alt);
+}
+
+.nu-photoset__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+}
+
+.nu-photoset__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-lg);
+  margin: 0;
+}
+
+.nu-photoset__meta {
+  margin: 0;
+  color: var(--nu-text-muted);
+  font-size: var(--nu-text-sm);
+}
+
+.nu-photoset__notes {
+  margin: var(--nu-space-3) 0 0;
+  color: var(--nu-ink-soft);
+  font-size: var(--nu-text-sm);
+}
+
+/* Before and after sit side by side so the pair reads as one comparison. */
+.nu-photoset__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--nu-space-4);
+  margin-top: var(--nu-space-4);
+}
+
+@media (max-width: 720px) {
+  .nu-photoset__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nu-phase {
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+  padding: var(--nu-space-3);
+}
+
+.nu-phase__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-2);
+  margin-bottom: var(--nu-space-3);
+}
+
+.nu-phase__empty {
+  display: grid;
+  place-items: center;
+  min-height: 140px;
+  border: 1px dashed var(--nu-line-strong);
+  border-radius: var(--nu-radius);
+  color: var(--nu-ink-faint);
+  font-size: var(--nu-text-sm);
+}
+
+.nu-phase__photos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--nu-space-3);
+}
+
+.nu-phase__photo {
+  position: relative;
+}
+
+.nu-phase__photo .nu-authimg {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--nu-radius);
+  background: var(--nu-sand);
+  display: block;
+}
+
+.nu-authimg--loading {
+  animation: nu-authimg-pulse 1.4s ease-in-out infinite;
+}
+
+.nu-authimg--failed {
+  display: grid;
+  place-items: center;
+  font-size: var(--nu-text-xs);
+  color: var(--nu-ink-faint);
+  border: 1px dashed var(--nu-line-strong);
+}
+
+@keyframes nu-authimg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.nu-phase__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nu-overlay);
+  color: var(--nu-white);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nu-phase__remove:hover {
+  background: var(--nu-danger);
+}
+
+.nu-phase__caption {
+  margin: var(--nu-space-2) 0 0;
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}
+
+/* Consent is deliberately prominent — it governs whether these photographs
+   may ever leave the client's file. */
+.nu-photoset__consent {
+  margin-top: var(--nu-space-4);
+  padding-top: var(--nu-space-3);
+  border-top: 1px solid var(--nu-line);
+}
+
+.nu-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  font-size: var(--nu-text-sm);
+  cursor: pointer;
+}
+
+.nu-checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--nu-champagne-deep);
+}
+
+.nu-filelist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--nu-space-2);
+}
+
+.nu-filelist__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-3);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+}
+
+.nu-filelist__main {
+  min-width: 0;
+}
+
+.nu-filelist__name {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--nu-accent);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+
+.nu-filelist__meta {
+  margin: 2px 0 0;
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}

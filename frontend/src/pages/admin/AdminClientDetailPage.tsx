@@ -8,6 +8,8 @@ import { TextAreaField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { ClientDocuments } from '@/components/admin/ClientDocuments';
+import { ClientPhotoSets } from '@/components/admin/ClientPhotoSets';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useAdminClient } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
@@ -192,6 +194,10 @@ export function AdminClientDetailPage() {
           </section>
         </div>
       </div>
+
+      {/* Full width: before/after comparison needs the room. */}
+      <ClientPhotoSets clientId={client._id} clientName={client.fullName} />
+      <ClientDocuments clientId={client._id} />
 
       <ConfirmDialog
         open={deactivateOpen}

@@ -24,6 +24,7 @@ authentication works, and the booking engine is the server-side authority on wha
 - [How double-booking is prevented](#how-double-booking-is-prevented)
 - [Availability engine](#availability-engine)
 - [API reference](#api-reference)
+- [Client records, photos and files](#client-records-photos-and-files)
 - [Frontend routes](#frontend-routes)
 - [PWA installation](#pwa-installation)
 - [Design system](#design-system)
@@ -163,6 +164,9 @@ seed warns you when the default is still in use.
 | `MIN_BOOKING_NOTICE_MINUTES`| Minimum notice for a client booking                                  |
 | `TIME_OFFER_EXPIRY_HOURS`   | How long an offered time stays valid                                 |
 | `SEED_ADMIN_*`              | Bootstrap admin credentials used by the seed                         |
+| `STORAGE_DRIVER`            | Where client media is stored (`local`)                               |
+| `UPLOAD_DIR`                | Directory the `local` driver writes to (default `uploads`)            |
+| `MAX_UPLOAD_MB`             | Per-file upload ceiling (default 15)                                  |
 
 The server validates all of these on boot with Zod and **refuses to start** if anything is
 missing or malformed, rather than failing later in a confusing way.
@@ -182,7 +186,7 @@ Only `VITE_*` variables reach the browser bundle — never put a secret here.
 ## Database and seed data
 
 Collections: `users`, `services`, `appointments`, `workinghours`, `blockedperiods`, `slotlocks`,
-`notifications`, `galleryimages`.
+`notifications`, `galleryimages`, `clientphotosets`, `clientassets`.
 
 Notable modelling decisions:
 
@@ -332,6 +336,67 @@ contract and drive the UI's error states.
 `approve`, `reject`, `offer-time`, `reschedule`, `approve-reschedule`, `complete`, `no-show`,
 `cancel`; plus service, availability (`working-hours`, `blocked`) and gallery management.
 
+Client records and media:
+
+| Method   | Route                                            | Purpose                                  |
+| -------- | ------------------------------------------------ | ---------------------------------------- |
+| `POST`   | `/admin/clients`                                 | Create a client from the front desk       |
+| `GET`    | `/admin/clients/:id/photo-sets`                  | Before/after records, photos grouped      |
+| `POST`   | `/admin/clients/:id/photo-sets`                  | Start a before/after record               |
+| `PATCH`  | `/admin/photo-sets/:setId`                       | Edit a record / record consent            |
+| `DELETE` | `/admin/photo-sets/:setId`                       | Delete a record and its photographs       |
+| `POST`   | `/admin/clients/:id/photo-sets/:setId/photos`    | Upload a `BEFORE` or `AFTER` photo        |
+| `GET`    | `/admin/clients/:id/documents`                   | List a client's files                     |
+| `POST`   | `/admin/clients/:id/documents`                   | Upload a file                             |
+| `GET`    | `/admin/assets/:assetId/file`                    | Stream the bytes (admin token required)   |
+| `DELETE` | `/admin/assets/:assetId`                         | Delete a file and its stored object       |
+
+---
+
+## Client records, photos and files
+
+The admin can create clients directly and keep a photographic and documentary record against
+each one.
+
+### Adding a client
+
+`POST /admin/clients` creates a **record, not an account**. No password is chosen: the row is
+written with a hash of random bytes nobody holds, so the account cannot be signed into at all.
+A client who later wants app access claims it through the normal forgot-password flow, which
+means staff never handle client credentials.
+
+### Before/after records
+
+A `ClientPhotoSet` groups the photographs for one treatment, and photos hang off it with a
+`phase` of `BEFORE` or `AFTER`.
+
+The pair is modelled as a document rather than as two loose images because the context belongs
+to the pair: the treatment, the date, and above all the **consent**. `consentToPublish` defaults
+to `false` and is stamped with `consentRecordedAt` only when it is actually granted —
+photographing a client for their file is not permission to show them publicly. Consent recorded
+per photo could let a "before" and its "after" disagree.
+
+### Files
+
+Any client can carry documents — consent forms, patch-test records, scans. Photos and documents
+share one `ClientAsset` collection because their lifecycle is identical; only `kind` differs.
+
+### How the bytes are handled
+
+| Concern            | Approach                                                                     |
+| ------------------ | ---------------------------------------------------------------------------- |
+| Where files live   | A `StorageAdapter` interface; `local` writes to `UPLOAD_DIR`. Swap the driver for S3/Cloudinary without touching a controller, model or route. |
+| Stored names       | `<yyyy>/<mm>/<uuid><ext>` — never derived from the uploaded filename, which is kept as metadata only. |
+| Type checking      | **Magic bytes**, not the extension or the browser's `Content-Type`. Both are attacker-controlled; a `.jpg` that is really HTML is the classic stored-XSS vector. JPEG, PNG, WebP and PDF are accepted; photo routes reject non-images. |
+| Reading files back | There is **no static file route**. Bytes stream from `/admin/assets/:id/file` behind the admin guard, marked `private, no-store` and `nosniff`. Guessing a path reaches nothing. |
+| In the browser     | Because the access token lives in memory rather than a cookie, an `<img src>` would arrive unauthenticated. `AuthImage` fetches the blob through the API client and renders an object URL, revoking it on unmount. |
+| Write ordering     | Bytes first, then the row; a failed insert removes the stored object, so a failed upload never leaves an orphan. Deleting a record removes its photographs and their bytes together. |
+| Size               | Capped by `MAX_UPLOAD_MB` (default 15).                                       |
+
+> **Deployment note:** the `local` driver writes to the API container's own disk. On hosts with
+> ephemeral filesystems (Render, Railway, Fly without a volume) uploads are lost on redeploy —
+> attach a persistent volume, or implement the adapter against object storage.
+
 ---
 
 ## Frontend routes
@@ -420,6 +485,10 @@ and every animation collapses under `prefers-reduced-motion`.
   with validated primitives. A payload such as `{ "email": { "$ne": null } }` fails validation
   before it can reach a query — which is also why Mongoose's blunt global `sanitizeFilter` is
   deliberately off (it would break the calendar's legitimate `$gt`/`$lt` range queries).
+- Uploaded client media is never served statically: bytes stream through an admin-guarded route
+  with `Cache-Control: private, no-store` and `X-Content-Type-Options: nosniff`. File types are
+  identified by magic bytes rather than the extension or the browser-supplied `Content-Type`, and
+  stored filenames are UUIDs so an uploaded name can never influence the path written to.
 - Helmet, an explicit CORS allow-list, and tiered rate limits (general / auth / booking).
 - Sensitive keys are redacted centrally before anything is logged; stack traces never appear in
   production responses.

@@ -33,6 +33,15 @@ const envSchema = z.object({
   SEED_ADMIN_EMAIL: z.string().email().default('admin@nurella.local'),
   SEED_ADMIN_PASSWORD: z.string().min(8).default('ChangeMe123!'),
   SEED_ADMIN_NAME: z.string().default('Nurella Admin'),
+
+  /**
+   * Client photos and documents. Stored outside the served tree and streamed
+   * through an authenticated route — never exposed as static files, because
+   * treatment photography is sensitive personal data.
+   */
+  STORAGE_DRIVER: z.enum(['local']).default('local'),
+  UPLOAD_DIR: z.string().default('uploads'),
+  MAX_UPLOAD_MB: positiveInt.default(15),
 });
 
 const parsed = envSchema.safeParse(process.env);

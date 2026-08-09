@@ -148,3 +148,17 @@ export const NotificationChannel = {
 } as const;
 export type NotificationChannel =
   (typeof NotificationChannel)[keyof typeof NotificationChannel];
+
+/** What an uploaded client asset is, which decides how the UI presents it. */
+export const AssetKind = {
+  PHOTO: 'PHOTO',
+  DOCUMENT: 'DOCUMENT',
+} as const;
+export type AssetKind = (typeof AssetKind)[keyof typeof AssetKind];
+
+/** Which side of a before/after record a photo sits on. */
+export const PhotoPhase = {
+  BEFORE: 'BEFORE',
+  AFTER: 'AFTER',
+} as const;
+export type PhotoPhase = (typeof PhotoPhase)[keyof typeof PhotoPhase];

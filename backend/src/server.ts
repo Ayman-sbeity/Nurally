@@ -3,6 +3,7 @@ import { createApp } from './app';
 import { connectDatabase, disconnectDatabase } from './config/db';
 import { env } from './config/env';
 import { expireStaleOffers } from './services/appointment.service';
+import { initStorage } from './services/storage';
 import { logger } from './utils/logger';
 import { loungeTimezone } from './utils/time';
 
@@ -11,6 +12,8 @@ const OFFER_SWEEP_INTERVAL_MS = 15 * 60 * 1000;
 
 async function bootstrap(): Promise<void> {
   await connectDatabase();
+  // Fails fast if UPLOAD_DIR is unwritable, rather than on a client's first upload.
+  await initStorage();
 
   const app = createApp();
   const server: Server = app.listen(env.PORT, () => {

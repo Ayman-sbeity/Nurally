@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
+import { CreateClientDialog } from '@/components/admin/CreateClientDialog';
 import { useAdminClients } from '@/hooks/queries';
 import { formatDate } from '@/utils/format';
 
@@ -12,6 +13,7 @@ export function AdminClientsPage() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAdminClients({
     ...(search ? { search } : {}),
@@ -24,9 +26,14 @@ export function AdminClientsPage() {
       <Seo title="Clients — Nurella Admin" noIndex />
 
       <div className="nu-admin-head">
-        <h1 className="nu-admin-head__title">Clients</h1>
-        {data && <p className="nu-admin-head__sub">{data.total} registered</p>}
+        <div>
+          <h1 className="nu-admin-head__title">Clients</h1>
+          {data && <p className="nu-admin-head__sub">{data.total} registered</p>}
+        </div>
+        <Button onClick={() => setCreateOpen(true)}>Add client</Button>
       </div>
+
+      <CreateClientDialog open={createOpen} onClose={() => setCreateOpen(false)} />
 
       <form
         className="nu-filters"

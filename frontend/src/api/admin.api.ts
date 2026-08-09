@@ -5,10 +5,13 @@ import type {
   Appointment,
   AppointmentStatus,
   BlockedPeriod,
+  ClientAsset,
   ClientListItem,
+  ClientPhotoSet,
   DashboardData,
   GalleryImage,
   Paginated,
+  PhotoPhase,
   Service,
   User,
   WorkingHours,
@@ -187,4 +190,100 @@ export const adminApi = {
     request<{ message: string }>(
       api.delete<ApiEnvelope<{ message: string }>>(`/admin/gallery/${id}`),
     ),
+
+  // --- Client media --------------------------------------------------------
+  createClient: (payload: {
+    fullName: string;
+    email: string;
+    phone: string;
+    notes?: string;
+    marketingOptIn?: boolean;
+  }) => request<{ client: User }>(api.post<ApiEnvelope<{ client: User }>>('/admin/clients', payload)),
+
+  listPhotoSets: (clientId: string) =>
+    request<{ photoSets: ClientPhotoSet[] }>(
+      api.get<ApiEnvelope<{ photoSets: ClientPhotoSet[] }>>(`/admin/clients/${clientId}/photo-sets`),
+    ),
+
+  createPhotoSet: (
+    clientId: string,
+    payload: { title: string; takenAt: string; serviceId?: string; notes?: string; consentToPublish?: boolean },
+  ) =>
+    request<{ photoSet: ClientPhotoSet }>(
+      api.post<ApiEnvelope<{ photoSet: ClientPhotoSet }>>(
+        `/admin/clients/${clientId}/photo-sets`,
+        payload,
+      ),
+    ),
+
+  updatePhotoSet: (
+    setId: string,
+    payload: { title?: string; takenAt?: string; notes?: string; consentToPublish?: boolean },
+  ) =>
+    request<{ photoSet: ClientPhotoSet }>(
+      api.patch<ApiEnvelope<{ photoSet: ClientPhotoSet }>>(`/admin/photo-sets/${setId}`, payload),
+    ),
+
+  deletePhotoSet: (setId: string) =>
+    request<{ deletedPhotos: number }>(
+      api.delete<ApiEnvelope<{ deletedPhotos: number }>>(`/admin/photo-sets/${setId}`),
+    ),
+
+  /**
+   * Multipart uploads deliberately omit an explicit Content-Type so the browser
+   * sets it along with the multipart boundary — hard-coding it breaks parsing.
+   */
+  uploadPhoto: (
+    clientId: string,
+    setId: string,
+    file: File,
+    payload: { phase: PhotoPhase; caption?: string },
+  ) => {
+    const body = new FormData();
+    body.append('file', file);
+    body.append('phase', payload.phase);
+    if (payload.caption) body.append('caption', payload.caption);
+    return request<{ asset: ClientAsset }>(
+      api.post<ApiEnvelope<{ asset: ClientAsset }>>(
+        `/admin/clients/${clientId}/photo-sets/${setId}/photos`,
+        body,
+        { headers: { 'Content-Type': undefined } },
+      ),
+    );
+  },
+
+  listDocuments: (clientId: string) =>
+    request<{ documents: ClientAsset[] }>(
+      api.get<ApiEnvelope<{ documents: ClientAsset[] }>>(`/admin/clients/${clientId}/documents`),
+    ),
+
+  uploadDocument: (clientId: string, file: File, caption?: string) => {
+    const body = new FormData();
+    body.append('file', file);
+    if (caption) body.append('caption', caption);
+    return request<{ asset: ClientAsset }>(
+      api.post<ApiEnvelope<{ asset: ClientAsset }>>(`/admin/clients/${clientId}/documents`, body, {
+        headers: { 'Content-Type': undefined },
+      }),
+    );
+  },
+
+  deleteAsset: (assetId: string) =>
+    request<{ deleted: boolean }>(
+      api.delete<ApiEnvelope<{ deleted: boolean }>>(`/admin/assets/${assetId}`),
+    ),
+
+  /**
+   * Fetches an asset's bytes as a blob.
+   *
+   * Uploaded files are not served statically and the access token lives in
+   * memory, so an `<img src>` pointing at the API would arrive unauthenticated.
+   * Everything that displays a client photo goes through here instead.
+   */
+  fetchAssetBlob: async (assetId: string): Promise<Blob> => {
+    const response = await api.get<Blob>(`/admin/assets/${assetId}/file`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };

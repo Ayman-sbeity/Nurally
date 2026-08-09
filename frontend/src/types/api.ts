@@ -251,3 +251,44 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
 }
+
+// --- Client media ----------------------------------------------------------
+
+export type AssetKind = 'PHOTO' | 'DOCUMENT';
+export type PhotoPhase = 'BEFORE' | 'AFTER';
+
+export interface ClientAsset {
+  _id: string;
+  client: string;
+  kind: AssetKind;
+  photoSet?: string;
+  phase?: PhotoPhase;
+  /** Display name only — the stored path is never exposed by the API. */
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  caption?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * A before/after record for one treatment. Consent lives here rather than on
+ * the individual photos, so a pair can never half-agree about whether it may
+ * be published.
+ */
+export interface ClientPhotoSet {
+  _id: string;
+  client: string;
+  title: string;
+  service?: Service | string;
+  appointment?: string;
+  takenAt: string;
+  notes?: string;
+  consentToPublish: boolean;
+  consentRecordedAt?: string;
+  before: ClientAsset[];
+  after: ClientAsset[];
+  createdAt: string;
+  updatedAt: string;
+}
