@@ -247,168 +247,682 @@
 }
 
 /* --- Calendar ------------------------------------------------------------- */
+.nu-cal {
+  display: grid;
+  gap: var(--nu-space-4);
+}
+
 .nu-cal__toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--nu-space-3);
+  gap: var(--nu-space-4);
   flex-wrap: wrap;
-  margin-bottom: var(--nu-space-5);
+  padding: var(--nu-space-3) var(--nu-space-4);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  box-shadow: var(--nu-shadow-sm);
+}
+
+.nu-cal__nav {
+  display: flex;
+  gap: var(--nu-space-2);
 }
 
 .nu-cal__label {
-  font-variant-numeric: lining-nums tabular-nums;
+  flex: 1 1 12rem;
+  text-align: center;
   font-family: var(--nu-font-display);
   font-size: var(--nu-text-xl);
-  min-width: 12rem;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
-.nu-cal__month {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+.nu-cal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-2) var(--nu-space-4);
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}
+
+.nu-cal__legenditem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.nu-cal__swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--nu-ink-faint);
+}
+
+.nu-cal__legenditem--PENDING .nu-cal__swatch {
+  background: var(--nu-status-pending);
+}
+.nu-cal__legenditem--CONFIRMED .nu-cal__swatch {
+  background: var(--nu-status-confirmed);
+}
+.nu-cal__legenditem--TIME_OFFERED .nu-cal__swatch {
+  background: var(--nu-status-offered);
+}
+.nu-cal__legenditem--RESCHEDULE_REQUESTED .nu-cal__swatch {
+  background: var(--nu-status-reschedule);
+}
+.nu-cal__legenditem--COMPLETED .nu-cal__swatch {
+  background: var(--nu-status-completed);
+}
+.nu-cal__legenditem--CANCELLED .nu-cal__swatch {
+  background: var(--nu-status-cancelled);
+}
+.nu-cal__legenditem--REJECTED .nu-cal__swatch {
+  background: var(--nu-status-rejected);
+}
+.nu-cal__legenditem--NO_SHOW .nu-cal__swatch {
+  background: var(--nu-status-noshow);
+}
+
+.nu-cal__hint {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}
+
+/* A dense grid needs more width than a phone has; it scrolls sideways there and
+   lays out in full from the width at which every column stays readable. */
+.nu-cal__scroller {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+@media (min-width: 1200px) {
+  .nu-cal__scroller {
+    overflow: visible;
+  }
+}
+
+@media (hover: none) {
+  /* There is no drag on touch — the panel's actions are the way to move. */
+  .nu-cal__hint,
+  .nu-peek__tip {
+    display: none;
+  }
+}
+
+/* --- Time grid (day + week) ----------------------------------------------- */
+/* No `overflow` on this element: it would become the sticky header's scroll
+   container and the day names would stop following the page. The rounded
+   corners are clipped by the head and body instead. */
+.nu-tg {
+  --tg-gutter: 3.5rem;
+  min-width: calc(var(--tg-gutter) + var(--tg-cols) * 5.5rem);
+  background: var(--nu-surface);
   border: 1px solid var(--nu-line);
   border-radius: var(--nu-radius-lg);
-  overflow: hidden;
-  background: var(--nu-surface);
+  box-shadow: var(--nu-shadow-sm);
 }
 
-.nu-cal__dow {
+.nu-tg__head {
+  display: grid;
+  grid-template-columns: var(--tg-gutter) repeat(var(--tg-cols), minmax(0, 1fr));
+  position: sticky;
+  top: 0;
+  /* Above every block in the grid, so nothing scrolls over the day names. */
+  z-index: 20;
+  background: var(--nu-surface);
+  border-bottom: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg) var(--nu-radius-lg) 0 0;
+  overflow: hidden;
+}
+
+.nu-tg__corner {
+  border-right: 1px solid var(--nu-line);
+}
+
+.nu-tg__dayhead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--nu-space-3) var(--nu-space-2);
+  border-left: 1px solid var(--nu-line);
+  transition: background-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-tg__dayhead:hover {
+  background: var(--nu-surface-alt);
+}
+
+.nu-tg__dow {
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+.nu-tg__daynum {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-lg);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+}
+
+.nu-tg__dayhead.is-today .nu-tg__daynum {
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+  border-radius: 50%;
+}
+
+.nu-tg__daycount {
+  padding: 0 0.4rem;
+  border-radius: var(--nu-radius-pill);
+  background: var(--nu-surface-alt);
+  color: var(--nu-champagne-deep);
+  font-size: 0.625rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.nu-tg__body {
+  display: grid;
+  grid-template-columns: var(--tg-gutter) minmax(0, 1fr);
+  border-radius: 0 0 var(--nu-radius-lg) var(--nu-radius-lg);
+  overflow: hidden;
+}
+
+.nu-tg__gutter {
+  position: relative;
+  height: var(--tg-height);
+  border-right: 1px solid var(--nu-line);
+}
+
+/* Labels sit just under the rule that opens their hour, so the first one is not
+   half-clipped against the top of the grid. */
+.nu-tg__hour {
+  position: absolute;
+  right: var(--nu-space-2);
+  padding-top: 2px;
+  font-size: var(--nu-text-xs);
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--nu-text-muted);
+}
+
+.nu-tg__cols {
+  position: relative;
+  height: var(--tg-height);
+  display: grid;
+  grid-template-columns: repeat(var(--tg-cols), minmax(0, 1fr));
+}
+
+.nu-tg__col {
+  position: relative;
+  border-left: 1px solid var(--nu-line);
+  /* Hour rules, with a lighter half-hour rule between them. */
+  background-image:
+    repeating-linear-gradient(to bottom, var(--nu-line) 0 1px, transparent 1px var(--tg-hour)),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(28, 23, 20, 0.04) 0 1px,
+      transparent 1px calc(var(--tg-hour) / 2)
+    );
+}
+
+.nu-tg__col:first-child {
+  border-left: 0;
+}
+
+.nu-tg__col.is-today {
+  background-color: rgba(201, 166, 107, 0.07);
+}
+
+.nu-tg__closed,
+.nu-tg__break,
+.nu-tg__block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.nu-tg__closed {
+  top: 0;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(28, 23, 20, 0.035) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.nu-tg__break {
+  background: repeating-linear-gradient(45deg, rgba(28, 23, 20, 0.06) 0 5px, transparent 5px 10px);
+}
+
+.nu-tg__block {
+  display: flex;
+  align-items: flex-start;
+  padding: 2px 6px;
+  border: 1px dashed rgba(166, 58, 47, 0.35);
+  border-radius: var(--nu-radius-sm);
+  background: rgba(166, 58, 47, 0.07);
+  color: var(--nu-danger);
+  font-size: 0.625rem;
+  overflow: hidden;
+}
+
+.nu-tg__now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px solid var(--nu-champagne-deep);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.nu-tg__now::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nu-champagne-deep);
+}
+
+/* --- Appointment blocks ---------------------------------------------------- */
+.nu-tg__event {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px 6px 3px 7px;
+  border-radius: var(--nu-radius-sm);
+  border-left: 3px solid currentColor;
+  background: var(--nu-surface-alt);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  text-align: left;
+  overflow: hidden;
+  box-shadow: var(--nu-shadow-sm);
+  transition:
+    box-shadow var(--nu-duration-fast) var(--nu-ease),
+    opacity var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-tg__event.is-movable {
+  cursor: grab;
+  /* Taps still work; the vertical gesture stays with the page scroller. */
+  touch-action: manipulation;
+}
+
+.nu-tg__event:hover {
+  z-index: 5;
+  box-shadow: var(--nu-shadow);
+}
+
+.nu-tg__event:focus-visible {
+  z-index: 6;
+  outline: 2px solid var(--nu-ink);
+  outline-offset: 1px;
+}
+
+.nu-tg__event.is-dragging {
+  opacity: 0.3;
+}
+
+.nu-tg__event.is-busy {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.nu-tg__event.is-compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  padding-block: 0;
+}
+
+.nu-tg__event.is-compact .nu-tg__event-service,
+.nu-tg__event.is-compact .nu-tg__event-end {
+  display: none;
+}
+
+.nu-tg__event-time {
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.nu-tg__event-name {
+  color: var(--nu-ink);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nu-tg__event-service {
+  color: var(--nu-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nu-tg__event--CANCELLED .nu-tg__event-name,
+.nu-tg__event--REJECTED .nu-tg__event-name {
+  text-decoration: line-through;
+}
+
+.nu-tg__ghost {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3px 6px;
+  border: 2px dashed var(--nu-champagne-deep);
+  border-radius: var(--nu-radius-sm);
+  background: rgba(201, 166, 107, 0.18);
+  color: var(--nu-champagne-deep);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow: hidden;
+}
+
+.nu-tg__ghost.is-invalid {
+  border-color: var(--nu-danger);
+  background: var(--nu-danger-bg);
+  color: var(--nu-danger);
+}
+
+.nu-tg__ghost-issue {
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: 1.3;
+}
+
+body.is-dragging-appointment {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* --- Status colours, shared by blocks and chips ---------------------------- */
+.nu-tg__event--PENDING,
+.nu-chip--PENDING {
+  background: var(--nu-status-pending-bg);
+  color: var(--nu-status-pending);
+}
+.nu-tg__event--CONFIRMED,
+.nu-chip--CONFIRMED {
+  background: var(--nu-status-confirmed-bg);
+  color: var(--nu-status-confirmed);
+}
+.nu-tg__event--TIME_OFFERED,
+.nu-chip--TIME_OFFERED {
+  background: var(--nu-status-offered-bg);
+  color: var(--nu-status-offered);
+}
+.nu-tg__event--RESCHEDULE_REQUESTED,
+.nu-chip--RESCHEDULE_REQUESTED {
+  background: var(--nu-status-reschedule-bg);
+  color: var(--nu-status-reschedule);
+}
+.nu-tg__event--COMPLETED,
+.nu-chip--COMPLETED {
+  background: var(--nu-status-completed-bg);
+  color: var(--nu-status-completed);
+}
+.nu-tg__event--CANCELLED,
+.nu-chip--CANCELLED {
+  background: var(--nu-status-cancelled-bg);
+  color: var(--nu-status-cancelled);
+}
+.nu-tg__event--REJECTED,
+.nu-chip--REJECTED {
+  background: var(--nu-status-rejected-bg);
+  color: var(--nu-status-rejected);
+}
+.nu-tg__event--NO_SHOW,
+.nu-chip--NO_SHOW {
+  background: var(--nu-status-noshow-bg);
+  color: var(--nu-status-noshow);
+}
+
+/* --- Month grid ------------------------------------------------------------ */
+.nu-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-width: 42rem;
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  box-shadow: var(--nu-shadow-sm);
+  overflow: hidden;
+}
+
+.nu-month__dow {
   padding: var(--nu-space-3) var(--nu-space-2);
   font-size: var(--nu-text-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--nu-text-muted);
   text-align: center;
-  border-bottom: 1px solid var(--nu-line);
   background: var(--nu-surface-alt);
+  border-bottom: 1px solid var(--nu-line);
 }
 
-.nu-cal__cell {
-  min-height: 6.5rem;
+.nu-month__cell {
+  position: relative;
+  min-height: 7.5rem;
   padding: var(--nu-space-2);
-  border-right: 1px solid var(--nu-line);
-  border-bottom: 1px solid var(--nu-line);
   display: flex;
   flex-direction: column;
   gap: 3px;
-  text-align: left;
-  align-items: stretch;
-  background: var(--nu-surface);
+  border-right: 1px solid var(--nu-line);
+  border-bottom: 1px solid var(--nu-line);
   transition: background-color var(--nu-duration-fast) var(--nu-ease);
 }
 
-.nu-cal__cell:hover {
-  background: var(--nu-surface-alt);
-}
-
-.nu-cal__cell:nth-child(7n + 7) {
+/* The seven weekday headings share the grid, so the modulus still lands on the
+   last cell of each week. */
+.nu-month__cell:nth-child(7n + 7) {
   border-right: none;
 }
 
-.nu-cal__cell.is-outside {
+.nu-month__cell.is-outside {
   background: var(--nu-surface-alt);
   color: var(--nu-ink-faint);
 }
 
-.nu-cal__cell.is-today .nu-cal__daynum {
-  background: var(--nu-ink);
-  color: var(--nu-cream);
-  border-radius: 50%;
+.nu-month__cell.is-closed {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(28, 23, 20, 0.03) 0 6px,
+    transparent 6px 12px
+  );
 }
 
-.nu-cal__daynum {
-  font-variant-numeric: lining-nums tabular-nums;
+.nu-month__cell.is-target {
+  background-color: rgba(201, 166, 107, 0.16);
+  box-shadow: inset 0 0 0 2px var(--nu-champagne-deep);
+}
+
+.nu-month__cell.is-invalid-target {
+  background-color: var(--nu-danger-bg);
+  box-shadow: inset 0 0 0 2px var(--nu-danger);
+}
+
+.nu-month__cellhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-2);
+}
+
+.nu-month__daynum {
   display: grid;
   place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
   font-size: var(--nu-text-xs);
   font-weight: 500;
-  flex-shrink: 0;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
-.nu-cal__chip {
-  display: block;
-  width: 100%;
-  padding: 2px 6px;
-  border-radius: var(--nu-radius-sm);
-  font-size: 0.6875rem;
-  line-height: 1.4;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  border-left: 3px solid currentColor;
-  background: var(--nu-surface-alt);
+.nu-month__daynum:hover {
+  background: var(--nu-sand-deep);
 }
 
-.nu-cal__chip--PENDING {
-  background: var(--nu-status-pending-bg);
-  color: var(--nu-status-pending);
-}
-.nu-cal__chip--CONFIRMED {
-  background: var(--nu-status-confirmed-bg);
-  color: var(--nu-status-confirmed);
-}
-.nu-cal__chip--TIME_OFFERED {
-  background: var(--nu-status-offered-bg);
-  color: var(--nu-status-offered);
-}
-.nu-cal__chip--RESCHEDULE_REQUESTED {
-  background: var(--nu-status-reschedule-bg);
-  color: var(--nu-status-reschedule);
-}
-.nu-cal__chip--COMPLETED {
-  background: var(--nu-status-completed-bg);
-  color: var(--nu-status-completed);
-}
-.nu-cal__chip--CANCELLED {
-  background: var(--nu-status-cancelled-bg);
-  color: var(--nu-status-cancelled);
-}
-.nu-cal__chip--REJECTED {
-  background: var(--nu-status-rejected-bg);
-  color: var(--nu-status-rejected);
-}
-.nu-cal__chip--NO_SHOW {
-  background: var(--nu-status-noshow-bg);
-  color: var(--nu-status-noshow);
+.nu-month__cell.is-today .nu-month__daynum {
+  background: var(--nu-ink);
+  color: var(--nu-cream);
 }
 
-.nu-cal__more {
+.nu-month__closed,
+.nu-month__more {
   font-size: 0.625rem;
+  letter-spacing: 0.06em;
   color: var(--nu-text-muted);
+}
+
+.nu-month__closed {
+  text-transform: uppercase;
+}
+
+.nu-month__more {
+  text-align: left;
   padding-left: 6px;
 }
 
-/* Week view: a column per day. */
-.nu-cal__week {
-  display: grid;
-  gap: var(--nu-space-3);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+.nu-month__more:hover {
+  color: var(--nu-ink);
 }
 
-.nu-cal__daycol {
-  background: var(--nu-surface);
+.nu-month__issue {
+  font-size: 0.625rem;
+  color: var(--nu-danger);
+}
+
+.nu-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: var(--nu-radius-sm);
+  border-left: 3px solid currentColor;
+  background: var(--nu-surface-alt);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  text-align: left;
+  overflow: hidden;
+}
+
+.nu-chip.is-movable {
+  cursor: grab;
+  touch-action: manipulation;
+}
+
+.nu-chip:hover {
+  box-shadow: var(--nu-shadow-sm);
+}
+
+.nu-chip:focus-visible {
+  outline: 2px solid var(--nu-ink);
+  outline-offset: 1px;
+}
+
+.nu-chip.is-dragging {
+  opacity: 0.35;
+}
+
+.nu-chip.is-busy {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.nu-chip__time {
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.nu-chip__label {
+  color: var(--nu-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Appointment panel + move confirmation --------------------------------- */
+.nu-peek__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+}
+
+.nu-peek__duration {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-text-muted);
+}
+
+.nu-movecard {
+  display: grid;
+  gap: 3px;
+  padding: var(--nu-space-4);
   border: 1px solid var(--nu-line);
   border-radius: var(--nu-radius);
-  padding: var(--nu-space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--nu-space-2);
-  min-height: 8rem;
+  background: var(--nu-surface-alt);
 }
 
-.nu-cal__daycol-head {
+.nu-movecard__who {
+  font-weight: 500;
+}
+
+.nu-movecard__what {
   font-size: var(--nu-text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--nu-text-muted);
-  padding-bottom: var(--nu-space-2);
-  border-bottom: 1px solid var(--nu-line);
 }
 
-/* Day/agenda view and the mobile fallback for month view. */
+.nu-movecard__times {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--nu-space-3);
+  margin-top: var(--nu-space-3);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.nu-movecard__from {
+  color: var(--nu-text-muted);
+  text-decoration: line-through;
+}
+
+.nu-movecard__arrow {
+  color: var(--nu-champagne-deep);
+}
+
+.nu-movecard__to {
+  font-weight: 600;
+}
+
+.nu-movecard__until {
+  font-weight: 400;
+  color: var(--nu-text-muted);
+}
+
+/* Day/agenda list, shared with the dashboard and availability pages. */
 .nu-agenda {
   display: grid;
   gap: var(--nu-space-2);
@@ -459,19 +973,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-@media (max-width: 767px) {
-  /* A desktop month grid is unusable on a phone — the list takes over. */
-  .nu-cal__month {
-    display: none;
-  }
-}
-
-@media (min-width: 768px) {
-  .nu-cal__month-fallback {
-    display: none;
-  }
 }
 
 /* --- Detail layout -------------------------------------------------------- */
