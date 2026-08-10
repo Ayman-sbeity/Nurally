@@ -19,17 +19,17 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'public');
  * script bakes colour into files, so it cannot read the stylesheet at runtime.
  */
 const BRAND = {
-  ink: '#241d18',
-  inkSoft: '#453a31',
-  espresso: '#2f251f',
-  sand: '#efe7da',
-  sandDeep: '#e2d6c5',
-  cream: '#f7f3ec',
-  taupe: '#b5a392',
-  taupeDeep: '#7e6b5c',
-  champagne: '#c9a86c',
-  champagneDeep: '#9f7a38',
-  champagneSoft: '#e9dabc',
+  ink: '#402e1f',
+  inkSoft: '#55402e',
+  espresso: '#4a3626',
+  sand: '#f2e9d9',
+  sandDeep: '#e6d8bf',
+  cream: '#faf7f1',
+  taupe: '#bda88f',
+  taupeDeep: '#836c55',
+  champagne: '#d4af6a',
+  champagneDeep: '#a17c2e',
+  champagneSoft: '#ecd9ae',
   blush: '#e4cac1',
   blushDeep: '#c2998c',
   wine: '#7c3a44',
@@ -40,11 +40,12 @@ const PALETTES = {
   lounge: [BRAND.espresso, BRAND.taupeDeep, BRAND.champagne],
   facial: [BRAND.blush, BRAND.blushDeep, '#8a6a5e'],
   skin: [BRAND.sand, BRAND.sandDeep, BRAND.champagneDeep],
-  laser: [BRAND.ink, '#4d3038', BRAND.champagne],
+  laser: [BRAND.ink, '#5c3a3a', BRAND.champagne],
   nails: [BRAND.sandDeep, BRAND.blushDeep, BRAND.taupeDeep],
   room: [BRAND.inkSoft, BRAND.taupe, BRAND.champagneSoft],
-  hero: ['#1e1814', BRAND.inkSoft, BRAND.champagneDeep],
-  philosophy: [BRAND.ink, '#5b4738', BRAND.champagne],
+  // The hero is the largest dark field on the site — brown, never near-black.
+  hero: ['#332417', BRAND.inkSoft, BRAND.champagneDeep],
+  philosophy: [BRAND.ink, '#6b5340', BRAND.champagne],
 }
 
 const svg = (width, height, [dark, mid, accent], seed) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-hidden="true">

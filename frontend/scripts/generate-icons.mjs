@@ -18,8 +18,8 @@ import { fileURLToPath } from 'node:url';
 const outDir = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'icons');
 mkdirSync(outDir, { recursive: true });
 
-const INK = [0x24, 0x1d, 0x18];
-const GOLD = [0xc9, 0xa8, 0x6c];
+const INK = [0x40, 0x2e, 0x1f];
+const GOLD = [0xd4, 0xaf, 0x6a];
 const SS = 4; // supersampling factor
 
 /** Monogram geometry in a 0..1 unit square: left stem, diagonal, right stem. */

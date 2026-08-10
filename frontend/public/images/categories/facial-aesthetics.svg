@@ -10,8 +10,8 @@
       <stop offset="100%" stop-color="#8a6a5e" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="r215" cx="70%" cy="74%" r="55%">
-      <stop offset="0%" stop-color="#f7f3ec" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#f7f3ec" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#faf7f1" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#faf7f1" stop-opacity="0"/>
     </radialGradient>
     <filter id="grain15">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="15"/>
@@ -23,6 +23,6 @@
   <rect width="960" height="480" fill="url(#r15)"/>
   <rect width="960" height="480" fill="url(#r215)"/>
   <ellipse cx="691.1999999999999" cy="144" rx="288" ry="134.4" fill="#8a6a5e" opacity="0.08"/>
-  <ellipse cx="230.39999999999998" cy="374.40000000000003" rx="326.40000000000003" ry="115.19999999999999" fill="#f7f3ec" opacity="0.06"/>
+  <ellipse cx="230.39999999999998" cy="374.40000000000003" rx="326.40000000000003" ry="115.19999999999999" fill="#faf7f1" opacity="0.06"/>
   <rect width="960" height="480" filter="url(#grain15)" opacity="0.6"/>
 </svg>

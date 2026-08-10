@@ -4,9 +4,14 @@
    PWA, and a dense admin dashboard. They share this palette and type scale so
    the product reads as one thing.
 
-   The palette is sampled from the clinic's own campaign work: warm espresso
-   ink, bone and sand paper stock, the greige taupe of the studio wall, the
-   champagne gold of the wordmark, lip blush, and the wine of the NAD+ script.
+   The palette is sampled from the Nurella wordmark: the roasted-coffee brown
+   it is printed on, the metallic champagne gold of the lettering and laurel,
+   an off-white paper stock, warm beige, the greige taupe of the studio wall,
+   lip blush, and the wine of the NAD+ script.
+
+   The dark surfaces are BROWN, not black. That is the single most defining
+   thing about the identity, and a near-black would flatten the gold on top of
+   it into something that reads as printer toner rather than leaf.
 
    Every colour lives here. Components never write a literal colour — they
    compose these tokens, so retuning the brand is a one-file change. Where a
@@ -18,38 +23,44 @@
   /* --- Brand: channels -----------------------------------------------------
      Space-separated channels so any tint can be mixed at the point of use
      without restating the colour. Keep each in sync with its hex below. */
-  --nu-ink-rgb: 36 29 24;
-  --nu-cream-rgb: 247 243 236;
-  --nu-champagne-rgb: 201 168 108;
+  --nu-ink-rgb: 64 46 31;
+  --nu-cream-rgb: 250 247 241;
+  --nu-champagne-rgb: 212 175 106;
   --nu-danger-rgb: 161 58 48;
 
   /* --- Brand: neutrals ---------------------------------------------------
-     Warm espresso rather than black — a neutral grey reads clinical against
-     this much cream. */
-  --nu-ink: #241d18;
-  --nu-ink-soft: #453a31;
-  --nu-ink-muted: #6e6055;
-  --nu-ink-faint: #8e7e70;
+     Roasted coffee brown, the colour the wordmark is printed on. Deliberately
+     lifted well clear of black: at 12:1 on the off-white it still carries body
+     copy, and as a full-bleed section it reads unmistakably brown. */
+  --nu-ink: #402e1f;
+  --nu-ink-soft: #55402e;
+  --nu-ink-muted: #79614a;
+  --nu-ink-faint: #9a8064;
 
-  --nu-cream: #f7f3ec;
-  --nu-sand: #efe7da;
-  --nu-sand-deep: #e2d6c5;
+  /* Off-white paper, then two beiges. Warmer than the previous stock so the
+     gold sits on it the way foil sits on card. */
+  --nu-cream: #faf7f1;
+  --nu-sand: #f2e9d9;
+  --nu-sand-deep: #e6d8bf;
   --nu-white: #ffffff;
 
   /* --- Brand: taupe -------------------------------------------------------
      The studio-wall greige. The mid-tone the campaigns lean on to keep large
      surfaces from going flat white. */
-  --nu-taupe: #b5a392;
-  --nu-taupe-deep: #7e6b5c;
+  --nu-taupe: #bda88f;
+  --nu-taupe-deep: #836c55;
 
   /* --- Brand: champagne ---------------------------------------------------
-     Gold at brand chroma cannot reach 4.5:1 on cream, so the accent is split
-     by job: -deep is decorative (rules, focus rings, borders, icons — 3:1),
-     -text is the bronzed gold used whenever gold has to carry small copy. */
-  --nu-champagne: #c9a86c;
-  --nu-champagne-deep: #9f7a38;
-  --nu-champagne-text: #856022;
-  --nu-champagne-soft: #e9dabc;
+     The metallic gold of the lettering. Gold at brand chroma cannot reach
+     4.5:1 on off-white, so the accent is split by job: --nu-champagne is the
+     true wordmark gold and is used at full strength on brown (6.2:1); -deep is
+     decorative on light (rules, focus rings, borders, icons — 3.6:1); -text is
+     the bronzed gold used whenever gold has to carry small copy on light
+     (5.4:1). */
+  --nu-champagne: #d4af6a;
+  --nu-champagne-deep: #a17c2e;
+  --nu-champagne-text: #855f1c;
+  --nu-champagne-soft: #ecd9ae;
 
   /* --- Brand: blush + wine ----------------------------------------------- */
   --nu-blush: #e4cac1;
@@ -72,7 +83,7 @@
   /* A native <select> arrow is a background image, and a data URI cannot read
      currentColor — so the chevron lives here rather than leaking a literal
      colour into the component sheet. Its fill mirrors --nu-ink-muted. */
-  --nu-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236e6055' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  --nu-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%2379614a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
 
   /* --- Semantic surfaces ------------------------------------------------- */
   --nu-bg: var(--nu-cream);
@@ -193,7 +204,7 @@
 
 /* The admin dashboard trades editorial airiness for density. */
 [data-surface='admin'] {
-  --nu-bg: #f4f0e9;
+  --nu-bg: #f5efe4;
   --nu-text-base: 0.875rem;
   --nu-section-y: var(--nu-space-6);
 }

@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200" role="img" aria-hidden="true">
   <defs>
     <linearGradient id="g8" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#241d18"/>
-      <stop offset="55%" stop-color="#4d3038"/>
-      <stop offset="100%" stop-color="#241d18"/>
+      <stop offset="0%" stop-color="#402e1f"/>
+      <stop offset="55%" stop-color="#5c3a3a"/>
+      <stop offset="100%" stop-color="#402e1f"/>
     </linearGradient>
     <radialGradient id="r8" cx="55%" cy="22%" r="62%">
-      <stop offset="0%" stop-color="#c9a86c" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#c9a86c" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#d4af6a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#d4af6a" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="r28" cx="48%" cy="53%" r="55%">
-      <stop offset="0%" stop-color="#f7f3ec" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#f7f3ec" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#faf7f1" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#faf7f1" stop-opacity="0"/>
     </radialGradient>
     <filter id="grain8">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="8"/>
@@ -22,7 +22,7 @@
   <rect width="900" height="1200" fill="url(#g8)"/>
   <rect width="900" height="1200" fill="url(#r8)"/>
   <rect width="900" height="1200" fill="url(#r28)"/>
-  <ellipse cx="648" cy="360" rx="270" ry="336.00000000000006" fill="#c9a86c" opacity="0.08"/>
-  <ellipse cx="216" cy="936" rx="306" ry="288" fill="#f7f3ec" opacity="0.06"/>
+  <ellipse cx="648" cy="360" rx="270" ry="336.00000000000006" fill="#d4af6a" opacity="0.08"/>
+  <ellipse cx="216" cy="936" rx="306" ry="288" fill="#faf7f1" opacity="0.06"/>
   <rect width="900" height="1200" filter="url(#grain8)" opacity="0.6"/>
 </svg>

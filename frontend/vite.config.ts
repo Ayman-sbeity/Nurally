@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const BRAND = '#241d18';
+const BRAND = '#402e1f';
 
 export default defineConfig({
   resolve: {
@@ -36,7 +36,7 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#f7f3ec',
+        background_color: '#faf7f1',
         theme_color: BRAND,
         categories: ['lifestyle', 'health', 'beauty'],
         icons: [

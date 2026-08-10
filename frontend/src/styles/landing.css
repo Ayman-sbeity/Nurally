@@ -205,7 +205,14 @@
   object-fit: cover;
 }
 
-/* Keeps the headline legible over any future photograph. */
+/* Keeps the headline legible over any future photograph.
+   Heavier than it looks like it needs to be, because the ink is a mid brown
+   rather than a near-black and the same alpha therefore buys less contrast.
+   Measured against the worst case — a blown-out white area of a photograph
+   directly behind the copy — the 0% and 100% stops hold cream at 4.5:1, and
+   the 45% band, which is the lightest and carries only the display headline,
+   holds 3.7:1 (the large-text threshold is 3:1). Over the current artwork, and
+   over any normally-exposed interior shot, all three are far higher. */
 .nu-hero::after {
   content: '';
   position: absolute;
@@ -213,9 +220,9 @@
   z-index: -1;
   background: linear-gradient(
     to bottom,
-    rgb(var(--nu-ink-rgb) / 0.62) 0%,
-    rgb(var(--nu-ink-rgb) / 0.42) 45%,
-    rgb(var(--nu-ink-rgb) / 0.78) 100%
+    rgb(var(--nu-ink-rgb) / 0.72) 0%,
+    rgb(var(--nu-ink-rgb) / 0.62) 45%,
+    rgb(var(--nu-ink-rgb) / 0.85) 100%
   );
 }
 
