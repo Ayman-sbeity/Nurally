@@ -6,6 +6,23 @@ const categorySchema = z.enum(
   Object.values(ServiceCategorySlug) as [ServiceCategorySlug, ...ServiceCategorySlug[]],
 );
 
+/**
+ * An image reference is either one of our own paths (`/images/...`, or an
+ * `/api/media/...` upload) or an absolute http(s) URL. Restricting the scheme
+ * keeps `javascript:` and `data:` values out of the `src` attributes these end
+ * up in, whatever renders them later.
+ *
+ * An empty string is allowed and means "clear it" — the controllers unset the
+ * field rather than storing a blank.
+ */
+const imageUrlSchema = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((value) => value === '' || /^(https?:\/\/|\/(?!\/))/.test(value), {
+    message: 'Enter an https:// address or a path beginning with /.',
+  });
+
 export const createServiceSchema = z.object({
   name: z.string().trim().min(2).max(160),
   category: categorySchema,
@@ -14,7 +31,7 @@ export const createServiceSchema = z.object({
   // Optional by design — Nurella has not published prices, so none are invented.
   price: z.coerce.number().min(0).optional(),
   currency: z.string().trim().max(8).optional(),
-  imageUrl: z.string().trim().max(500).optional(),
+  imageUrl: imageUrlSchema.optional(),
   isActive: z.boolean().optional().default(true),
   displayOrder: z.coerce.number().int().optional().default(0),
 });

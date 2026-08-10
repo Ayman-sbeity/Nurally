@@ -2,16 +2,18 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
+import { ImageField } from '@/components/admin/ImageField';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { SelectField, TextAreaField, TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { ErrorState, LoadingState } from '@/components/ui/States';
-import { CATEGORY_ORDER } from '@/content/brand';
+import { CATEGORY_ORDER, categoryImage } from '@/content/brand';
 import { useServices } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
 import type { Service, ServiceCategorySlug } from '@/types/api';
 import { formatDuration } from '@/utils/format';
+import { mediaSrc } from '@/utils/media';
 
 interface FormState {
   name: string;
@@ -63,17 +65,20 @@ export function AdminServicesPage() {
       'error',
     );
 
-  /** Empty optional fields are omitted rather than sent as blanks. */
+  /**
+   * Empty optional fields are omitted rather than sent as blanks — except the
+   * image, where an empty string is how the API is told to clear one.
+   */
   const payloadFrom = (values: FormState) => ({
     name: values.name.trim(),
     category: values.category,
     durationMinutes: Number(values.durationMinutes),
     displayOrder: Number(values.displayOrder) || 0,
     isActive: values.isActive,
+    imageUrl: values.imageUrl.trim(),
     ...(values.description.trim() ? { description: values.description.trim() } : {}),
     ...(values.price.trim() ? { price: Number(values.price) } : {}),
     ...(values.currency.trim() ? { currency: values.currency.trim() } : {}),
-    ...(values.imageUrl.trim() ? { imageUrl: values.imageUrl.trim() } : {}),
   });
 
   const create = useMutation({
@@ -151,6 +156,9 @@ export function AdminServicesPage() {
             <table className="nu-table">
               <thead>
                 <tr>
+                  <th scope="col">
+                    <span className="nu-sr-only">Image</span>
+                  </th>
                   <th scope="col">Name</th>
                   <th scope="col">Duration</th>
                   <th scope="col">Price</th>
@@ -164,6 +172,16 @@ export function AdminServicesPage() {
               <tbody>
                 {category.services.map((service) => (
                   <tr key={service._id}>
+                    <td>
+                      {/* Decorative: the name sits in the very next cell. */}
+                      <img
+                        className="nu-thumb"
+                        src={mediaSrc(service.imageUrl ?? categoryImage(service.category))}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </td>
                     <td>{service.name}</td>
                     <td>{formatDuration(service.durationMinutes)}</td>
                     <td>{service.price === undefined ? '—' : `${service.currency ?? ''} ${service.price}`}</td>
@@ -262,10 +280,13 @@ export function AdminServicesPage() {
             value={form.currency}
             onChange={(event) => setForm({ ...form, currency: event.target.value })}
           />
-          <TextField
-            label="Image URL (optional)"
+          <ImageField
+            label="Card image"
             value={form.imageUrl}
-            onChange={(event) => setForm({ ...form, imageUrl: event.target.value })}
+            onChange={(imageUrl) => setForm({ ...form, imageUrl })}
+            fallbackSrc={categoryImage(form.category)}
+            fallbackNote="Showing the default artwork for this category."
+            hint="Appears on the treatment cards and the treatment page. Wide images work best — they are cropped to a band."
           />
           <TextField
             label="Display order"

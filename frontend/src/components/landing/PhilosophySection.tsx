@@ -16,7 +16,7 @@ export function PhilosophySection() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div style={{ color: 'rgba(250, 247, 242, 0.82)' }}>
+            <div style={{ color: 'rgb(var(--nu-cream-rgb) / 0.82)' }}>
               {PHILOSOPHY.paragraphs.map((paragraph) => (
                 <p key={paragraph} style={{ marginBottom: 'var(--nu-space-4)' }}>
                   {paragraph}

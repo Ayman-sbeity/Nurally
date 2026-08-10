@@ -22,4 +22,4 @@ export async function initStorage(): Promise<void> {
   if (storage instanceof LocalDiskAdapter) await storage.ensureReady();
 }
 
-export type { StorageAdapter, StoredObject } from './types';
+export type { SaveOptions, StorageAdapter, StoredObject } from './types';

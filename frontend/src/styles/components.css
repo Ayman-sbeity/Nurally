@@ -19,6 +19,38 @@
   padding-block: var(--nu-section-y);
 }
 
+/* A landing section is its own container, so it is capped at --nu-max-width.
+   This paints a tint edge to edge behind it without another wrapper element:
+   the pseudo-element re-centres on the viewport and spans 100vw. Body sets
+   overflow-x: hidden, so the 100vw cannot open a horizontal scrollbar. */
+.nu-section--tint {
+  position: relative;
+  isolation: isolate;
+}
+
+.nu-section--tint::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--nu-section-tint);
+  z-index: -1;
+}
+
+.nu-section--sand {
+  --nu-section-tint: var(--nu-sand);
+}
+
+.nu-section--taupe {
+  --nu-section-tint: var(--nu-taupe-tint);
+}
+
+.nu-section--blush {
+  --nu-section-tint: var(--nu-blush-tint);
+}
+
 .nu-stack {
   display: flex;
   flex-direction: column;
@@ -49,7 +81,7 @@
   font-size: var(--nu-text-xs);
   letter-spacing: var(--nu-tracking-wider);
   text-transform: uppercase;
-  color: var(--nu-champagne-deep);
+  color: var(--nu-accent-text);
   font-weight: 500;
 }
 
@@ -174,7 +206,7 @@
 .nu-btn--on-dark-outline {
   --btn-bg: transparent;
   --btn-fg: var(--nu-cream);
-  --btn-border: rgba(250, 247, 242, 0.4);
+  --btn-border: rgb(var(--nu-cream-rgb) / 0.4);
 }
 
 .nu-btn--on-dark-outline:hover:not(:disabled) {
@@ -194,7 +226,7 @@
 
 /* --- Text link ----------------------------------------------------------- */
 .nu-link {
-  color: var(--nu-champagne-deep);
+  color: var(--nu-accent-text);
   font-weight: 500;
   border-bottom: 1px solid transparent;
   transition: border-color var(--nu-duration) var(--nu-ease);
@@ -339,7 +371,7 @@
 .nu-select:focus {
   outline: none;
   border-color: var(--nu-champagne-deep);
-  box-shadow: 0 0 0 3px rgba(201, 166, 107, 0.18);
+  box-shadow: 0 0 0 3px rgb(var(--nu-champagne-rgb) / 0.18);
 }
 
 .nu-input[aria-invalid='true'],
@@ -354,7 +386,7 @@
 
 .nu-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236b5f56' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: var(--nu-select-chevron);
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 12px;
@@ -369,6 +401,51 @@
 .nu-hint {
   font-size: var(--nu-text-xs);
   color: var(--nu-text-muted);
+}
+
+/* Picture control: preview beside the upload / paste-a-URL controls. */
+.nu-image-field {
+  display: flex;
+  gap: var(--nu-space-4);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.nu-image-field__preview {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 10rem;
+  height: 100px;
+  overflow: hidden;
+  background: var(--nu-sand);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+}
+
+.nu-image-field__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nu-image-field__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+/* Row thumbnail in admin tables. */
+.nu-thumb {
+  display: block;
+  width: 4rem;
+  height: 2.5rem;
+  object-fit: cover;
+  background: var(--nu-sand);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-sm);
 }
 
 .nu-checkbox {

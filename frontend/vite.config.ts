@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const BRAND = '#1c1714';
+const BRAND = '#241d18';
 
 export default defineConfig({
   resolve: {
@@ -36,7 +36,7 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#faf7f2',
+        background_color: '#f7f3ec',
         theme_color: BRAND,
         categories: ['lifestyle', 'health', 'beauty'],
         icons: [
@@ -68,6 +68,18 @@ export default defineConfig({
               cacheName: 'nurella-catalogue',
               networkTimeoutSeconds: 4,
               expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+          {
+            // Uploaded website artwork. Keys are random and never rewritten, so
+            // a cached copy can only ever be the right one.
+            urlPattern: ({ url, request }) =>
+              request.method === 'GET' && url.pathname.startsWith('/api/media/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'nurella-media',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {

@@ -28,7 +28,7 @@
 
 .nu-admin__sidebar-head {
   padding: var(--nu-space-5);
-  border-bottom: 1px solid rgba(250, 247, 242, 0.12);
+  border-bottom: 1px solid rgb(var(--nu-cream-rgb) / 0.12);
 }
 
 .nu-admin__nav {
@@ -48,19 +48,19 @@
   padding: 0.7rem var(--nu-space-4);
   border-radius: var(--nu-radius);
   font-size: var(--nu-text-sm);
-  color: rgba(250, 247, 242, 0.68);
+  color: rgb(var(--nu-cream-rgb) / 0.68);
   transition:
     background-color var(--nu-duration-fast) var(--nu-ease),
     color var(--nu-duration-fast) var(--nu-ease);
 }
 
 .nu-admin__navlink:hover {
-  background: rgba(250, 247, 242, 0.08);
+  background: rgb(var(--nu-cream-rgb) / 0.08);
   color: var(--nu-cream);
 }
 
 .nu-admin__navlink.is-active {
-  background: rgba(201, 166, 107, 0.18);
+  background: rgb(var(--nu-champagne-rgb) / 0.18);
   color: var(--nu-champagne-soft);
 }
 
@@ -77,7 +77,7 @@
 
 .nu-admin__sidebar-foot {
   padding: var(--nu-space-5);
-  border-top: 1px solid rgba(250, 247, 242, 0.12);
+  border-top: 1px solid rgb(var(--nu-cream-rgb) / 0.12);
   font-size: var(--nu-text-sm);
 }
 
@@ -86,11 +86,11 @@
 }
 
 .nu-admin__sidebar-foot .nu-hint {
-  color: rgba(250, 247, 242, 0.5);
+  color: rgb(var(--nu-cream-rgb) / 0.5);
 }
 
 .nu-admin__sidebar-foot .nu-btn--ghost {
-  --btn-fg: rgba(250, 247, 242, 0.75);
+  --btn-fg: rgb(var(--nu-cream-rgb) / 0.75);
 }
 
 .nu-admin__sidebar-foot .nu-btn--ghost:hover {
@@ -423,7 +423,7 @@
   padding: 0 0.4rem;
   border-radius: var(--nu-radius-pill);
   background: var(--nu-surface-alt);
-  color: var(--nu-champagne-deep);
+  color: var(--nu-accent-text);
   font-size: 0.625rem;
   font-weight: 600;
   font-variant-numeric: lining-nums tabular-nums;
@@ -468,7 +468,7 @@
     repeating-linear-gradient(to bottom, var(--nu-line) 0 1px, transparent 1px var(--tg-hour)),
     repeating-linear-gradient(
       to bottom,
-      rgba(28, 23, 20, 0.04) 0 1px,
+      rgb(var(--nu-ink-rgb) / 0.04) 0 1px,
       transparent 1px calc(var(--tg-hour) / 2)
     );
 }
@@ -478,7 +478,7 @@
 }
 
 .nu-tg__col.is-today {
-  background-color: rgba(201, 166, 107, 0.07);
+  background-color: rgb(var(--nu-champagne-rgb) / 0.07);
 }
 
 .nu-tg__closed,
@@ -495,22 +495,22 @@
   height: 100%;
   background: repeating-linear-gradient(
     45deg,
-    rgba(28, 23, 20, 0.035) 0 6px,
+    rgb(var(--nu-ink-rgb) / 0.035) 0 6px,
     transparent 6px 12px
   );
 }
 
 .nu-tg__break {
-  background: repeating-linear-gradient(45deg, rgba(28, 23, 20, 0.06) 0 5px, transparent 5px 10px);
+  background: repeating-linear-gradient(45deg, rgb(var(--nu-ink-rgb) / 0.06) 0 5px, transparent 5px 10px);
 }
 
 .nu-tg__block {
   display: flex;
   align-items: flex-start;
   padding: 2px 6px;
-  border: 1px dashed rgba(166, 58, 47, 0.35);
+  border: 1px dashed rgb(var(--nu-danger-rgb) / 0.35);
   border-radius: var(--nu-radius-sm);
-  background: rgba(166, 58, 47, 0.07);
+  background: rgb(var(--nu-danger-rgb) / 0.07);
   color: var(--nu-danger);
   font-size: 0.625rem;
   overflow: hidden;
@@ -631,8 +631,8 @@
   padding: 3px 6px;
   border: 2px dashed var(--nu-champagne-deep);
   border-radius: var(--nu-radius-sm);
-  background: rgba(201, 166, 107, 0.18);
-  color: var(--nu-champagne-deep);
+  background: rgb(var(--nu-champagne-rgb) / 0.18);
+  color: var(--nu-accent-text);
   font-size: 0.6875rem;
   font-weight: 600;
   font-variant-numeric: lining-nums tabular-nums;
@@ -747,13 +747,13 @@ body.is-dragging-appointment {
 .nu-month__cell.is-closed {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(28, 23, 20, 0.03) 0 6px,
+    rgb(var(--nu-ink-rgb) / 0.03) 0 6px,
     transparent 6px 12px
   );
 }
 
 .nu-month__cell.is-target {
-  background-color: rgba(201, 166, 107, 0.16);
+  background-color: rgb(var(--nu-champagne-rgb) / 0.16);
   box-shadow: inset 0 0 0 2px var(--nu-champagne-deep);
 }
 
@@ -910,7 +910,7 @@ body.is-dragging-appointment {
 }
 
 .nu-movecard__arrow {
-  color: var(--nu-champagne-deep);
+  color: var(--nu-accent-text);
 }
 
 .nu-movecard__to {
@@ -1252,7 +1252,7 @@ body.is-dragging-appointment {
   border: 0;
   padding: 0;
   font: inherit;
-  color: var(--nu-accent);
+  color: var(--nu-accent-text);
   cursor: pointer;
   text-align: left;
   text-decoration: underline;

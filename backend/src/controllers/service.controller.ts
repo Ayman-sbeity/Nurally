@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { Service } from '../models/Service';
+import * as mediaService from '../services/media.service';
 import { UserRole, type ServiceCategorySlug } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -67,12 +68,21 @@ export const getService = asyncHandler(async (req: Request, res: Response) => {
 export const createService = asyncHandler(async (req: Request, res: Response) => {
   const existing = await Service.find().select('slug').lean();
   const slug = uniqueSlug(req.body.name, new Set(existing.map((item) => item.slug)));
-  const service = await Service.create({ ...req.body, slug });
+
+  const attrs = { ...req.body, slug };
+  // "No image" is the field being absent, never an empty string.
+  if (!attrs.imageUrl) delete attrs.imageUrl;
+
+  const service = await Service.create(attrs);
   ok(res, { service }, 201);
 });
 
 export const updateService = asyncHandler(async (req: Request, res: Response) => {
   const update: Record<string, unknown> = { ...req.body };
+
+  // An empty string clears the image; Mongo stores the absence, not a blank.
+  const clearsImage = update.imageUrl === '';
+  if (clearsImage) delete update.imageUrl;
 
   if (typeof update.name === 'string') {
     const others = await Service.find({ _id: { $ne: req.params.id } }).select('slug').lean();
@@ -84,12 +94,21 @@ export const updateService = asyncHandler(async (req: Request, res: Response) =>
     }
   }
 
+  const previous = await Service.findById(req.params.id).select('imageUrl').lean();
+
   const service = await Service.findByIdAndUpdate(
     req.params.id,
-    { $set: update },
+    { $set: update, ...(clearsImage ? { $unset: { imageUrl: '' } } : {}) },
     { new: true, runValidators: true },
   );
   if (!service) throw ApiError.notFound('That service could not be found.');
+
+  // The bytes behind a replaced upload are no longer reachable from anywhere,
+  // so remove them rather than letting the upload directory grow forever.
+  if (previous?.imageUrl && previous.imageUrl !== service.imageUrl) {
+    await mediaService.discardServiceImage(previous.imageUrl, { exceptServiceId: service.id });
+  }
+
   ok(res, { service });
 });
 

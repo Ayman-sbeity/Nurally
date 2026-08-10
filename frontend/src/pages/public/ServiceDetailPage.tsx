@@ -5,7 +5,9 @@ import { useBookService } from '@/components/landing/ServiceCard';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
 import { useService, useServices } from '@/hooks/queries';
 import { ServiceCard } from '@/components/landing/ServiceCard';
+import { categoryImage } from '@/content/brand';
 import { formatDuration, formatPrice } from '@/utils/format';
+import { mediaSrc } from '@/utils/media';
 
 export function ServiceDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -60,7 +62,8 @@ export function ServiceDetailPage() {
         <div className="nu-editorial">
           <div className="nu-editorial__media">
             <img
-              src={service.imageUrl ?? '/images/about.svg'}
+              // Falls back to the category's artwork, matching the treatment cards.
+              src={mediaSrc(service.imageUrl ?? categoryImage(service.category))}
               alt={service.imageUrl ? service.name : ''}
               role={service.imageUrl ? undefined : 'presentation'}
               loading="lazy"

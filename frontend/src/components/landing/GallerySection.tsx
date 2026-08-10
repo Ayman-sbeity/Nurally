@@ -27,7 +27,7 @@ export function GallerySection({ limit }: { limit?: number }) {
   const images = limit ? (data?.images ?? []).slice(0, limit) : (data?.images ?? []);
 
   return (
-    <section className="nu-section nu-container" id="gallery">
+    <section className="nu-section nu-container nu-section--tint nu-section--blush" id="gallery">
       <div className="nu-section-head nu-section-head--center">
         <Reveal>
           <p className="nu-eyebrow">Our work</p>

@@ -72,7 +72,7 @@ export function ClientHomePage() {
                 style={{
                   marginTop: 'var(--nu-space-3)',
                   fontSize: 'var(--nu-text-sm)',
-                  color: 'rgba(250,247,242,0.72)',
+                  color: 'rgb(var(--nu-cream-rgb) / 0.72)',
                 }}
               >
                 {STATUS_EXPLANATION[next.status]}

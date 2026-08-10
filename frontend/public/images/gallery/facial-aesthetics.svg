@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200" role="img" aria-hidden="true">
   <defs>
     <linearGradient id="g6" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e7d3cb"/>
-      <stop offset="55%" stop-color="#cdb0a5"/>
-      <stop offset="100%" stop-color="#e7d3cb"/>
+      <stop offset="0%" stop-color="#e4cac1"/>
+      <stop offset="55%" stop-color="#c2998c"/>
+      <stop offset="100%" stop-color="#e4cac1"/>
     </linearGradient>
     <radialGradient id="r6" cx="37%" cy="46%" r="62%">
       <stop offset="0%" stop-color="#8a6a5e" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#8a6a5e" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="r26" cx="70%" cy="67%" r="55%">
-      <stop offset="0%" stop-color="#faf7f2" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#faf7f2" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#f7f3ec" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#f7f3ec" stop-opacity="0"/>
     </radialGradient>
     <filter id="grain6">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="6"/>
@@ -23,6 +23,6 @@
   <rect width="900" height="1200" fill="url(#r6)"/>
   <rect width="900" height="1200" fill="url(#r26)"/>
   <ellipse cx="648" cy="360" rx="270" ry="336.00000000000006" fill="#8a6a5e" opacity="0.08"/>
-  <ellipse cx="216" cy="936" rx="306" ry="288" fill="#faf7f2" opacity="0.06"/>
+  <ellipse cx="216" cy="936" rx="306" ry="288" fill="#f7f3ec" opacity="0.06"/>
   <rect width="900" height="1200" filter="url(#grain6)" opacity="0.6"/>
 </svg>

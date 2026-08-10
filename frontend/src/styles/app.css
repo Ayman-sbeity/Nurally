@@ -15,7 +15,7 @@
   position: sticky;
   top: 0;
   z-index: var(--nu-z-header);
-  background: rgba(250, 247, 242, 0.94);
+  background: rgb(var(--nu-cream-rgb) / 0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--nu-line);
   padding-top: var(--nu-safe-top);
@@ -97,7 +97,7 @@
   z-index: var(--nu-z-nav);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: rgba(250, 247, 242, 0.96);
+  background: rgb(var(--nu-cream-rgb) / 0.96);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--nu-line);
   padding-bottom: var(--nu-safe-bottom);
@@ -268,11 +268,11 @@
 }
 
 .nu-highlight__when {
-  color: rgba(250, 247, 242, 0.82);
+  color: rgb(var(--nu-cream-rgb) / 0.82);
 }
 
 .nu-highlight .nu-badge {
-  background: rgba(250, 247, 242, 0.14);
+  background: rgb(var(--nu-cream-rgb) / 0.14);
   color: var(--nu-cream);
 }
 

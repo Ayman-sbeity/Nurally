@@ -4,7 +4,7 @@ import { mkdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Readable } from 'node:stream';
 import { logger } from '../../utils/logger';
-import type { StorageAdapter, StoredObject } from './types';
+import type { SaveOptions, StorageAdapter, StoredObject } from './types';
 
 /**
  * Filesystem storage.
@@ -37,10 +37,11 @@ export class LocalDiskAdapter implements StorageAdapter {
     return target;
   }
 
-  async save(buffer: Buffer, options: { extension: string }): Promise<StoredObject> {
+  async save(buffer: Buffer, options: SaveOptions): Promise<StoredObject> {
     const now = new Date();
     const folder = `${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
-    const key = `${folder}/${randomUUID()}${options.extension}`;
+    // The prefix comes from application code, never from a request.
+    const key = `${options.prefix ? `${options.prefix}/` : ''}${folder}/${randomUUID()}${options.extension}`;
     const target = this.resolveKey(key);
 
     await mkdir(path.dirname(target), { recursive: true });

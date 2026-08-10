@@ -3,7 +3,7 @@ import { ABOUT } from '@/content/brand';
 
 export function AboutSection() {
   return (
-    <section className="nu-section nu-container" id="about">
+    <section className="nu-section nu-container nu-section--tint nu-section--sand" id="about">
       <div className="nu-editorial">
         <Reveal direction="left">
           <div className="nu-editorial__media">

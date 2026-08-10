@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" width="960" height="240" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="g15" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e4cac1"/>
+      <stop offset="55%" stop-color="#c2998c"/>
+      <stop offset="100%" stop-color="#e4cac1"/>
+    </linearGradient>
+    <radialGradient id="r15" cx="28%" cy="58%" r="62%">
+      <stop offset="0%" stop-color="#8a6a5e" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#8a6a5e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="r215" cx="70%" cy="74%" r="55%">
+      <stop offset="0%" stop-color="#f7f3ec" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#f7f3ec" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain15">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="15"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="960" height="240" fill="url(#g15)"/>
+  <rect width="960" height="240" fill="url(#r15)"/>
+  <rect width="960" height="240" fill="url(#r215)"/>
+  <ellipse cx="691.1999999999999" cy="72" rx="288" ry="67.2" fill="#8a6a5e" opacity="0.08"/>
+  <ellipse cx="230.39999999999998" cy="187.20000000000002" rx="326.40000000000003" ry="57.599999999999994" fill="#f7f3ec" opacity="0.06"/>
+  <rect width="960" height="240" filter="url(#grain15)" opacity="0.6"/>
+</svg>

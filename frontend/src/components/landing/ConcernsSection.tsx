@@ -21,7 +21,7 @@ export function ConcernsSection() {
   );
 
   return (
-    <section className="nu-section nu-container" id="concerns">
+    <section className="nu-section nu-container nu-section--tint nu-section--taupe" id="concerns">
       <div className="nu-section-head nu-section-head--center">
         <Reveal>
           <p className="nu-eyebrow">Treatments by concern</p>

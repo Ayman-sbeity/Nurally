@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import * as galleryController from '../controllers/gallery.controller';
+import * as mediaController from '../controllers/media.controller';
 import * as notificationController from '../controllers/notification.controller';
 import { optionalAuth, requireAuth } from '../middleware/auth';
 import { validate } from '../middleware/validate';
@@ -30,6 +31,11 @@ router.use('/availability', availabilityRoutes);
 router.use('/appointments', appointmentRoutes);
 
 router.get('/gallery', optionalAuth, galleryController.listGallery);
+
+// Website artwork uploaded through the admin. Public by design — these images
+// are rendered on pages visitors read while signed out. The controller can only
+// reach the `public/` area of storage, never a client's photographs.
+router.get('/media/:year/:month/:file', mediaController.streamPublicImage);
 
 router.get('/notifications', requireAuth, notificationController.listNotifications);
 router.post('/notifications/read-all', requireAuth, notificationController.markAllRead);

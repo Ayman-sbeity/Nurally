@@ -118,6 +118,22 @@ export const adminApi = {
       api.patch<ApiEnvelope<{ client: User }>>(`/admin/clients/${id}`, payload),
     ),
 
+  // --- Website media -------------------------------------------------------
+  /**
+   * Uploads a public image (service photography, gallery artwork) and returns
+   * the URL to save on the record being edited. Content-Type is left to the
+   * browser so it can add the multipart boundary.
+   */
+  uploadImage: (file: File) => {
+    const body = new FormData();
+    body.append('file', file);
+    return request<{ url: string }>(
+      api.post<ApiEnvelope<{ url: string }>>('/admin/media/images', body, {
+        headers: { 'Content-Type': undefined },
+      }),
+    );
+  },
+
   // --- Services ------------------------------------------------------------
   createService: (payload: Partial<Service> & { name: string; category: string; durationMinutes: number }) =>
     request<{ service: Service }>(

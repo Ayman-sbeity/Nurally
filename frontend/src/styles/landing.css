@@ -16,7 +16,7 @@
 }
 
 .nu-header--solid {
-  background: rgba(250, 247, 242, 0.92);
+  background: rgb(var(--nu-cream-rgb) / 0.92);
   backdrop-filter: blur(14px);
   border-bottom-color: var(--nu-line);
   color: var(--nu-ink);
@@ -106,7 +106,7 @@
 
 .nu-header:not(.nu-header--solid) .nu-btn--outline {
   --btn-fg: var(--nu-cream);
-  --btn-border: rgba(250, 247, 242, 0.45);
+  --btn-border: rgb(var(--nu-cream-rgb) / 0.45);
 }
 
 /* --- Burger -------------------------------------------------------------- */
@@ -213,9 +213,9 @@
   z-index: -1;
   background: linear-gradient(
     to bottom,
-    rgba(28, 23, 20, 0.62) 0%,
-    rgba(28, 23, 20, 0.42) 45%,
-    rgba(28, 23, 20, 0.78) 100%
+    rgb(var(--nu-ink-rgb) / 0.62) 0%,
+    rgb(var(--nu-ink-rgb) / 0.42) 45%,
+    rgb(var(--nu-ink-rgb) / 0.78) 100%
   );
 }
 
@@ -250,7 +250,7 @@
 .nu-hero__body {
   margin-top: var(--nu-space-5);
   max-width: 52ch;
-  color: rgba(250, 247, 242, 0.82);
+  color: rgb(var(--nu-cream-rgb) / 0.82);
 }
 
 .nu-hero__statement {
@@ -276,7 +276,7 @@
   font-size: var(--nu-text-xs);
   letter-spacing: var(--nu-tracking-wide);
   text-transform: uppercase;
-  color: rgba(250, 247, 242, 0.6);
+  color: rgb(var(--nu-cream-rgb) / 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -322,7 +322,9 @@
   font-family: var(--nu-font-display);
   font-size: clamp(1.6rem, 3.2vw, 2.4rem);
   font-style: italic;
-  color: var(--nu-champagne-deep);
+  /* Wine script against a gold rule — the pairing the campaign artwork uses
+     for its display lines. */
+  color: var(--nu-wine);
   padding-left: var(--nu-space-5);
   border-left: 1px solid var(--nu-champagne);
   margin-block: var(--nu-space-5);
@@ -414,9 +416,11 @@
   border-color: var(--nu-champagne-soft);
 }
 
+/* A fixed 100px band, bled to the card edges so it spans the full card width. */
 .nu-service-card__media {
-  aspect-ratio: 16 / 10;
-  border-radius: var(--nu-radius);
+  display: block;
+  height: 100px;
+  flex: none;
   overflow: hidden;
   background: var(--nu-sand);
   margin: calc(var(--nu-space-5) * -1) calc(var(--nu-space-5) * -1) 0;
@@ -425,9 +429,21 @@
 
 .nu-service-card__media img,
 .nu-service-card__media svg {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--nu-duration) var(--nu-ease);
+}
+
+.nu-service-card:hover .nu-service-card__media img {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nu-service-card:hover .nu-service-card__media img {
+    transform: none;
+  }
 }
 
 .nu-service-card__name {
@@ -571,7 +587,7 @@
   position: absolute;
   inset: auto 0 0;
   padding: var(--nu-space-5) var(--nu-space-4) var(--nu-space-4);
-  background: linear-gradient(to top, rgba(28, 23, 20, 0.85), transparent);
+  background: linear-gradient(to top, rgb(var(--nu-ink-rgb) / 0.85), transparent);
   color: var(--nu-cream);
 }
 
@@ -605,7 +621,7 @@
 }
 
 .nu-cta__body {
-  color: rgba(250, 247, 242, 0.78);
+  color: rgb(var(--nu-cream-rgb) / 0.78);
   margin-bottom: var(--nu-space-7);
 }
 
@@ -618,7 +634,7 @@
 
 /* --- Footer -------------------------------------------------------------- */
 .nu-footer {
-  background: var(--nu-sand);
+  background: var(--nu-taupe-tint);
   padding-block: var(--nu-space-8) var(--nu-space-6);
 }
 
@@ -696,7 +712,7 @@
 }
 
 .nu-auth__sub {
-  color: rgba(250, 247, 242, 0.75);
+  color: rgb(var(--nu-cream-rgb) / 0.75);
   max-width: 32ch;
 }
 

@@ -4,6 +4,7 @@ import * as appointmentController from '../controllers/appointment.controller';
 import * as availabilityController from '../controllers/availability.controller';
 import * as clientAssetController from '../controllers/clientAsset.controller';
 import * as galleryController from '../controllers/gallery.controller';
+import * as mediaController from '../controllers/media.controller';
 import * as serviceController from '../controllers/service.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { singleUpload } from '../middleware/upload';
@@ -167,6 +168,11 @@ router.delete(
   validate({ params: assetIdParamSchema }),
   clientAssetController.removeAsset,
 );
+
+// --- Website media ---------------------------------------------------------
+// One uploader for every public image field in the admin. It returns a URL the
+// caller saves onto the record it is editing.
+router.post('/media/images', singleUpload('file'), mediaController.uploadImage);
 
 // --- Services --------------------------------------------------------------
 router.post('/services', validate({ body: createServiceSchema }), serviceController.createService);

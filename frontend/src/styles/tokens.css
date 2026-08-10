@@ -3,59 +3,109 @@
    One brand, three experiences: an editorial landing page, a simple client
    PWA, and a dense admin dashboard. They share this palette and type scale so
    the product reads as one thing.
+
+   The palette is sampled from the clinic's own campaign work: warm espresso
+   ink, bone and sand paper stock, the greige taupe of the studio wall, the
+   champagne gold of the wordmark, lip blush, and the wine of the NAD+ script.
+
+   Every colour lives here. Components never write a literal colour — they
+   compose these tokens, so retuning the brand is a one-file change. Where a
+   translucent tint is needed, use the -rgb channel tokens:
+       background: rgb(var(--nu-ink-rgb) / 0.08);
    ========================================================================== */
 
 :root {
-  /* --- Brand ------------------------------------------------------------ */
-  --nu-ink: #1c1714;
-  --nu-ink-soft: #3a322c;
-  --nu-ink-muted: #6b5f56;
-  --nu-ink-faint: #9b8e83;
+  /* --- Brand: channels -----------------------------------------------------
+     Space-separated channels so any tint can be mixed at the point of use
+     without restating the colour. Keep each in sync with its hex below. */
+  --nu-ink-rgb: 36 29 24;
+  --nu-cream-rgb: 247 243 236;
+  --nu-champagne-rgb: 201 168 108;
+  --nu-danger-rgb: 161 58 48;
 
-  --nu-cream: #faf7f2;
-  --nu-sand: #f2ece3;
-  --nu-sand-deep: #e6dccf;
+  /* --- Brand: neutrals ---------------------------------------------------
+     Warm espresso rather than black — a neutral grey reads clinical against
+     this much cream. */
+  --nu-ink: #241d18;
+  --nu-ink-soft: #453a31;
+  --nu-ink-muted: #6e6055;
+  --nu-ink-faint: #8e7e70;
+
+  --nu-cream: #f7f3ec;
+  --nu-sand: #efe7da;
+  --nu-sand-deep: #e2d6c5;
   --nu-white: #ffffff;
 
-  --nu-champagne: #c9a66b;
-  --nu-champagne-deep: #a8813f;
-  --nu-champagne-soft: #e8d9bd;
-  --nu-blush: #e7d3cb;
-  --nu-blush-deep: #cdb0a5;
+  /* --- Brand: taupe -------------------------------------------------------
+     The studio-wall greige. The mid-tone the campaigns lean on to keep large
+     surfaces from going flat white. */
+  --nu-taupe: #b5a392;
+  --nu-taupe-deep: #7e6b5c;
 
-  --nu-line: rgba(28, 23, 20, 0.1);
-  --nu-line-strong: rgba(28, 23, 20, 0.18);
-  --nu-overlay: rgba(28, 23, 20, 0.55);
+  /* --- Brand: champagne ---------------------------------------------------
+     Gold at brand chroma cannot reach 4.5:1 on cream, so the accent is split
+     by job: -deep is decorative (rules, focus rings, borders, icons — 3:1),
+     -text is the bronzed gold used whenever gold has to carry small copy. */
+  --nu-champagne: #c9a86c;
+  --nu-champagne-deep: #9f7a38;
+  --nu-champagne-text: #856022;
+  --nu-champagne-soft: #e9dabc;
 
-  /* --- Semantic surfaces ------------------------------------------------ */
+  /* --- Brand: blush + wine ----------------------------------------------- */
+  --nu-blush: #e4cac1;
+  --nu-blush-deep: #c2998c;
+  --nu-wine: #7c3a44;
+
+  /* --- Section washes -----------------------------------------------------
+     Derived, not hand-picked, so retuning a mid-tone retunes its wash too. At
+     full strength taupe and blush are backdrop colours — they carry a
+     photograph well but shout under body copy — so a whole band of the page
+     takes them cut into cream. */
+  --nu-taupe-tint: color-mix(in srgb, var(--nu-taupe) 18%, var(--nu-cream));
+  --nu-blush-tint: color-mix(in srgb, var(--nu-blush) 22%, var(--nu-cream));
+
+  /* --- Derived tints ----------------------------------------------------- */
+  --nu-line: rgb(var(--nu-ink-rgb) / 0.1);
+  --nu-line-strong: rgb(var(--nu-ink-rgb) / 0.18);
+  --nu-overlay: rgb(var(--nu-ink-rgb) / 0.55);
+
+  /* A native <select> arrow is a background image, and a data URI cannot read
+     currentColor — so the chevron lives here rather than leaking a literal
+     colour into the component sheet. Its fill mirrors --nu-ink-muted. */
+  --nu-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236e6055' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+
+  /* --- Semantic surfaces ------------------------------------------------- */
   --nu-bg: var(--nu-cream);
   --nu-surface: var(--nu-white);
   --nu-surface-alt: var(--nu-sand);
   --nu-text: var(--nu-ink);
   --nu-text-muted: var(--nu-ink-muted);
   --nu-accent: var(--nu-champagne-deep);
+  --nu-accent-text: var(--nu-champagne-text);
 
-  /* --- Appointment status ----------------------------------------------- */
-  --nu-status-pending: #b57d1a;
-  --nu-status-pending-bg: #fdf3e0;
-  --nu-status-confirmed: #2f6b4f;
-  --nu-status-confirmed-bg: #e6f2ec;
-  --nu-status-offered: #6a5099;
-  --nu-status-offered-bg: #efe9f8;
-  --nu-status-reschedule: #1f6a86;
-  --nu-status-reschedule-bg: #e2f1f7;
-  --nu-status-completed: #4a5a63;
-  --nu-status-completed-bg: #eaeff1;
-  --nu-status-cancelled: #6b6259;
-  --nu-status-cancelled-bg: #efece8;
-  --nu-status-rejected: #a63a2f;
-  --nu-status-rejected-bg: #fbe9e6;
+  /* --- Appointment status -------------------------------------------------
+     Hue-separated so states stay distinguishable, but pulled toward the warm
+     palette. Each pairing clears 4.5:1 against its own chip background. */
+  --nu-status-pending: #916111;
+  --nu-status-pending-bg: #fbf1de;
+  --nu-status-confirmed: #2f6650;
+  --nu-status-confirmed-bg: #e6f0ea;
+  --nu-status-offered: #655091;
+  --nu-status-offered-bg: #efe9f7;
+  --nu-status-reschedule: #1f6480;
+  --nu-status-reschedule-bg: #e3f0f6;
+  --nu-status-completed: #4c5a60;
+  --nu-status-completed-bg: #eceef0;
+  --nu-status-cancelled: #6d635a;
+  --nu-status-cancelled-bg: #efeae4;
+  --nu-status-rejected: #a13a30;
+  --nu-status-rejected-bg: #fae9e5;
   --nu-status-noshow: #8a5a1f;
   --nu-status-noshow-bg: #f8ecdd;
 
-  --nu-danger: #a63a2f;
-  --nu-danger-bg: #fbe9e6;
-  --nu-success: #2f6b4f;
+  --nu-danger: #a13a30;
+  --nu-danger-bg: #fae9e5;
+  --nu-success: #2f6650;
 
   /* --- Type ------------------------------------------------------------- */
   --nu-font-display: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
@@ -100,11 +150,13 @@
   --nu-radius-xl: 22px;
   --nu-radius-pill: 999px;
 
-  /* --- Elevation -------------------------------------------------------- */
-  --nu-shadow-sm: 0 1px 2px rgba(28, 23, 20, 0.06);
-  --nu-shadow: 0 4px 16px rgba(28, 23, 20, 0.07);
-  --nu-shadow-lg: 0 18px 48px rgba(28, 23, 20, 0.12);
-  --nu-shadow-xl: 0 32px 80px rgba(28, 23, 20, 0.18);
+  /* --- Elevation ----------------------------------------------------------
+     Shadows are tinted with the ink so they warm the cream instead of
+     greying it. */
+  --nu-shadow-sm: 0 1px 2px rgb(var(--nu-ink-rgb) / 0.06);
+  --nu-shadow: 0 4px 16px rgb(var(--nu-ink-rgb) / 0.07);
+  --nu-shadow-lg: 0 18px 48px rgb(var(--nu-ink-rgb) / 0.12);
+  --nu-shadow-xl: 0 32px 80px rgb(var(--nu-ink-rgb) / 0.18);
 
   /* --- Motion ----------------------------------------------------------- */
   --nu-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -125,9 +177,23 @@
   --nu-safe-top: env(safe-area-inset-top, 0px);
 }
 
+/* Dark surfaces flip the text-bearing accent back to the wordmark gold. The
+   bronzed --nu-champagne-text exists only to clear 4.5:1 on cream; over ink it
+   would read as mud. Anything with a dark background belongs in this list, or
+   can opt in with data-tone="dark". */
+.nu-philosophy,
+.nu-cta,
+.nu-auth__aside,
+.nu-highlight,
+.nu-admin__sidebar,
+.nu-toast,
+[data-tone='dark'] {
+  --nu-accent-text: var(--nu-champagne);
+}
+
 /* The admin dashboard trades editorial airiness for density. */
 [data-surface='admin'] {
-  --nu-bg: #f6f4f1;
+  --nu-bg: #f4f0e9;
   --nu-text-base: 0.875rem;
   --nu-section-y: var(--nu-space-6);
 }

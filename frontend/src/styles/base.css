@@ -94,7 +94,7 @@ p {
 
 /* A single, consistent focus ring across the whole product. */
 :focus-visible {
-  outline: 2px solid var(--nu-champagne-deep);
+  outline: 2px solid var(--nu-accent);
   outline-offset: 3px;
   border-radius: var(--nu-radius-sm);
 }
