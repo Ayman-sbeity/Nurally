@@ -3,15 +3,26 @@ import { Reveal } from '@/components/ui/Reveal';
 import { EmptyState, ErrorState, SkeletonList } from '@/components/ui/States';
 import { ServiceCard } from '@/components/landing/ServiceCard';
 import { CATEGORY_INTROS, COLLAGEN_INTRO } from '@/content/brand';
+import { treatmentFacts } from '@/content/business';
 import { useServices } from '@/hooks/queries';
 
 interface ServicesSectionProps {
   /** Landing page shows a curated subset; the Treatments page shows everything. */
   limitPerCategory?: number;
   showViewAll?: boolean;
+  /**
+   * Treatments page only: states what each category is and who it is for,
+   * before the cards. Keeps the landing page preview uncluttered while giving
+   * the indexable page a plain answer for every category.
+   */
+  showCategoryFacts?: boolean;
 }
 
-export function ServicesSection({ limitPerCategory, showViewAll }: ServicesSectionProps) {
+export function ServicesSection({
+  limitPerCategory,
+  showViewAll,
+  showCategoryFacts,
+}: ServicesSectionProps) {
   const { data, isPending, isError, error, refetch } = useServices();
 
   return (
@@ -53,6 +64,8 @@ export function ServicesSection({ limitPerCategory, showViewAll }: ServicesSecti
                 <p className="nu-category__intro">{CATEGORY_INTROS[category.slug]}</p>
               )}
 
+              {showCategoryFacts && <CategoryFacts slug={category.slug} />}
+
               <div className="nu-service-grid">
                 {services.map((service) => (
                   <ServiceCard key={service._id} service={service} />
@@ -81,5 +94,40 @@ export function ServicesSection({ limitPerCategory, showViewAll }: ServicesSecti
         </Reveal>
       )}
     </section>
+  );
+}
+
+/**
+ * What the category is, who it is for and which concerns it addresses — in
+ * plain sentences, ahead of the treatment cards. This is the block an AI
+ * assistant can quote when someone asks "what treats acne scars?".
+ */
+function CategoryFacts({ slug }: { slug: string }) {
+  const facts = treatmentFacts(slug);
+  if (!facts) return null;
+
+  return (
+    <div className="nu-facts" style={{ marginBottom: 'var(--nu-space-5)' }}>
+      <div className="nu-facts__row">
+        <p className="nu-facts__key">What it is</p>
+        <div className="nu-facts__value">{facts.whatItIs}</div>
+      </div>
+      <div className="nu-facts__row">
+        <p className="nu-facts__key">Who it's for</p>
+        <div className="nu-facts__value">{facts.whoItIsFor}</div>
+      </div>
+      {facts.addresses.length > 0 && (
+        <div className="nu-facts__row">
+          <p className="nu-facts__key">What it addresses</p>
+          <ul className="nu-facts__tags">
+            {facts.addresses.map((concern) => (
+              <li className="nu-facts__tag" key={concern}>
+                {concern}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }

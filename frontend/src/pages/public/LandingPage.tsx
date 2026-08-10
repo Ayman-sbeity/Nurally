@@ -5,6 +5,8 @@ import { ServicesSection } from '@/components/landing/ServicesSection';
 import { ConcernsSection } from '@/components/landing/ConcernsSection';
 import { PhilosophySection } from '@/components/landing/PhilosophySection';
 import { GallerySection } from '@/components/landing/GallerySection';
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
+import { FaqSection } from '@/components/landing/FaqSection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
 
 export function LandingPage() {
@@ -12,7 +14,7 @@ export function LandingPage() {
     <>
       <Seo
         title="Nurella Beauty Lounge — Advanced Aesthetics, Skin & Beauty"
-        description="Where advanced aesthetics meet elegance, precision, and personalized care. Book your personalized consultation at Nurella Beauty Lounge."
+        description="Nurella Beauty Lounge offers facial aesthetics, collagen biostimulation, skin boosters, advanced skin treatments, laser, permanent makeup, facials and nails. Every treatment begins with a personalized consultation — request an appointment online."
         canonicalPath="/"
       />
       <Hero />
@@ -22,6 +24,10 @@ export function LandingPage() {
       <ConcernsSection />
       <PhilosophySection />
       <GallerySection limit={6} />
+      <TestimonialsSection />
+      {/* A short, question-phrased answer block; the full set lives at /faq,
+          which is where the FAQPage structured data is declared. */}
+      <FaqSection limit={5} showViewAll />
       <BookingCtaSection />
     </>
   );

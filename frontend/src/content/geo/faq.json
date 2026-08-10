@@ -1,0 +1,161 @@
+{
+  "$comment": "Step 2 of the GEO guide. Questions are phrased the way a person asks an AI assistant, not the way a salon markets itself. Answers are direct and 2–4 sentences, and every fact in them is verifiable from the site, the catalogue or the booking flow — no invented prices, hours, staff or clinical outcomes. `requires`/`unless` gate an entry on configured business facts (address, phone, email), so an unanswerable question is never published. `{{placeholders}}` are filled from the same facts.",
+
+  "sections": [
+    { "id": "treatments", "title": "Treatments" },
+    { "id": "concerns", "title": "Choosing a treatment for your concern" },
+    { "id": "booking", "title": "Booking and appointments" },
+    { "id": "practical", "title": "Pricing, location and practicalities" }
+  ],
+
+  "entries": [
+    {
+      "id": "what-treatments",
+      "section": "treatments",
+      "question": "What treatments does Nurella Beauty Lounge offer?",
+      "answer": "Nurella Beauty Lounge offers ten categories of treatment: facial aesthetics, collagen and biostimulation, skin boosters and rejuvenation, advanced skin treatments, lifting and contouring, laser, professional skin care facials, permanent makeup, nails, and combined beauty and nail services. That covers everything from a deep-cleansing facial or laser hair removal to non-surgical facial contouring and regenerative skin protocols. The full treatment menu, with the duration of each treatment, is published on the treatments page."
+    },
+    {
+      "id": "medical-or-beauty",
+      "section": "treatments",
+      "question": "Is Nurella a beauty salon or an aesthetics clinic?",
+      "answer": "It is a beauty lounge that combines both sides: classic beauty services such as facials, nails and permanent makeup sit alongside advanced aesthetic treatments like collagen biostimulation, skin boosters, laser and non-surgical facial contouring. That means one appointment can cover routine maintenance and a longer-term skin plan. Which treatments are appropriate for you is decided at the consultation, not at the time of booking."
+    },
+    {
+      "id": "laser-hair-removal",
+      "section": "treatments",
+      "question": "Do you offer laser hair removal?",
+      "answer": "Yes. Laser hair removal is part of the laser category, alongside CO2 laser, HIFU and RF microneedling. Laser hair removal is normally carried out as a course of sessions rather than a single appointment, and the number of sessions is discussed at your consultation."
+    },
+    {
+      "id": "permanent-makeup",
+      "section": "treatments",
+      "question": "Do you do microblading and other permanent makeup?",
+      "answer": "Yes. The permanent makeup menu covers microblading, nano blading, lip blush and eyeliner. These are semi-permanent cosmetic tattooing treatments designed to follow your natural features rather than redraw them, in line with the lounge's \"enhance, never change\" approach. Shape and colour are agreed with you before any work begins."
+    },
+    {
+      "id": "nails",
+      "section": "treatments",
+      "question": "Can I book a manicure or pedicure there too?",
+      "answer": "Yes. Nurella offers manicure, pedicure, gel polish and gel extensions, and these can be booked on their own or alongside a beauty appointment. Each nail service is booked as its own appointment slot through the online booking system."
+    },
+    {
+      "id": "collagen-biostimulation",
+      "section": "treatments",
+      "question": "What is collagen biostimulation and who is it for?",
+      "answer": "Collagen biostimulation is a group of treatments designed to support the skin's own collagen production over a series of sessions rather than in one visit. At Nurella it covers PLLA collagen stimulation, CaHA biostimulation and personalized collagen-stimulator protocols. It is generally chosen by people noticing loss of firmness or facial structure who prefer a gradual change, and the protocol is selected according to skin condition, age and aesthetic goals."
+    },
+    {
+      "id": "skin-boosters",
+      "section": "treatments",
+      "question": "What are skin boosters, and how are they different from a facial?",
+      "answer": "Skin boosters are treatments aimed at skin quality — hydration, radiance, elasticity and texture — rather than at cleansing the skin's surface the way a facial does. Nurella's rejuvenation category also includes polynucleotide treatments, mesotherapy, exosome therapy and glow and brightening protocols. A facial and a skin booster course are often combined in the same plan, which is set out at your consultation."
+    },
+    {
+      "id": "acne",
+      "section": "concerns",
+      "question": "What's the best treatment for oily, acne-prone skin and acne scars?",
+      "answer": "For acne and acne marks, the two relevant categories at Nurella are advanced skin treatments and professional skin care. Advanced skin treatments handle established texture and scarring concerns, while the skin care menu — deep cleansing, HydraFacial, diamond technique, microneedling — targets congestion and surface condition. Which combination suits you depends on your skin at the time, so the plan is set at a personalized consultation rather than chosen from a menu."
+    },
+    {
+      "id": "wrinkles",
+      "section": "concerns",
+      "question": "What can I do about fine lines and wrinkles?",
+      "answer": "Fine lines and wrinkles are addressed through the facial aesthetics category, which includes anti-wrinkle treatments and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order."
+    },
+    {
+      "id": "sagging",
+      "section": "concerns",
+      "question": "Is there a non-surgical option for sagging skin and a softening jawline?",
+      "answer": "Yes. Nurella's lifting and contouring category covers non-surgical lifting and jawline definition, and collagen biostimulation supports firmness gradually over a course of sessions. HIFU, available under both laser and advanced skin treatments, is also used for firmness. None of these is a substitute for surgery, and what is realistic for you is discussed at the consultation."
+    },
+    {
+      "id": "dull-skin",
+      "section": "concerns",
+      "question": "What helps with dull, dehydrated skin?",
+      "answer": "Dullness and dehydration are handled through skin boosters and rejuvenation — including mesotherapy and glow and brightening protocols — and through the professional skin care facials such as HydraFacial and deep cleansing. Skin boosters work on hydration and radiance from within the skin, while facials work on its surface and are often combined. The starting point is a consultation that looks at your skin's current condition."
+    },
+    {
+      "id": "dark-circles",
+      "section": "concerns",
+      "question": "Do you treat dark circles and tired-looking eyes?",
+      "answer": "Yes. Under-eye rejuvenation sits in the facial aesthetics category, and the skin boosters and rejuvenation category is used where the concern is skin quality around the eye rather than volume. The under-eye area is assessed individually at consultation, because dark circles have several different causes."
+    },
+    {
+      "id": "not-sure",
+      "section": "concerns",
+      "question": "I don't know which treatment I need — where do I start?",
+      "answer": "Start with a consultation. The Nurella website also lets you browse treatments by concern — fine lines, facial volume, sagging, dark circles, dull skin, acne, pigmentation, pores, contouring and rejuvenation — and each concern links to the treatment categories that address it. That gives you a shortlist to discuss, and the final plan is confirmed in person."
+    },
+    {
+      "id": "how-to-book",
+      "section": "booking",
+      "question": "How do I book an appointment at Nurella Beauty Lounge?",
+      "answer": "Appointments are booked online. You choose a treatment, pick a date and time from the lounge's live availability, and submit the request; the request stays pending until the lounge reviews it. You are notified once it is confirmed, or offered an alternative time if that slot is no longer workable."
+    },
+    {
+      "id": "confirmation",
+      "section": "booking",
+      "question": "Is my appointment confirmed as soon as I book it?",
+      "answer": "No — a booking request is received immediately but is not confirmed until the lounge approves it. You will see the status in your account and be notified when it changes. If the lounge proposes a different time, you can accept or decline it, and your original request is released only once you respond."
+    },
+    {
+      "id": "reschedule",
+      "section": "booking",
+      "question": "Can I reschedule or cancel my appointment?",
+      "answer": "Yes. You can request a reschedule or cancel from your appointment in your Nurella account. When you request a new time, your original appointment is held until the lounge responds, so you are never left without a slot while you wait."
+    },
+    {
+      "id": "consultation-required",
+      "section": "booking",
+      "question": "Do I need a consultation before a treatment?",
+      "answer": "Yes. Every treatment at Nurella begins with a personalized consultation and a plan designed around your features, skin needs and desired results. The consultation is where the treatment, the number of sessions and the price are confirmed before anything is carried out."
+    },
+    {
+      "id": "duration",
+      "section": "practical",
+      "question": "How long does an appointment take?",
+      "answer": "Duration depends on the treatment, and the exact length of each one is shown on its treatment page and again in the booking flow before you confirm. Courses such as laser hair removal or collagen biostimulation are booked as individual sessions, each with its own appointment."
+    },
+    {
+      "id": "pricing",
+      "section": "practical",
+      "question": "How much do treatments at Nurella Beauty Lounge cost?",
+      "answer": "Nurella does not publish a fixed price list, because treatment plans are personalized rather than sold as standard packages. The price for your plan is confirmed during the consultation, before any treatment is carried out. Where the lounge has set a price for a specific treatment, it is shown on that treatment's page."
+    },
+    {
+      "id": "location",
+      "section": "practical",
+      "question": "Where is Nurella Beauty Lounge located?",
+      "requires": ["address"],
+      "answer": "Nurella Beauty Lounge is located at {{addressLine}}. Appointments are booked online in advance, so it is best to arrange a time before visiting."
+    },
+    {
+      "id": "location-unlisted",
+      "section": "practical",
+      "question": "How do I get in touch with Nurella Beauty Lounge?",
+      "unless": ["address"],
+      "answer": "Appointments are requested through the booking system on this website, which is the most reliable way to reach the lounge and secure a time. Nurella is also reachable on Instagram at {{instagram}}. The lounge reviews and confirms every request rather than accepting bookings automatically."
+    },
+    {
+      "id": "phone",
+      "section": "practical",
+      "question": "What is Nurella Beauty Lounge's phone number?",
+      "requires": ["phone"],
+      "answer": "You can reach Nurella Beauty Lounge on {{phone}}. Appointments can also be requested online at any time, and the lounge confirms each request directly."
+    },
+    {
+      "id": "hours",
+      "section": "practical",
+      "question": "What are Nurella Beauty Lounge's opening hours?",
+      "requires": ["hours"],
+      "answer": "Nurella Beauty Lounge is open {{hoursLine}}. Bookable times within those hours depend on the treatment and on what is already reserved, so the live availability shown in the booking flow is the authoritative answer for any given day."
+    },
+    {
+      "id": "what-makes-different",
+      "section": "practical",
+      "question": "What makes Nurella Beauty Lounge different from other beauty salons?",
+      "answer": "Nurella works to a stated principle — \"Enhance, never change\" — which means treatments are chosen to respect your facial proportions and individuality rather than produce a standardized look. Advanced aesthetics, regenerative skin treatments, laser, permanent makeup and nails are offered in one place, so a plan can combine categories instead of being split across providers. Every treatment starts from a personalized consultation, and every booking is reviewed by the lounge rather than automatically accepted."
+    }
+  ]
+}

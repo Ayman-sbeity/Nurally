@@ -92,7 +92,7 @@ const FILES = [
 
 /**
  * Card artwork for every service category, keyed by the slug the API returns.
- * Wide banners (4:1) because service cards crop them into a short strip.
+ * Landscape 2:1, which is roughly how the service cards crop them.
  * Keep this list in step with `CATEGORY_IMAGES` in `src/content/brand.ts`.
  */
 const CATEGORY_ART = {
@@ -111,7 +111,7 @@ const CATEGORY_ART = {
 };
 
 Object.entries(CATEGORY_ART).forEach(([slug, palette], index) => {
-  FILES.push([`images/categories/${slug}.svg`, 960, 240, palette, 11 + index]);
+  FILES.push([`images/categories/${slug}.svg`, 960, 480, palette, 11 + index]);
 });
 
 for (const [file, width, height, palette, seed] of FILES) {

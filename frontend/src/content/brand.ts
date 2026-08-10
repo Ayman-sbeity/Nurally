@@ -146,8 +146,13 @@ export const CATEGORY_ORDER = [
  * CONFIGURATION PLACEHOLDERS.
  *
  * Nurella did not supply these details. They are listed explicitly instead of
- * being filled with plausible-looking fiction. Add them here (and to the
- * footer / structured data) once the real values are known.
+ * being filled with plausible-looking fiction.
+ *
+ * Most of them now have a home: set the `VITE_BUSINESS_*` variables in
+ * `frontend/.env` (see `.env.example`) and the footer, the structured data,
+ * the location/phone/hours FAQ entries and `llms.txt` all pick them up at once
+ * — see `docs/GEO-NAP-AUDIT.md`. Until then every one of those surfaces omits
+ * the detail rather than inventing it.
  */
 export const MISSING_INFORMATION = [
   'Street address',

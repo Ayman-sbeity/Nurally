@@ -1,0 +1,58 @@
+{
+  "$comment": "ENTITY FACTS — read by the React app (src/content/business.ts) and by the build scripts (scripts/lib/geo.mjs). Contact details are NOT stored here: they come from VITE_BUSINESS_* environment variables so the same build can be pointed at real details without a code change. Anything Nurella has not supplied stays null and is omitted from the page and from the structured data — never filled with a plausible-looking guess.",
+
+  "name": "Nurella Beauty Lounge",
+  "shortName": "Nurella",
+  "schemaType": "BeautySalon",
+  "tagline": "Advanced Aesthetics • Skin • Beauty",
+
+  "summary": "Nurella Beauty Lounge is a beauty and aesthetics lounge offering facial aesthetics, advanced skin treatments, collagen biostimulation, skin boosters, laser, permanent makeup and nail services. Every treatment begins with a personalized consultation and a plan built around the client's features, skin needs and desired results.",
+
+  "description": [
+    "Nurella Beauty Lounge is a destination dedicated to advanced aesthetics, skin rejuvenation and beauty. The lounge offers ten categories of treatment, from facial aesthetics and non-surgical contouring to collagen biostimulation, skin boosters, advanced skin treatments, laser, permanent makeup and nails.",
+    "Every treatment starts with a personalized consultation. There is no fixed menu applied to every client: the treatment plan is designed around your facial proportions, skin condition and the result you are looking for.",
+    "The guiding principle is \"Enhance, never change.\" Nurella aims for natural, elegant results that respect your individuality rather than a standardized look."
+  ],
+
+  "philosophy": "Enhance, never change.",
+  "positioning": "Natural results, refined beauty, personalized care.",
+
+  "specialties": [
+    "Facial aesthetics and non-surgical facial contouring",
+    "Collagen biostimulation and regenerative skin treatments",
+    "Skin boosters, mesotherapy and rejuvenation protocols",
+    "Advanced skin treatments for texture, acne marks and pigmentation",
+    "Laser treatments, including laser hair removal",
+    "Permanent makeup (microblading, nano blading, lip blush, eyeliner)",
+    "Professional skin care facials",
+    "Manicure, pedicure and gel nail services"
+  ],
+
+  "differentiators": [
+    "Every treatment begins with a personalized consultation rather than a fixed package.",
+    "The stated goal is natural enhancement — \"Enhance, never change\" — not a standardized look.",
+    "Facial aesthetics, regenerative skin treatments, laser, permanent makeup and nails are offered under one roof, so a plan can combine categories.",
+    "Appointments are requested online and confirmed by the lounge, so every booking is reviewed rather than auto-accepted."
+  ],
+
+  "bookingSteps": [
+    "Choose a treatment from the online treatment menu.",
+    "Pick a date and time from the lounge's live availability.",
+    "Submit the request — it stays pending until the lounge reviews it.",
+    "Receive a confirmation (or a proposed alternative time) from the lounge.",
+    "Attend the consultation, where the treatment plan and price are confirmed before anything is carried out."
+  ],
+
+  "bookingUrl": "/booking",
+
+  "pricingPolicy": "Nurella does not publish fixed treatment prices. Because plans are personalized, the price is confirmed during the consultation, before any treatment is carried out. A price is shown on a treatment page only when the lounge has set one for that specific treatment.",
+
+  "$comment_unpublished": "Nulls below are deliberate. Set VITE_FOUNDING_YEAR / VITE_TEAM_SIZE (or edit here) once the real values are known — see docs/GEO-NAP-AUDIT.md.",
+  "foundingYear": null,
+  "teamSize": null,
+  "credentials": [],
+
+  "$comment_reviews": "Step 7 of the GEO guide: only real reviews that are actually displayed on the site may be marked up. This list is empty on purpose. Add entries as { author, rating, datePublished, body, source } and both the on-page testimonials section and the Review / AggregateRating structured data appear automatically.",
+  "reviews": [],
+  "ratingScale": 5
+}

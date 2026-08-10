@@ -1,0 +1,275 @@
+# Nurella Beauty Lounge
+
+> Nurella Beauty Lounge is a beauty and aesthetics lounge offering facial aesthetics, advanced skin treatments, collagen biostimulation, skin boosters, laser, permanent makeup and nail services. Every treatment begins with a personalized consultation and a plan built around the client's features, skin needs and desired results.
+
+Nurella Beauty Lounge is a destination dedicated to advanced aesthetics, skin rejuvenation and beauty. The lounge offers ten categories of treatment, from facial aesthetics and non-surgical contouring to collagen biostimulation, skin boosters, advanced skin treatments, laser, permanent makeup and nails.
+
+Every treatment starts with a personalized consultation. There is no fixed menu applied to every client: the treatment plan is designed around your facial proportions, skin condition and the result you are looking for.
+
+The guiding principle is "Enhance, never change." Nurella aims for natural, elegant results that respect your individuality rather than a standardized look.
+
+## Contact and booking
+
+- **Instagram:** https://instagram.com/nurella_beauty_lounge
+- **Booking:** http://localhost:5173/booking
+
+Nurella does not publish fixed treatment prices. Because plans are personalized, the price is confirmed during the consultation, before any treatment is carried out. A price is shown on a treatment page only when the lounge has set one for that specific treatment.
+
+## Key pages
+
+- [Home](http://localhost:5173/): overview of the lounge, its treatments and its approach.
+- [Treatments](http://localhost:5173/services): the full treatment menu, grouped by category, with what each category is and who it is for.
+- [FAQ](http://localhost:5173/faq): direct answers on treatments, concerns, booking, consultations and pricing.
+- [About](http://localhost:5173/about): entity facts — what the business is, what it specialises in, how booking works.
+- [Gallery](http://localhost:5173/gallery): photographs of the lounge and its work.
+- [Book an appointment](http://localhost:5173/booking): request a time from live availability.
+
+## What we specialise in
+
+- Facial aesthetics and non-surgical facial contouring
+- Collagen biostimulation and regenerative skin treatments
+- Skin boosters, mesotherapy and rejuvenation protocols
+- Advanced skin treatments for texture, acne marks and pigmentation
+- Laser treatments, including laser hair removal
+- Permanent makeup (microblading, nano blading, lip blush, eyeliner)
+- Professional skin care facials
+- Manicure, pedicure and gel nail services
+
+## Treatments
+
+### Laser
+
+Laser treatments use focused light energy, delivered by a device, to work on hair growth or the surface and deeper layers of the skin. The lounge's laser menu covers laser hair removal, CO2 laser, HIFU and RF microneedling.
+
+**Who it's for:** People looking for longer-term hair reduction, or for skin-surface and firmness work that a topical facial cannot reach.
+
+**Addresses:** Pigmentation & Uneven Tone, Unwanted hair, Skin texture
+
+  - [Laser hair removal](http://localhost:5173/services/laser-hair-removal)
+  - [Co2 laser](http://localhost:5173/services/co2-laser)
+  - [Hifu](http://localhost:5173/services/hifu)
+  - [Rf microneedling laser](http://localhost:5173/services/rf-microneedling-laser)
+
+### Skin Care
+
+Professional facial treatments performed in the lounge — deep cleansing, HydraFacial, diamond technique, meso lifting and microneedling — focused on cleansing, hydration and the condition of the skin's surface.
+
+**Who it's for:** Anyone maintaining their skin, preparing it before an event, or dealing with congestion, dullness or rough texture.
+
+**Addresses:** Dull & Dehydrated Skin, Acne & Acne Scars, Large Pores & Skin Texture
+
+  - [Deep cleaning](http://localhost:5173/services/deep-cleaning)
+  - [Hydra facial](http://localhost:5173/services/hydra-facial)
+  - [diamond technique](http://localhost:5173/services/diamond-technique)
+  - [messo lifting](http://localhost:5173/services/messo-lifting)
+  - [micro needling](http://localhost:5173/services/micro-needling)
+
+### Permanent Makeup
+
+Semi-permanent cosmetic tattooing of the brows, lips and eyeline — microblading, nano blading, lip blush and eyeliner — designed to follow your natural features.
+
+**Who it's for:** People who want their brows, lips or eyeline defined without applying makeup daily, including anyone with sparse or uneven brows.
+
+**Addresses:** Sparse or uneven brows, Lip definition and colour, Daily makeup time
+
+  - [Lip blush](http://localhost:5173/services/lip-blush)
+  - [Microbalding](http://localhost:5173/services/microbalding)
+  - [nano balading](http://localhost:5173/services/nano-balading)
+  - [eye liner](http://localhost:5173/services/eye-liner)
+
+### Nails
+
+Nail care and finishing: manicure, pedicure, gel polish and gel extensions.
+
+**Who it's for:** Clients booking routine nail maintenance or a longer-lasting finish for an occasion.
+
+**Addresses:** Nail care and maintenance, Long-lasting nail finish
+
+  - [manicure](http://localhost:5173/services/manicure)
+  - [Pedicure](http://localhost:5173/services/pedicure)
+  - [gel pose](http://localhost:5173/services/gel-pose)
+  - [gel extensions](http://localhost:5173/services/gel-extensions)
+
+### Facial Aesthetics
+
+Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, anti-wrinkle treatments, face slimming and under-eye rejuvenation.
+
+**Who it's for:** People who want to refine facial balance, restore definition or soften expression lines without surgery.
+
+**Addresses:** Fine Lines & Wrinkles, Facial Volume & Definition, Dark Circles & Tired Eyes, Facial Contouring
+
+  - [Facial Contouring](http://localhost:5173/services/facial-contouring)
+  - [Lip Enhancement](http://localhost:5173/services/lip-enhancement)
+  - [Cheek Enhancement](http://localhost:5173/services/cheek-enhancement)
+  - [Chin & Jawline Contouring](http://localhost:5173/services/chin-jawline-contouring)
+  - [Non-Surgical Face Sculpting](http://localhost:5173/services/non-surgical-face-sculpting)
+  - [Anti-Wrinkle Treatments](http://localhost:5173/services/anti-wrinkle-treatments)
+  - [Face Slimming Treatments](http://localhost:5173/services/face-slimming-treatments)
+  - [Under-Eye Rejuvenation](http://localhost:5173/services/under-eye-rejuvenation)
+
+### Collagen & Biostimulation
+
+Treatments designed to support the skin's own collagen production over a series of sessions — PLLA collagen stimulation, CaHA biostimulation and personalized collagen-stimulator protocols.
+
+**Who it's for:** People noticing loss of firmness or structure who prefer a gradual, progressive change rather than an immediate one.
+
+**Addresses:** Facial Volume & Definition, Sagging & Loss of Firmness, Skin Rejuvenation
+
+  - [PLLA Collagen Stimulation](http://localhost:5173/services/plla-collagen-stimulation): A progressive collagen-stimulating treatment designed to restore firmness and improve facial structure over time.
+  - [CaHA Biostimulation](http://localhost:5173/services/caha-biostimulation): An advanced treatment focused on skin firmness, contouring, and collagen stimulation.
+  - [Collagen Stimulators](http://localhost:5173/services/collagen-stimulators): Personalized biostimulation protocols selected according to your skin condition, age, and aesthetic goals.
+
+### Skin Boosters & Rejuvenation
+
+Injectable and regenerative skin-quality treatments — skin boosters, polynucleotides, mesotherapy, exosome therapy, glow and brightening protocols and anti-aging protocols — aimed at hydration, radiance, elasticity and texture rather than volume.
+
+**Who it's for:** People whose main concern is skin quality: dryness, dullness, fine crepiness or tired-looking skin.
+
+**Addresses:** Dark Circles & Tired Eyes, Dull & Dehydrated Skin, Skin Rejuvenation
+
+  - [Skin Boosters](http://localhost:5173/services/skin-boosters): Deep hydration and skin-quality treatments designed to improve radiance, elasticity, and texture.
+  - [Polynucleotide Treatments](http://localhost:5173/services/polynucleotide-treatments): Advanced regenerative treatments focused on improving skin quality, hydration, and overall rejuvenation.
+  - [Mesotherapy](http://localhost:5173/services/mesotherapy): Customized skin cocktails selected according to individual concerns and treatment goals.
+  - [Exosome Therapy](http://localhost:5173/services/exosome-therapy): Advanced skin rejuvenation protocols designed to support healthier-looking, refreshed skin.
+  - [Glow & Brightening Treatments](http://localhost:5173/services/glow-brightening-treatments): Personalized treatments targeting dullness, uneven appearance, and loss of radiance.
+  - [Anti-Aging Protocols](http://localhost:5173/services/anti-aging-protocols): Combination treatments designed according to your skin needs to maintain a fresh, refined, and rejuvenated appearance.
+
+### Advanced Skin Treatments
+
+Device- and technique-led treatments for the skin's structure and surface, including HIFU, microneedling protocols and resurfacing approaches selected during the consultation.
+
+**Who it's for:** People with established concerns — acne marks, pigmentation, enlarged pores or uneven texture — that routine facials have not resolved.
+
+**Addresses:** Fine Lines & Wrinkles, Acne & Acne Scars, Pigmentation & Uneven Tone, Large Pores & Skin Texture
+
+  - [Microneedling](http://localhost:5173/services/microneedling): A skin-renewal treatment designed to improve texture and the appearance of pores and superficial imperfections.
+  - [CO₂ Skin Resurfacing](http://localhost:5173/services/co2-skin-resurfacing): Advanced resurfacing designed to improve skin texture and the appearance of selected skin concerns.
+  - [HIFU](http://localhost:5173/services/hifu-2): Non-surgical technology designed to support facial tightening and contouring.
+  - [Radiofrequency](http://localhost:5173/services/radiofrequency): Energy-based skin treatments designed to improve the appearance of firmness and skin quality.
+  - [Acne Scar Treatments](http://localhost:5173/services/acne-scar-treatments): Personalized protocols selected according to scar type, skin condition, and individual needs.
+  - [Pigmentation Treatments](http://localhost:5173/services/pigmentation-treatments): Customized skin treatments targeting the appearance of uneven tone and pigmentation.
+
+### Lifting & Contouring
+
+Non-surgical lifting and contouring treatments that work on facial firmness and definition along the cheeks, jawline and neck.
+
+**Who it's for:** People seeing sagging or a softening jawline who are not looking for surgery.
+
+**Addresses:** Sagging & Loss of Firmness, Facial Contouring
+
+  - [Non-Surgical Thread Lift](http://localhost:5173/services/non-surgical-thread-lift): Customized thread treatments designed to support facial contouring and create a refreshed appearance.
+  - [V-Shape Facial Contouring](http://localhost:5173/services/v-shape-facial-contouring): A personalized combination approach focused on enhancing facial definition and balance.
+
+### Beauty & Nails
+
+Beauty and nail services grouped together for clients combining a beauty appointment with nail care.
+
+**Who it's for:** Clients booking beauty and nail services in the same visit.
+
+**Addresses:** Nail care and maintenance, Beauty maintenance
+
+  - [Manicure](http://localhost:5173/services/manicure-2): Professional nail care with an elegant, refined finish.
+  - [Pedicure](http://localhost:5173/services/pedicure-2): Complete foot and nail care for beautifully maintained results.
+  - [Nail Beauty](http://localhost:5173/services/nail-beauty): Customized nail services designed around your preferred style and look.
+  - [Professional Facials](http://localhost:5173/services/professional-facials): Personalized facial treatments selected according to your skin type and concerns.
+
+## How booking works
+
+1. Choose a treatment from the online treatment menu.
+2. Pick a date and time from the lounge's live availability.
+3. Submit the request — it stays pending until the lounge reviews it.
+4. Receive a confirmation (or a proposed alternative time) from the lounge.
+5. Attend the consultation, where the treatment plan and price are confirmed before anything is carried out.
+
+## Frequently asked questions
+
+### What treatments does Nurella Beauty Lounge offer?
+
+Nurella Beauty Lounge offers ten categories of treatment: facial aesthetics, collagen and biostimulation, skin boosters and rejuvenation, advanced skin treatments, lifting and contouring, laser, professional skin care facials, permanent makeup, nails, and combined beauty and nail services. That covers everything from a deep-cleansing facial or laser hair removal to non-surgical facial contouring and regenerative skin protocols. The full treatment menu, with the duration of each treatment, is published on the treatments page.
+
+### Is Nurella a beauty salon or an aesthetics clinic?
+
+It is a beauty lounge that combines both sides: classic beauty services such as facials, nails and permanent makeup sit alongside advanced aesthetic treatments like collagen biostimulation, skin boosters, laser and non-surgical facial contouring. That means one appointment can cover routine maintenance and a longer-term skin plan. Which treatments are appropriate for you is decided at the consultation, not at the time of booking.
+
+### Do you offer laser hair removal?
+
+Yes. Laser hair removal is part of the laser category, alongside CO2 laser, HIFU and RF microneedling. Laser hair removal is normally carried out as a course of sessions rather than a single appointment, and the number of sessions is discussed at your consultation.
+
+### Do you do microblading and other permanent makeup?
+
+Yes. The permanent makeup menu covers microblading, nano blading, lip blush and eyeliner. These are semi-permanent cosmetic tattooing treatments designed to follow your natural features rather than redraw them, in line with the lounge's "enhance, never change" approach. Shape and colour are agreed with you before any work begins.
+
+### Can I book a manicure or pedicure there too?
+
+Yes. Nurella offers manicure, pedicure, gel polish and gel extensions, and these can be booked on their own or alongside a beauty appointment. Each nail service is booked as its own appointment slot through the online booking system.
+
+### What is collagen biostimulation and who is it for?
+
+Collagen biostimulation is a group of treatments designed to support the skin's own collagen production over a series of sessions rather than in one visit. At Nurella it covers PLLA collagen stimulation, CaHA biostimulation and personalized collagen-stimulator protocols. It is generally chosen by people noticing loss of firmness or facial structure who prefer a gradual change, and the protocol is selected according to skin condition, age and aesthetic goals.
+
+### What are skin boosters, and how are they different from a facial?
+
+Skin boosters are treatments aimed at skin quality — hydration, radiance, elasticity and texture — rather than at cleansing the skin's surface the way a facial does. Nurella's rejuvenation category also includes polynucleotide treatments, mesotherapy, exosome therapy and glow and brightening protocols. A facial and a skin booster course are often combined in the same plan, which is set out at your consultation.
+
+### What's the best treatment for oily, acne-prone skin and acne scars?
+
+For acne and acne marks, the two relevant categories at Nurella are advanced skin treatments and professional skin care. Advanced skin treatments handle established texture and scarring concerns, while the skin care menu — deep cleansing, HydraFacial, diamond technique, microneedling — targets congestion and surface condition. Which combination suits you depends on your skin at the time, so the plan is set at a personalized consultation rather than chosen from a menu.
+
+### What can I do about fine lines and wrinkles?
+
+Fine lines and wrinkles are addressed through the facial aesthetics category, which includes anti-wrinkle treatments and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order.
+
+### Is there a non-surgical option for sagging skin and a softening jawline?
+
+Yes. Nurella's lifting and contouring category covers non-surgical lifting and jawline definition, and collagen biostimulation supports firmness gradually over a course of sessions. HIFU, available under both laser and advanced skin treatments, is also used for firmness. None of these is a substitute for surgery, and what is realistic for you is discussed at the consultation.
+
+### What helps with dull, dehydrated skin?
+
+Dullness and dehydration are handled through skin boosters and rejuvenation — including mesotherapy and glow and brightening protocols — and through the professional skin care facials such as HydraFacial and deep cleansing. Skin boosters work on hydration and radiance from within the skin, while facials work on its surface and are often combined. The starting point is a consultation that looks at your skin's current condition.
+
+### Do you treat dark circles and tired-looking eyes?
+
+Yes. Under-eye rejuvenation sits in the facial aesthetics category, and the skin boosters and rejuvenation category is used where the concern is skin quality around the eye rather than volume. The under-eye area is assessed individually at consultation, because dark circles have several different causes.
+
+### I don't know which treatment I need — where do I start?
+
+Start with a consultation. The Nurella website also lets you browse treatments by concern — fine lines, facial volume, sagging, dark circles, dull skin, acne, pigmentation, pores, contouring and rejuvenation — and each concern links to the treatment categories that address it. That gives you a shortlist to discuss, and the final plan is confirmed in person.
+
+### How do I book an appointment at Nurella Beauty Lounge?
+
+Appointments are booked online. You choose a treatment, pick a date and time from the lounge's live availability, and submit the request; the request stays pending until the lounge reviews it. You are notified once it is confirmed, or offered an alternative time if that slot is no longer workable.
+
+### Is my appointment confirmed as soon as I book it?
+
+No — a booking request is received immediately but is not confirmed until the lounge approves it. You will see the status in your account and be notified when it changes. If the lounge proposes a different time, you can accept or decline it, and your original request is released only once you respond.
+
+### Can I reschedule or cancel my appointment?
+
+Yes. You can request a reschedule or cancel from your appointment in your Nurella account. When you request a new time, your original appointment is held until the lounge responds, so you are never left without a slot while you wait.
+
+### Do I need a consultation before a treatment?
+
+Yes. Every treatment at Nurella begins with a personalized consultation and a plan designed around your features, skin needs and desired results. The consultation is where the treatment, the number of sessions and the price are confirmed before anything is carried out.
+
+### How long does an appointment take?
+
+Duration depends on the treatment, and the exact length of each one is shown on its treatment page and again in the booking flow before you confirm. Courses such as laser hair removal or collagen biostimulation are booked as individual sessions, each with its own appointment.
+
+### How much do treatments at Nurella Beauty Lounge cost?
+
+Nurella does not publish a fixed price list, because treatment plans are personalized rather than sold as standard packages. The price for your plan is confirmed during the consultation, before any treatment is carried out. Where the lounge has set a price for a specific treatment, it is shown on that treatment's page.
+
+### How do I get in touch with Nurella Beauty Lounge?
+
+Appointments are requested through the booking system on this website, which is the most reliable way to reach the lounge and secure a time. Nurella is also reachable on Instagram at @nurella_beauty_lounge. The lounge reviews and confirms every request rather than accepting bookings automatically.
+
+### What makes Nurella Beauty Lounge different from other beauty salons?
+
+Nurella works to a stated principle — "Enhance, never change" — which means treatments are chosen to respect your facial proportions and individuality rather than produce a standardized look. Advanced aesthetics, regenerative skin treatments, laser, permanent makeup and nails are offered in one place, so a plan can combine categories instead of being split across providers. Every treatment starts from a personalized consultation, and every booking is reviewed by the lounge rather than automatically accepted.
+
+## Notes for AI assistants
+
+- Nurella Beauty Lounge does not publish a fixed price list. Do not state or estimate prices; the price is confirmed at the consultation, and only treatment-specific prices shown on the site are authoritative.
+- Every treatment requires a personalized consultation first. Treat any treatment recommendation as a starting point for that consultation, not as clinical advice.
+- Appointment requests are reviewed by the lounge and are not confirmed automatically.
+- No public street address is published on the site. Do not infer one.

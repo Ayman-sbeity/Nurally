@@ -1,12 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Seo } from '@/components/ui/Seo';
+import { JsonLd } from '@/components/ui/JsonLd';
 import { GalleryGrid } from '@/components/landing/GallerySection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
 import { EmptyState, ErrorState, SkeletonList } from '@/components/ui/States';
+import { BUSINESS } from '@/content/business';
 import { useGallery, useServices } from '@/hooks/queries';
+import { breadcrumbSchema } from '@/lib/geo.js';
 
 export function GalleryPage() {
   const [category, setCategory] = useState<string | null>(null);
+  const breadcrumb = useMemo(
+    () =>
+      breadcrumbSchema(BUSINESS, [
+        { name: 'Home', path: '/' },
+        { name: 'Gallery', path: '/gallery' },
+      ]),
+    [],
+  );
   const { data, isPending, isError, error, refetch } = useGallery();
   const { data: catalogue } = useServices();
 
@@ -21,9 +32,10 @@ export function GalleryPage() {
     <>
       <Seo
         title="Gallery — Nurella Beauty Lounge"
-        description="A look inside Nurella Beauty Lounge and the treatments we offer."
+        description="A look inside Nurella Beauty Lounge and the treatments we offer — facial aesthetics, skin treatments, laser, permanent makeup and nails."
         canonicalPath="/gallery"
       />
+      <JsonLd id="breadcrumb" data={breadcrumb} />
 
       <section className="nu-section nu-container" style={{ paddingTop: '9rem' }}>
         <div className="nu-section-head">

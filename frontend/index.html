@@ -4,24 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
+    <!--
+      The tags between here and the end of the JSON-LD block are rewritten per
+      route by `scripts/prerender.mjs` after the build, so a crawler that does
+      not run JavaScript still gets route-specific metadata. Keep each on one
+      line — the pre-renderer matches them by tag.
+    -->
     <title>Nurella Beauty Lounge — Advanced Aesthetics, Skin &amp; Beauty</title>
-    <meta
-      name="description"
-      content="Nurella Beauty Lounge — where advanced aesthetics meet elegance, precision and personalized care. Book your personalized consultation."
-    />
-    <link rel="canonical" href="http://localhost:5173/" />
+    <meta name="description" content="Nurella Beauty Lounge offers facial aesthetics, collagen biostimulation, skin boosters, advanced skin treatments, laser, permanent makeup, facials and nails. Every treatment begins with a personalized consultation — request an appointment online." />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
     <meta name="robots" content="index, follow" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Nurella Beauty Lounge" />
-    <meta property="og:title" content="Nurella Beauty Lounge — Beauty, Refined." />
-    <meta
-      property="og:description"
-      content="Where advanced aesthetics meet elegance, precision, and personalized care."
-    />
-    <meta property="og:image" content="/images/og-cover.svg" />
-    <meta property="og:url" content="http://localhost:5173/" />
+    <meta property="og:title" content="Nurella Beauty Lounge — Advanced Aesthetics, Skin &amp; Beauty" />
+    <meta property="og:description" content="Facial aesthetics, collagen biostimulation, skin boosters, advanced skin treatments, laser, permanent makeup, facials and nails — every treatment planned around you." />
+    <meta property="og:image" content="%VITE_SITE_URL%/images/og-cover.svg" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- PWA -->
@@ -40,12 +40,19 @@
       rel="stylesheet"
     />
 
+    <!--
+      Development / fallback graph only. The build replaces this with the full
+      per-route graph (business, website, services, FAQ, breadcrumbs) built from
+      `src/content/geo/*` — see scripts/prerender.mjs. At runtime the React app
+      renders the same graph through `components/ui/JsonLd`.
+    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "BeautySalon",
         "name": "Nurella Beauty Lounge",
         "description": "Advanced Aesthetics • Skin • Beauty",
+        "url": "%VITE_SITE_URL%/",
         "sameAs": ["https://instagram.com/nurella_beauty_lounge"]
       }
     </script>

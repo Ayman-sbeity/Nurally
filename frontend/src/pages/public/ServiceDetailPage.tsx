@@ -1,19 +1,23 @@
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Seo } from '@/components/ui/Seo';
+import { JsonLd } from '@/components/ui/JsonLd';
 import { ErrorState, LoadingState } from '@/components/ui/States';
 import { useBookService } from '@/components/landing/ServiceCard';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
-import { useService, useServices } from '@/hooks/queries';
+import { ServiceFacts } from '@/components/landing/ServiceFacts';
 import { ServiceCard } from '@/components/landing/ServiceCard';
 import { categoryImage } from '@/content/brand';
-import { formatDuration, formatPrice } from '@/utils/format';
+import { BUSINESS, treatmentFacts } from '@/content/business';
+import { useService, useServices } from '@/hooks/queries';
+import { breadcrumbSchema, serviceSchema } from '@/lib/geo.js';
+import type { Service, ServiceCategory } from '@/types/api';
 import { mediaSrc } from '@/utils/media';
 
 export function ServiceDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isPending, isError, error, refetch } = useService(slug);
   const { data: catalogue } = useServices();
-  const bookService = useBookService();
 
   if (isPending) {
     return (
@@ -36,21 +40,48 @@ export function ServiceDetailPage() {
     );
   }
 
-  const { service } = data;
-  const price = formatPrice(service.price, service.currency);
-  const category = catalogue?.categories.find((entry) => entry.slug === service.category);
+  const category = catalogue?.categories.find((entry) => entry.slug === data.service.category);
+
+  // Split out so the structured data can be memoised without the hook sitting
+  // behind the loading and error branches above.
+  return <ServiceDetail service={data.service} category={category} />;
+}
+
+function ServiceDetail({ service, category }: { service: Service; category?: ServiceCategory }) {
+  const bookService = useBookService();
+  const facts = treatmentFacts(service.category);
   const related = (category?.services ?? []).filter((item) => item._id !== service._id).slice(0, 3);
+
+  const schema = useMemo(
+    () => serviceSchema(BUSINESS, service, category, facts),
+    [service, category, facts],
+  );
+  const breadcrumb = useMemo(
+    () =>
+      breadcrumbSchema(BUSINESS, [
+        { name: 'Home', path: '/' },
+        { name: 'Treatments', path: '/services' },
+        { name: service.name, path: `/services/${service.slug}` },
+      ]),
+    [service],
+  );
+
+  // Fact-dense first sentence, so the search snippet and any AI summary lead
+  // with what the treatment is rather than with the lounge's positioning.
+  const description =
+    service.description ??
+    (facts ? `${service.name} at ${BUSINESS.name}. ${facts.whatItIs}` : undefined) ??
+    `${service.name} at ${BUSINESS.name}. Every treatment begins with a personalized consultation.`;
 
   return (
     <>
       <Seo
         title={`${service.name} — Nurella Beauty Lounge`}
-        description={
-          service.description ??
-          `${service.name} at Nurella Beauty Lounge. Book your personalized consultation.`
-        }
+        description={description}
         canonicalPath={`/services/${service.slug}`}
       />
+      <JsonLd id="service" data={schema} />
+      <JsonLd id="breadcrumb" data={breadcrumb} />
 
       <article className="nu-section nu-container" style={{ paddingTop: '9rem' }}>
         <nav aria-label="Breadcrumb" style={{ marginBottom: 'var(--nu-space-5)' }}>
@@ -76,25 +107,27 @@ export function ServiceDetailPage() {
               {service.name}
             </h1>
 
-            {service.description && <p className="nu-lede">{service.description}</p>}
+            {/* The plain answer comes first — what it is, who it is for, what
+                it addresses, how long it takes, what it costs — and the
+                lounge's own copy follows it. */}
+            <ServiceFacts service={service} category={category} />
 
-            <dl className="nu-deflist" style={{ marginBlock: 'var(--nu-space-6)' }}>
-              <div className="nu-deflist__row">
-                <dt className="nu-deflist__key">Duration</dt>
-                <dd>{formatDuration(service.durationMinutes)}</dd>
-              </div>
-              {/* Price is rendered only when the lounge has configured one. */}
-              {price && (
-                <div className="nu-deflist__row">
-                  <dt className="nu-deflist__key">Price</dt>
-                  <dd>{price}</dd>
-                </div>
-              )}
-            </dl>
+            {service.description && (
+              <p className="nu-lede" style={{ marginTop: 'var(--nu-space-6)' }}>
+                {service.description}
+              </p>
+            )}
+
+            <p className="nu-prose" style={{ marginTop: 'var(--nu-space-5)' }}>
+              Every treatment at {BUSINESS.name} begins with a personalized consultation. The plan,
+              the number of sessions and the price are confirmed with you before anything is carried
+              out.
+            </p>
 
             <button
               type="button"
               className="nu-btn nu-btn--primary"
+              style={{ marginTop: 'var(--nu-space-6)' }}
               onClick={() => bookService(service._id)}
             >
               Book this service

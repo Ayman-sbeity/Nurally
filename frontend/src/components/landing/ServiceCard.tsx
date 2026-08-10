@@ -40,7 +40,7 @@ export function ServiceCard({ service }: { service: Service }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <img src={image} alt="" width={960} height={400} loading="lazy" decoding="async" />
+        <img src={image} alt="" width={960} height={480} loading="lazy" decoding="async" />
       </Link>
 
       <h3 className="nu-service-card__name">

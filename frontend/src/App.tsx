@@ -15,6 +15,7 @@ const ServicesPage = lazy(() => import('@/pages/public/ServicesPage'));
 const ServiceDetailPage = lazy(() => import('@/pages/public/ServiceDetailPage'));
 const AboutPage = lazy(() => import('@/pages/public/AboutPage'));
 const GalleryPage = lazy(() => import('@/pages/public/GalleryPage'));
+const FaqPage = lazy(() => import('@/pages/public/FaqPage'));
 const NotFoundPage = lazy(() => import('@/pages/public/NotFoundPage'));
 
 const LoginPage = lazy(() => import('@/pages/public/LoginPage'));
@@ -61,6 +62,7 @@ export function App() {
             <Route path="services/:slug" element={<ServiceDetailPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="gallery" element={<GalleryPage />} />
+            <Route path="faq" element={<FaqPage />} />
           </Route>
 
           {/* --- Authentication --- */}

@@ -37,6 +37,12 @@ const queryClient = new QueryClient({
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element #root was not found.');
 
+// `scripts/prerender.mjs` writes a crawlable copy of each page's facts into the
+// document: plain HTML inside #root (React clears it on first render) and the
+// route's JSON-LD in the head. The head scripts have to go by hand, otherwise a
+// client-side navigation would leave the previous route's graph behind.
+document.head.querySelectorAll('script[data-geo-static]').forEach((node) => node.remove());
+
 createRoot(container).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

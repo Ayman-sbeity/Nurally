@@ -389,13 +389,26 @@
   margin-bottom: var(--nu-space-5);
 }
 
+/*
+ * Column count is decided by the space available, not by breakpoints: the
+ * track floor is 17rem, and `min(100%, …)` keeps that floor from overflowing a
+ * viewport narrower than one card.
+ */
 .nu-service-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
-  gap: var(--nu-space-4);
+  gap: clamp(var(--nu-space-3), 2.5vw, var(--nu-space-5));
 }
 
+/*
+ * Each card is a container, so its contents respond to the width of the card
+ * rather than of the window. The same card then reads correctly full-width on
+ * a phone, two-up on a tablet and three-up on a desktop — including inside any
+ * narrower column it is dropped into later.
+ */
 .nu-service-card {
+  container-type: inline-size;
+  container-name: service-card;
   display: flex;
   flex-direction: column;
   gap: var(--nu-space-3);
@@ -416,10 +429,16 @@
   border-color: var(--nu-champagne-soft);
 }
 
-/* A fixed 100px band, bled to the card edges so it spans the full card width. */
+/*
+ * A picture bled to the card edges, so it always spans the full card width.
+ * Its height comes from a ratio rather than a fixed value, so it grows and
+ * shrinks with the card at every size — one rule instead of a breakpoint per
+ * layout. The cap stops a full-width card on a tablet becoming a poster.
+ */
 .nu-service-card__media {
   display: block;
-  height: 100px;
+  aspect-ratio: 2 / 1;
+  max-height: 15rem;
   flex: none;
   overflow: hidden;
   background: var(--nu-sand);
@@ -466,6 +485,24 @@
   padding-top: var(--nu-space-3);
   border-top: 1px solid var(--nu-line);
   flex-wrap: wrap;
+}
+
+/*
+ * Below this width the duration and the button no longer sit side by side
+ * comfortably. Rather than let them wrap into a ragged row, stack them and
+ * give the action the card's full width.
+ *
+ * Flex wrapping above is the fallback wherever container queries are missing.
+ */
+@container service-card (max-width: 20rem) {
+  .nu-service-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nu-service-card__foot .nu-btn {
+    width: 100%;
+  }
 }
 
 .nu-service-card__meta {
@@ -660,6 +697,20 @@
   margin-top: var(--nu-space-2);
 }
 
+/* Name, address and phone — empty until those details are configured. */
+.nu-footer__nap {
+  display: grid;
+  gap: var(--nu-space-1);
+  margin-top: var(--nu-space-4);
+  font-size: var(--nu-text-sm);
+  font-style: normal;
+  color: var(--nu-text-muted);
+}
+
+.nu-footer__nap:empty {
+  display: none;
+}
+
 .nu-footer__nav {
   display: grid;
   gap: var(--nu-space-2);
@@ -733,4 +784,182 @@
 .nu-prose {
   color: var(--nu-text-muted);
   font-size: var(--nu-text-md);
+}
+
+/* --- Fact blocks (GEO) ----------------------------------------------------
+   Step 3 of the GEO plan puts a plain, fact-dense answer above the marketing
+   copy on every treatment page. It has to read as considered editorial rather
+   than a spec sheet, so it borrows the card surface and the hairline rules the
+   rest of the landing page uses instead of introducing a new visual language. */
+.nu-facts {
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  background: var(--nu-surface);
+  padding: var(--nu-space-5) var(--nu-space-6);
+}
+
+.nu-facts__row + .nu-facts__row {
+  margin-top: var(--nu-space-4);
+  padding-top: var(--nu-space-4);
+  border-top: 1px solid var(--nu-line);
+}
+
+.nu-facts__key {
+  font-size: var(--nu-text-xs);
+  letter-spacing: var(--nu-tracking-wider);
+  text-transform: uppercase;
+  color: var(--nu-champagne-text);
+  font-weight: 500;
+  margin-bottom: var(--nu-space-2);
+}
+
+.nu-facts__value {
+  color: var(--nu-text);
+  font-size: var(--nu-text-base);
+}
+
+.nu-facts__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-2);
+}
+
+.nu-facts__tag {
+  font-size: var(--nu-text-xs);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--nu-line-strong);
+  border-radius: var(--nu-radius-pill);
+  color: var(--nu-text-muted);
+}
+
+/* --- FAQ ------------------------------------------------------------------ */
+.nu-faq {
+  display: grid;
+  gap: var(--nu-space-6);
+  max-width: 72ch;
+}
+
+.nu-faq__section + .nu-faq__section {
+  margin-top: var(--nu-space-7);
+}
+
+.nu-faq__section-title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-xl);
+  font-weight: 400;
+  padding-bottom: var(--nu-space-3);
+  border-bottom: 1px solid var(--nu-line);
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-faq__item + .nu-faq__item {
+  margin-top: var(--nu-space-5);
+}
+
+.nu-faq__q {
+  font-size: var(--nu-text-lg);
+  font-family: var(--nu-font-display);
+  font-weight: 500;
+  margin-bottom: var(--nu-space-2);
+}
+
+.nu-faq__a {
+  color: var(--nu-text-muted);
+  max-width: 72ch;
+}
+
+.nu-faq__jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-2);
+  margin-bottom: var(--nu-space-7);
+}
+
+/* --- Entity facts (About) ------------------------------------------------- */
+.nu-entity {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+.nu-entity__item {
+  padding: var(--nu-space-5);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  background: var(--nu-surface);
+}
+
+.nu-entity__label {
+  font-size: var(--nu-text-xs);
+  letter-spacing: var(--nu-tracking-wider);
+  text-transform: uppercase;
+  color: var(--nu-champagne-text);
+  margin-bottom: var(--nu-space-2);
+}
+
+.nu-entity__value {
+  font-size: var(--nu-text-base);
+}
+
+.nu-process {
+  counter-reset: nu-process;
+  display: grid;
+  gap: var(--nu-space-4);
+  max-width: 68ch;
+}
+
+.nu-process__step {
+  position: relative;
+  padding-left: 2.75rem;
+  color: var(--nu-text-muted);
+}
+
+.nu-process__step::before {
+  counter-increment: nu-process;
+  content: counter(nu-process);
+  position: absolute;
+  left: 0;
+  top: -0.15rem;
+  width: 1.85rem;
+  height: 1.85rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--nu-champagne-deep);
+  border-radius: 50%;
+  color: var(--nu-champagne-text);
+  font-size: var(--nu-text-xs);
+}
+
+/* --- Reviews -------------------------------------------------------------- */
+.nu-reviews {
+  display: grid;
+  gap: var(--nu-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.nu-review {
+  padding: var(--nu-space-5);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  background: var(--nu-surface);
+}
+
+.nu-review__rating {
+  color: var(--nu-champagne-deep);
+  letter-spacing: 0.15em;
+  margin-bottom: var(--nu-space-3);
+}
+
+.nu-review__body {
+  color: var(--nu-text-muted);
+}
+
+.nu-review__author {
+  margin-top: var(--nu-space-4);
+  font-size: var(--nu-text-sm);
+}
+
+@media (min-width: 720px) {
+  .nu-entity {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
 }

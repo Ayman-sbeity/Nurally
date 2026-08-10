@@ -220,6 +220,17 @@
   font-size: 0.6875rem;
 }
 
+/*
+ * Compact buttons are sized for a mouse. Where the pointer is a fingertip they
+ * grow to the 44px target regardless of how wide the screen is — a tablet is
+ * still touch at 1024px, and a small laptop is still a mouse at 900px.
+ */
+@media (pointer: coarse) {
+  .nu-btn--sm {
+    min-height: 2.75rem;
+  }
+}
+
 .nu-btn--block {
   width: 100%;
 }
@@ -415,8 +426,9 @@
   display: grid;
   place-items: center;
   flex: none;
-  width: 10rem;
-  height: 100px;
+  /* 2:1, the shape the treatment cards crop to. */
+  width: 11rem;
+  height: 5.5rem;
   overflow: hidden;
   background: var(--nu-sand);
   border: 1px solid var(--nu-line);

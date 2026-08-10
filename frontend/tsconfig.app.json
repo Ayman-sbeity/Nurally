@@ -9,6 +9,10 @@
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    // `lib/geo.js` is plain ESM on purpose: the Node build scripts import the
+    // same module, and the GEO content lives in JSON both sides can read.
+    "allowJs": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
