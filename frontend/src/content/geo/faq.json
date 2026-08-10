@@ -22,6 +22,12 @@
       "answer": "It is a beauty lounge that combines both sides: classic beauty services such as facials, nails and permanent makeup sit alongside advanced aesthetic treatments like collagen biostimulation, skin boosters, laser and non-surgical facial contouring. That means one appointment can cover routine maintenance and a longer-term skin plan. Which treatments are appropriate for you is decided at the consultation, not at the time of booking."
     },
     {
+      "id": "botox",
+      "section": "treatments",
+      "question": "Do you offer Botox?",
+      "answer": "Yes. Botox is part of the facial aesthetics menu at Nurella Beauty Lounge, alongside under-eye rejuvenation, facial contouring, lip and cheek enhancement and non-surgical face sculpting. Which areas are suitable, and whether Botox is the right choice for you at all, is decided at a personalized consultation rather than at the time of booking. The price is confirmed at that consultation, before anything is carried out."
+    },
+    {
       "id": "laser-hair-removal",
       "section": "treatments",
       "question": "Do you offer laser hair removal?",
@@ -61,7 +67,7 @@
       "id": "wrinkles",
       "section": "concerns",
       "question": "What can I do about fine lines and wrinkles?",
-      "answer": "Fine lines and wrinkles are addressed through the facial aesthetics category, which includes anti-wrinkle treatments and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order."
+      "answer": "Fine lines and wrinkles are addressed through the facial aesthetics category, which includes Botox and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order."
     },
     {
       "id": "sagging",

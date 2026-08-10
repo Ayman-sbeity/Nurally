@@ -423,7 +423,7 @@ Rf microneedling laser
 - Cheek Enhancement
 - Chin & Jawline Contouring
 - Non-Surgical Face Sculpting
-- Anti-Wrinkle Treatments
+- Botox (originally supplied as "Anti-Wrinkle Treatments"; renamed at the lounge's request)
 - Face Slimming Treatments
 - Under-Eye Rejuvenation
 

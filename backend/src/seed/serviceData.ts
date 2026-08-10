@@ -58,7 +58,11 @@ export const SEED_SERVICES: SeedService[] = [
   { name: 'Cheek Enhancement', category: ServiceCategorySlug.FACIAL_AESTHETICS },
   { name: 'Chin & Jawline Contouring', category: ServiceCategorySlug.FACIAL_AESTHETICS },
   { name: 'Non-Surgical Face Sculpting', category: ServiceCategorySlug.FACIAL_AESTHETICS },
-  { name: 'Anti-Wrinkle Treatments', category: ServiceCategorySlug.FACIAL_AESTHETICS },
+  // Renamed from 'Anti-Wrinkle Treatments' at the lounge's request. A rename
+  // here does NOT rename an existing record: seedServices() matches on name,
+  // so a fresh install gets 'Botox' while an existing database keeps the old
+  // row and gains a duplicate. Live databases are migrated separately.
+  { name: 'Botox', category: ServiceCategorySlug.FACIAL_AESTHETICS },
   { name: 'Face Slimming Treatments', category: ServiceCategorySlug.FACIAL_AESTHETICS },
   { name: 'Under-Eye Rejuvenation', category: ServiceCategorySlug.FACIAL_AESTHETICS },
 
