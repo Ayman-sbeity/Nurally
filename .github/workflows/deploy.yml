@@ -1,0 +1,91 @@
+name: Deploy
+
+# Every push to main goes live. The build itself happens on the droplet, in
+# `/srv/nurella/deploy.sh`, so there is exactly one deploy path whether it is
+# triggered from here or by hand.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never let two deploys overlap: the second would `git reset --hard` the tree
+# out from under the first one's build.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Catches a broken build here, on a runner with real memory, rather than
+      # after the droplet has already reset its working tree to the new commit.
+      # GEO_API_URL is left unset on purpose: the pre-render falls back to
+      # category-level pages, which is enough to prove the build works without
+      # exposing the API to the runner.
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy to droplet
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://134-122-26-199.sslip.io
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pinned host key rather than StrictHostKeyChecking=no, so a spoofed
+          # host cannot collect the deploy key.
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      # The key is restricted on the server with a forced command, so this
+      # connection can only ever run the deploy script — no shell, no port
+      # forwarding. Whatever is passed here is ignored by design.
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o IdentitiesOnly=yes \
+              -o ConnectTimeout=30 \
+              -o ServerAliveInterval=30 \
+              root@${{ secrets.DEPLOY_HOST }} 'deploy'
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          BASE=https://134-122-26-199.sslip.io
+
+          echo "API health:"
+          curl -fsS --retry 5 --retry-delay 5 --retry-all-errors "$BASE/api/health"
+          echo
+
+          for path in / /faq /services /about /gallery /robots.txt /llms.txt /sitemap.xml; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$BASE$path")
+            printf '%-16s %s\n' "$path" "$code"
+            [ "$code" = "200" ] || { echo "!! $path returned $code"; exit 1; }
+          done
+
+          # The pre-rendered HTML is the whole point of the build step: if the
+          # FAQ answers are missing from the raw response, crawlers see nothing.
+          echo "Pre-render check:"
+          curl -fsS "$BASE/faq" | grep -q "acceptedAnswer" \
+            && echo "  FAQ structured data present" \
+            || { echo "!! /faq is missing its pre-rendered content"; exit 1; }
