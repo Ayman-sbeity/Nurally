@@ -81,10 +81,13 @@ export function ClientAppointmentDetailPage() {
   const canCancel = ['PENDING', 'CONFIRMED', 'TIME_OFFERED', 'RESCHEDULE_REQUESTED'].includes(
     appointment.status,
   );
-  // Asking for a different time only makes sense while a time is actually
-  // held. A request already awaiting an answer is excluded so the client
-  // cannot stack two proposals on the same appointment.
-  const canReschedule = ['PENDING', 'CONFIRMED'].includes(appointment.status);
+  // Mirrors the server's state machine (APPOINTMENT_TRANSITIONS in
+  // backend/src/types/domain.ts), which lets a CLIENT move to
+  // RESCHEDULE_REQUESTED from exactly these two states. PENDING is absent by
+  // design: nothing has been agreed yet, so there is no time to move — the
+  // lounge will either confirm it or offer an alternative. Offering the button
+  // there would only produce a 409 INVALID_TRANSITION.
+  const canReschedule = ['CONFIRMED', 'TIME_OFFERED'].includes(appointment.status);
   const offerExpired =
     appointment.offer && new Date(appointment.offer.expiresAt).getTime() < Date.now();
 
@@ -129,11 +132,17 @@ export function ClientAppointmentDetailPage() {
                 <p className="nu-hint">
                   Respond by {formatShortDateTime(appointment.offer.expiresAt)}.
                 </p>
-                <div className="nu-row" style={{ marginTop: 'var(--nu-space-4)', gap: 'var(--nu-space-3)' }}>
+                <div className="nu-actions" style={{ marginTop: 'var(--nu-space-4)' }}>
                   <Button loading={accept.isPending} onClick={() => accept.mutate()}>
                     Accept this time
                   </Button>
-                  <Button variant="outline" onClick={() => setDeclineOpen(true)}>
+                  {/* The state machine allows a client to counter-propose
+                      from here, which beats declining outright and starting
+                      the whole booking again. */}
+                  <Button variant="outline" onClick={() => setRescheduleOpen(true)}>
+                    Suggest another time
+                  </Button>
+                  <Button variant="ghost" onClick={() => setDeclineOpen(true)}>
                     Decline
                   </Button>
                 </div>
@@ -202,8 +211,10 @@ export function ClientAppointmentDetailPage() {
           <div className="nu-actions">
             {/* Asking for another time comes first: it is the constructive
                 action, and burying it behind Cancel is what pushes clients
-                into cancelling when all they wanted was a different slot. */}
-            {canReschedule && (
+                into cancelling when all they wanted was a different slot.
+                TIME_OFFERED is excluded because the offer card above already
+                carries this action, in the context it belongs to. */}
+            {canReschedule && appointment.status !== 'TIME_OFFERED' && (
               <Button variant="outline" onClick={() => setRescheduleOpen(true)}>
                 Request a different time
               </Button>
