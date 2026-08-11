@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { AppointmentCard, serviceName } from '@/components/client/AppointmentCard';
 import { useAuth } from '@/context/AuthContext';
 import { useMyAppointments, useNotifications } from '@/hooks/queries';
-import { STATUS_EXPLANATION, formatDateTime, formatDuration } from '@/utils/format';
+import { STATUS_EXPLANATION, formatDateTime, formatDuration, timeUntil } from '@/utils/format';
 
 export function ClientHomePage() {
   const { user } = useAuth();
@@ -63,7 +63,9 @@ export function ClientHomePage() {
               <p className="nu-highlight__service">{serviceName(next)}</p>
               <p className="nu-highlight__when">{formatDateTime(next.startAt)}</p>
               <p className="nu-highlight__when" style={{ fontSize: 'var(--nu-text-sm)' }}>
-                {formatDuration(next.durationMinutes)}
+                {/* "in 3 days" answers the question people actually open the
+                    app to ask, without making them work out the date. */}
+                {timeUntil(next.startAt)} · {formatDuration(next.durationMinutes)}
               </p>
               <div style={{ marginTop: 'var(--nu-space-4)' }}>
                 <StatusBadge status={next.status} />

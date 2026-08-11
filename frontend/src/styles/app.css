@@ -519,3 +519,76 @@
   color: var(--nu-text-muted);
   margin-top: var(--nu-space-1);
 }
+
+/* --- Booking: step indicator as back-navigation --------------------------
+   A completed step becomes a button. It inherits the step's own layout so
+   the row does not shift when a step flips from static text to interactive. */
+.nu-step__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  /* 44px target without changing the visual height of the row. */
+  padding: var(--nu-space-2) var(--nu-space-1);
+  margin: calc(var(--nu-space-2) * -1) calc(var(--nu-space-1) * -1);
+  border-radius: var(--nu-radius);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nu-step__btn:hover .nu-step__label {
+  color: var(--nu-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Booking review: edit an earlier answer in place --------------------- */
+.nu-summary__edit {
+  margin-left: var(--nu-space-3);
+  padding: 0.25rem 0.5rem;
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--nu-accent-text);
+  border: 1px solid var(--nu-line-strong);
+  border-radius: var(--nu-radius-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    border-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-summary__edit:hover {
+  background: var(--nu-surface-alt);
+  border-color: var(--nu-champagne-deep);
+}
+
+/* --- Appointment lists grouped by day ------------------------------------ */
+.nu-daygroup + .nu-daygroup {
+  margin-top: var(--nu-space-6);
+}
+
+.nu-daygroup__label {
+  /* Deliberately not sticky: the app header is already sticky at top:0, and a
+     second sticky element would need to track its height, which varies with
+     the iOS safe-area inset. The grouping alone carries the scannability. */
+  padding-block: var(--nu-space-2);
+  margin-bottom: var(--nu-space-3);
+  font-size: var(--nu-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--nu-tracking-wide);
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+/* --- Segmented control extras -------------------------------------------- */
+.nu-segmented--spaced {
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-segmented__count {
+  margin-left: 0.4rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}

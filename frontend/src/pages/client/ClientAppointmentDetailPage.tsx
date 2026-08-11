@@ -5,6 +5,7 @@ import { bookingApi } from '@/api/booking.api';
 import { ApiRequestError } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
+import { RescheduleDialog } from '@/components/client/RescheduleDialog';
 import { Seo } from '@/components/ui/Seo';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ErrorState, LoadingState } from '@/components/ui/States';
@@ -24,6 +25,7 @@ export function ClientAppointmentDetailPage() {
   const { notify } = useToast();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAppointment(id);
 
@@ -79,6 +81,10 @@ export function ClientAppointmentDetailPage() {
   const canCancel = ['PENDING', 'CONFIRMED', 'TIME_OFFERED', 'RESCHEDULE_REQUESTED'].includes(
     appointment.status,
   );
+  // Asking for a different time only makes sense while a time is actually
+  // held. A request already awaiting an answer is excluded so the client
+  // cannot stack two proposals on the same appointment.
+  const canReschedule = ['PENDING', 'CONFIRMED'].includes(appointment.status);
   const offerExpired =
     appointment.offer && new Date(appointment.offer.expiresAt).getTime() < Date.now();
 
@@ -136,6 +142,30 @@ export function ClientAppointmentDetailPage() {
           </div>
         )}
 
+        {/* A request the client has made and is waiting on. Without this the
+            proposed time is invisible to the person who proposed it. */}
+        {appointment.status === 'RESCHEDULE_REQUESTED' && appointment.rescheduleRequest && (
+          <div className="nu-card" style={{ borderColor: 'var(--nu-status-reschedule)' }}>
+            <p className="nu-eyebrow">Your reschedule request</p>
+            <p
+              style={{
+                fontFamily: 'var(--nu-font-display)',
+                fontSize: 'var(--nu-text-xl)',
+                marginBlock: 'var(--nu-space-2)',
+              }}
+            >
+              {formatDateTime(appointment.rescheduleRequest.proposedStartAt)}
+            </p>
+            {appointment.rescheduleRequest.message && (
+              <p className="nu-hint">“{appointment.rescheduleRequest.message}”</p>
+            )}
+            <p className="nu-hint" style={{ marginTop: 'var(--nu-space-3)' }}>
+              Sent {formatShortDateTime(appointment.rescheduleRequest.requestedAt)}. Your current
+              time below is still held until the lounge responds.
+            </p>
+          </div>
+        )}
+
         <div className="nu-card">
           <dl className="nu-deflist">
             <div className="nu-deflist__row">
@@ -168,11 +198,21 @@ export function ClientAppointmentDetailPage() {
           </dl>
         </div>
 
-        {canCancel && (
-          <div>
-            <Button variant="danger" onClick={() => setCancelOpen(true)}>
-              Cancel appointment
-            </Button>
+        {(canReschedule || canCancel) && (
+          <div className="nu-actions">
+            {/* Asking for another time comes first: it is the constructive
+                action, and burying it behind Cancel is what pushes clients
+                into cancelling when all they wanted was a different slot. */}
+            {canReschedule && (
+              <Button variant="outline" onClick={() => setRescheduleOpen(true)}>
+                Request a different time
+              </Button>
+            )}
+            {canCancel && (
+              <Button variant="danger" onClick={() => setCancelOpen(true)}>
+                Cancel appointment
+              </Button>
+            )}
           </div>
         )}
 
@@ -192,6 +232,12 @@ export function ClientAppointmentDetailPage() {
         </section>
       </div>
 
+      <RescheduleDialog
+        appointment={appointment}
+        open={rescheduleOpen}
+        onClose={() => setRescheduleOpen(false)}
+      />
+
       <Dialog
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
@@ -199,6 +245,19 @@ export function ClientAppointmentDetailPage() {
         description="This releases the time so another client can book it. This cannot be undone."
         footer={
           <>
+            {/* Most cancellations are really "this time no longer suits me".
+                Offering the reschedule here saves the slot for both sides. */}
+            {canReschedule && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setCancelOpen(false);
+                  setRescheduleOpen(true);
+                }}
+              >
+                Change the time instead
+              </Button>
+            )}
             <Button variant="ghost" onClick={() => setCancelOpen(false)}>
               Keep it
             </Button>

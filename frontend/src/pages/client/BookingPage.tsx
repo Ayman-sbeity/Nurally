@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bookingApi } from '@/api/booking.api';
@@ -29,6 +29,24 @@ export function BookingPage() {
   const [notes, setNotes] = useState('');
   const [conflict, setConflict] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<Appointment | null>(null);
+
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
+  // Skips the very first render: stealing focus on arrival would drag the
+  // page down past the heading the client just navigated to.
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    stepHeadingRef.current?.focus();
+  }, [step]);
+
+  /** Steps only ever move backwards by hand; forward movement is a selection. */
+  const goTo = (target: Step) => {
+    setConflict(null);
+    setStep(target);
+  };
 
   // Deep link from the landing page: /app/book?serviceId=…
   const presetServiceId = searchParams.get('serviceId');
@@ -126,9 +144,6 @@ export function BookingPage() {
     );
   }
 
-  const canContinue =
-    (step === 0 && service) || (step === 1 && date) || (step === 2 && slot) || step === 3;
-
   return (
     <>
       <Seo title="Book an appointment — Nurella" noIndex />
@@ -140,7 +155,14 @@ export function BookingPage() {
         </p>
       </div>
 
-      <StepIndicator current={step} />
+      <StepIndicator current={step} onGoTo={(target) => goTo(target as Step)} />
+
+      {/* Announces the step change to screen readers and takes focus, so a
+          keyboard user is not left at the top of a page whose content has
+          silently swapped underneath them. */}
+      <h2 className="nu-sr-only" tabIndex={-1} ref={stepHeadingRef}>
+        Step {step + 1} of {BOOKING_STEPS.length}: {BOOKING_STEPS[step]}
+      </h2>
 
       {conflict && (
         <div className="nu-notice nu-notice--danger" role="alert" style={{ marginBottom: 'var(--nu-space-5)' }}>
@@ -197,14 +219,27 @@ export function BookingPage() {
 
       {step === 3 && service && slot && (
         <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          {/* Each answer is editable from where it is shown. Previously the
+              only way back was repeated presses of Back, which meant losing
+              the later answers to correct an earlier one. */}
           <div className="nu-summary">
             <div className="nu-summary__row">
               <span className="nu-summary__label">Treatment</span>
-              <span className="nu-summary__value">{service.name}</span>
+              <span className="nu-summary__value">
+                {service.name}
+                <button type="button" className="nu-summary__edit" onClick={() => goTo(0)}>
+                  Change<span className="nu-sr-only"> treatment</span>
+                </button>
+              </span>
             </div>
             <div className="nu-summary__row">
               <span className="nu-summary__label">When</span>
-              <span className="nu-summary__value">{formatDateTime(slot)}</span>
+              <span className="nu-summary__value">
+                {formatDateTime(slot)}
+                <button type="button" className="nu-summary__edit" onClick={() => goTo(2)}>
+                  Change<span className="nu-sr-only"> time</span>
+                </button>
+              </span>
             </div>
             <div className="nu-summary__row">
               <span className="nu-summary__label">Duration</span>
@@ -235,22 +270,18 @@ export function BookingPage() {
         </div>
       )}
 
-      <div className="nu-row nu-row--between" style={{ marginTop: 'var(--nu-space-6)' }}>
+      {/* Back only. Choosing a service, a date or a time advances the flow by
+          itself, so a "Continue" button here could never be reached in an
+          enabled state — it was permanently greyed out, which read as the flow
+          being stuck. The one place an explicit commit is needed is the review
+          step, where "Submit request" lives. */}
+      <div className="nu-row" style={{ marginTop: 'var(--nu-space-6)' }}>
         <Button
           variant="ghost"
-          onClick={() => (step === 0 ? navigate('/app') : setStep((step - 1) as Step))}
+          onClick={() => (step === 0 ? navigate('/app') : goTo((step - 1) as Step))}
         >
-          {step === 0 ? 'Cancel' : 'Back'}
+          {step === 0 ? 'Cancel' : `Back to ${BOOKING_STEPS[step - 1]}`}
         </Button>
-        {step < 3 && (
-          <Button
-            variant="outline"
-            disabled={!canContinue}
-            onClick={() => setStep((step + 1) as Step)}
-          >
-            Continue to {BOOKING_STEPS[step + 1]}
-          </Button>
-        )}
       </div>
     </>
   );

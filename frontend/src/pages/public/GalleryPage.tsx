@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Seo } from '@/components/ui/Seo';
 import { JsonLd } from '@/components/ui/JsonLd';
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { GalleryGrid } from '@/components/landing/GallerySection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
 import { EmptyState, ErrorState, SkeletonList } from '@/components/ui/States';
@@ -46,29 +47,20 @@ export function GalleryPage() {
         </div>
 
         {availableCategories.length > 0 && (
-          <div
-            className="nu-segmented"
-            role="tablist"
-            aria-label="Filter gallery by category"
-            style={{ marginBottom: 'var(--nu-space-6)' }}
-          >
-            <button type="button" role="tab" aria-selected={category === null} onClick={() => setCategory(null)}>
-              All
-            </button>
-            {availableCategories.map((entry) => (
-              <button
-                key={entry.slug}
-                type="button"
-                role="tab"
-                aria-selected={category === entry.slug}
-                onClick={() => setCategory(entry.slug)}
-              >
-                {entry.label}
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs
+            tabs={[
+              { key: 'all', label: 'All' },
+              ...availableCategories.map((entry) => ({ key: entry.slug, label: entry.label })),
+            ]}
+            value={category ?? 'all'}
+            onChange={(key) => setCategory(key === 'all' ? null : key)}
+            label="Filter gallery by category"
+            controls="gallery-panel"
+            className="nu-segmented--spaced"
+          />
         )}
 
+        <div id="gallery-panel" role="tabpanel" tabIndex={-1}>
         {isPending && <SkeletonList rows={2} height={240} />}
         {isError && <ErrorState error={error} onRetry={() => void refetch()} />}
 
@@ -80,6 +72,7 @@ export function GalleryPage() {
         )}
 
         {visible.length > 0 && <GalleryGrid images={visible} />}
+        </div>
       </section>
 
       <BookingCtaSection />

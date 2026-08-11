@@ -92,7 +92,7 @@ Nail care and finishing: manicure, pedicure, gel polish and gel extensions.
 
 ### Facial Aesthetics
 
-Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, anti-wrinkle treatments, face slimming and under-eye rejuvenation.
+Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, Botox, face slimming and under-eye rejuvenation.
 
 **Who it's for:** People who want to refine facial balance, restore definition or soften expression lines without surgery.
 
@@ -103,7 +103,7 @@ Non-surgical facial treatments that work on proportion and definition — facial
   - [Cheek Enhancement](http://localhost:5173/services/cheek-enhancement)
   - [Chin & Jawline Contouring](http://localhost:5173/services/chin-jawline-contouring)
   - [Non-Surgical Face Sculpting](http://localhost:5173/services/non-surgical-face-sculpting)
-  - [Anti-Wrinkle Treatments](http://localhost:5173/services/anti-wrinkle-treatments)
+  - [Botox](http://localhost:5173/services/botox)
   - [Face Slimming Treatments](http://localhost:5173/services/face-slimming-treatments)
   - [Under-Eye Rejuvenation](http://localhost:5173/services/under-eye-rejuvenation)
 
@@ -191,6 +191,10 @@ Nurella Beauty Lounge offers ten categories of treatment: facial aesthetics, col
 
 It is a beauty lounge that combines both sides: classic beauty services such as facials, nails and permanent makeup sit alongside advanced aesthetic treatments like collagen biostimulation, skin boosters, laser and non-surgical facial contouring. That means one appointment can cover routine maintenance and a longer-term skin plan. Which treatments are appropriate for you is decided at the consultation, not at the time of booking.
 
+### Do you offer Botox?
+
+Yes. Botox is part of the facial aesthetics menu at Nurella Beauty Lounge, alongside under-eye rejuvenation, facial contouring, lip and cheek enhancement and non-surgical face sculpting. Which areas are suitable, and whether Botox is the right choice for you at all, is decided at a personalized consultation rather than at the time of booking. The price is confirmed at that consultation, before anything is carried out.
+
 ### Do you offer laser hair removal?
 
 Yes. Laser hair removal is part of the laser category, alongside CO2 laser, HIFU and RF microneedling. Laser hair removal is normally carried out as a course of sessions rather than a single appointment, and the number of sessions is discussed at your consultation.
@@ -217,7 +221,7 @@ For acne and acne marks, the two relevant categories at Nurella are advanced ski
 
 ### What can I do about fine lines and wrinkles?
 
-Fine lines and wrinkles are addressed through the facial aesthetics category, which includes anti-wrinkle treatments and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order.
+Fine lines and wrinkles are addressed through the facial aesthetics category, which includes Botox and under-eye rejuvenation, and through advanced skin treatments that work on skin texture. Where lines come with loss of firmness, collagen biostimulation is often part of the plan as well. A consultation determines which of these applies to your face and in what order.
 
 ### Is there a non-surgical option for sagging skin and a softening jawline?
 

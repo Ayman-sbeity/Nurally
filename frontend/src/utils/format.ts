@@ -50,6 +50,33 @@ export function friendlyDay(iso: string): string {
 export const relativeTime = (iso: string): string =>
   `${formatDistanceToNowStrict(parseISO(iso))} ago`;
 
+/** "in 3 days", "in 2 hours" — how far off an upcoming appointment is. */
+export const timeUntil = (iso: string): string =>
+  `in ${formatDistanceToNowStrict(parseISO(iso))}`;
+
+/**
+ * Buckets appointments under a day heading, preserving the order the API
+ * returned them in. Used by the list screens, where a flat run of cards gives
+ * no sense of "which day am I looking at".
+ */
+export function groupByDay<T extends { startAt: string }>(
+  items: T[],
+): { key: string; label: string; items: T[] }[] {
+  const groups: { key: string; label: string; items: T[] }[] = [];
+
+  for (const item of items) {
+    const key = dateKey(parseISO(item.startAt));
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.items.push(item);
+      continue;
+    }
+    groups.push({ key, label: friendlyDay(item.startAt), items: [item] });
+  }
+
+  return groups;
+}
+
 /** Minutes from midnight → `HH:mm`, for working-hours editing. */
 export function minutesToTime(minutes: number): string {
   const hours = Math.floor(minutes / 60);
