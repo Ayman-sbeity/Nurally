@@ -39,6 +39,7 @@ const AdminClientDetailPage = lazy(() => import('@/pages/admin/AdminClientDetail
 const AdminServicesPage = lazy(() => import('@/pages/admin/AdminServicesPage'));
 const AdminAvailabilityPage = lazy(() => import('@/pages/admin/AdminAvailabilityPage'));
 const AdminGalleryPage = lazy(() => import('@/pages/admin/AdminGalleryPage'));
+const AdminInstagramPage = lazy(() => import('@/pages/admin/AdminInstagramPage'));
 const AdminSettingsPage = lazy(() => import('@/pages/admin/AdminSettingsPage'));
 
 function RouteFallback() {
@@ -126,6 +127,7 @@ export function App() {
             <Route path="services" element={<AdminServicesPage />} />
             <Route path="availability" element={<AdminAvailabilityPage />} />
             <Route path="gallery" element={<AdminGalleryPage />} />
+            <Route path="instagram" element={<AdminInstagramPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
           </Route>
 

@@ -168,6 +168,7 @@ seed warns you when the default is still in use.
 | `STORAGE_DRIVER`            | Where client media is stored (`local`)                               |
 | `UPLOAD_DIR`                | Directory the `local` driver writes to (default `uploads`)            |
 | `MAX_UPLOAD_MB`             | Per-file upload ceiling (default 15)                                  |
+| `MAX_VIDEO_UPLOAD_MB`       | Ceiling for Instagram reel videos only (default 80)                   |
 
 The server validates all of these on boot with Zod and **refuses to start** if anything is
 missing or malformed, rather than failing later in a confusing way.
@@ -180,7 +181,7 @@ Only `VITE_*` variables reach the browser bundle — never put a secret here.
 | ------------------------ | ------------------------------------------- |
 | `VITE_API_URL`           | API base URL (default `/api` via the proxy) |
 | `VITE_SITE_URL`          | Canonical + Open Graph URLs, sitemap, `llms.txt`, structured data. **Must be the production origin before a production build.** |
-| `VITE_INSTAGRAM_HANDLE`  | Handle shown in the footer and booking CTA  |
+| `VITE_INSTAGRAM_HANDLE`  | Handle shown in the footer, booking CTA and the reels section's Follow button |
 | `VITE_BUSINESS_*`        | Address, phone, email, hours, coordinates, social profiles. Empty by default — each one is omitted from the page and the structured data until set. See [`docs/GEO-NAP-AUDIT.md`](docs/GEO-NAP-AUDIT.md). |
 | `VITE_FOUNDING_YEAR`, `VITE_TEAM_SIZE` | Shown on `/about` and in structured data only when set |
 
@@ -394,7 +395,8 @@ share one `ClientAsset` collection because their lifecycle is identical; only `k
 | Reading files back | There is **no static file route**. Bytes stream from `/admin/assets/:id/file` behind the admin guard, marked `private, no-store` and `nosniff`. Guessing a path reaches nothing. |
 | In the browser     | Because the access token lives in memory rather than a cookie, an `<img src>` would arrive unauthenticated. `AuthImage` fetches the blob through the API client and renders an object URL, revoking it on unmount. |
 | Write ordering     | Bytes first, then the row; a failed insert removes the stored object, so a failed upload never leaves an orphan. Deleting a record removes its photographs and their bytes together. |
-| Size               | Capped by `MAX_UPLOAD_MB` (default 15).                                       |
+| Size               | Capped by `MAX_UPLOAD_MB` (default 15); reel videos by `MAX_VIDEO_UPLOAD_MB` (default 80). |
+| Reel videos        | Public marketing clips, so they take the opposite route to client media: stored under `public/videos`, served unauthenticated from `/api/media/video/…` with `Accept-Ranges` so the player can seek, and cached `immutable`. Accepted formats are MP4 (an allowlist of ISO brands, so a renamed `.mov` is refused) and WebM. |
 
 > **Deployment note:** the `local` driver writes to the API container's own disk. On hosts with
 > ephemeral filesystems (Render, Railway, Fly without a volume) uploads are lost on redeploy —
@@ -409,7 +411,7 @@ share one `ClientAsset` collection because their lifecycle is identical; only `k
 | Public | `/`, `/services`, `/services/:slug`, `/about`, `/gallery`, `/faq`                          |
 | Auth   | `/login`, `/register`, `/forgot-password`, `/reset-password`                                 |
 | Client | `/app`, `/app/book`, `/app/appointments`, `/app/appointments/:id`, `/app/profile`, `/app/notifications` |
-| Admin  | `/admin`, `/admin/calendar`, `/admin/appointments[/:id]`, `/admin/clients[/:id]`, `/admin/services`, `/admin/availability`, `/admin/gallery`, `/admin/settings` |
+| Admin  | `/admin`, `/admin/calendar`, `/admin/appointments[/:id]`, `/admin/clients[/:id]`, `/admin/services`, `/admin/availability`, `/admin/gallery`, `/admin/instagram`, `/admin/settings` |
 
 `/booking` is the landing page's CTA target: it forwards to the booking flow, and the route guard
 sends unauthenticated visitors through sign-in first, returning them to booking afterwards.

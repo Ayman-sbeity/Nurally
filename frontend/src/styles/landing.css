@@ -645,6 +645,306 @@
   opacity: 0.75;
 }
 
+/* --- Instagram reels ------------------------------------------------------
+   A rail rather than a grid. Reels are 9:16, and a grid of nine-by-sixteen
+   cards turns any row into a wall — the rail keeps the section the height of
+   one card and lets the row itself say "there is more this way". */
+.nu-instagram__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--nu-space-5);
+  flex-wrap: wrap;
+  max-width: none;
+  margin-bottom: var(--nu-space-6);
+}
+
+.nu-instagram__head .nu-heading {
+  margin-block: var(--nu-space-3) var(--nu-space-4);
+}
+
+.nu-instagram__head .nu-lede {
+  max-width: 34rem;
+}
+
+.nu-instagram__follow {
+  gap: var(--nu-space-2);
+  flex-shrink: 0;
+}
+
+.nu-reels {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(13rem, 15rem);
+  gap: var(--nu-space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* The gutter is negative-margined away so the rail bleeds to the screen edge
+     on a phone, the way a reel row is expected to. */
+  margin-inline: calc(var(--nu-gutter) * -1);
+  padding-inline: var(--nu-gutter);
+  padding-bottom: var(--nu-space-3);
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+.nu-reel {
+  scroll-snap-align: center;
+}
+
+.nu-reel__card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border-radius: var(--nu-radius-lg);
+  overflow: hidden;
+  background: var(--nu-sand);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: var(--nu-shadow);
+  transition:
+    transform var(--nu-duration) var(--nu-ease),
+    box-shadow var(--nu-duration) var(--nu-ease);
+}
+
+.nu-reel__card:hover,
+.nu-reel__card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--nu-shadow-lg);
+}
+
+.nu-reel__cover,
+.nu-reel__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Fades up over the poster instead of cutting to it, so a preview that starts
+   mid-decode never flashes black. */
+.nu-reel__preview {
+  animation: nu-reel-fade var(--nu-duration) var(--nu-ease) both;
+}
+
+@keyframes nu-reel-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.nu-reel__play {
+  position: absolute;
+  top: var(--nu-space-3);
+  right: var(--nu-space-3);
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--nu-radius-pill);
+  color: var(--nu-cream);
+  background: rgb(var(--nu-ink-rgb) / 0.55);
+  backdrop-filter: blur(6px);
+  /* Nudged right so the triangle looks centred rather than measured centred. */
+  padding-left: 2px;
+}
+
+.nu-reel__caption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: var(--nu-space-6) var(--nu-space-4) var(--nu-space-4);
+  color: var(--nu-cream);
+  font-size: var(--nu-text-sm);
+  line-height: 1.45;
+  background: linear-gradient(to top, rgb(var(--nu-ink-rgb) / 0.88), transparent);
+  /* Two lines, then an ellipsis — a long caption must not become the card. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Reel viewer --------------------------------------------------------- */
+.nu-reel-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--nu-z-dialog);
+  display: grid;
+  place-items: center;
+  padding: var(--nu-space-4);
+  background: rgb(var(--nu-ink-rgb) / 0.86);
+  backdrop-filter: blur(10px);
+  animation: nu-reel-fade var(--nu-duration-fast) var(--nu-ease) both;
+}
+
+.nu-reel-viewer__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-4);
+  width: min(100%, 68rem);
+  max-height: 100%;
+  color: var(--nu-cream);
+}
+
+.nu-reel-viewer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-4);
+}
+
+.nu-reel-viewer__handle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--nu-space-3);
+  font-size: var(--nu-text-sm);
+  letter-spacing: 0.08em;
+  color: var(--nu-champagne-soft);
+}
+
+.nu-reel-viewer__count {
+  font-size: var(--nu-text-xs);
+  color: rgb(var(--nu-cream-rgb) / 0.6);
+}
+
+.nu-reel-viewer__close {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--nu-radius-pill);
+  color: var(--nu-cream);
+  background: rgb(var(--nu-cream-rgb) / 0.12);
+  cursor: pointer;
+  transition: background-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-reel-viewer__close:hover {
+  background: rgb(var(--nu-cream-rgb) / 0.24);
+}
+
+.nu-reel-viewer__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nu-space-4);
+  min-height: 0;
+}
+
+.nu-reel-viewer__media {
+  position: relative;
+  /* The player is sized by height so a portrait video fills the screen it is
+     given without ever growing wider than the viewport. */
+  height: min(72dvh, 40rem);
+  aspect-ratio: 9 / 16;
+  border-radius: var(--nu-radius-lg);
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.nu-reel-viewer__video,
+.nu-reel-viewer__embed {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.nu-reel-viewer__video {
+  object-fit: contain;
+}
+
+/* Instagram's embed is a light card with its own chrome and a fixed minimum
+   width; it is centred on black rather than stretched to fit. */
+.nu-reel-viewer__embed {
+  background: var(--nu-cream);
+}
+
+.nu-reel-viewer__step {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border-radius: var(--nu-radius-pill);
+  font-size: var(--nu-text-2xl);
+  line-height: 1;
+  color: var(--nu-cream);
+  background: rgb(var(--nu-cream-rgb) / 0.12);
+  cursor: pointer;
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    opacity var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-reel-viewer__step:hover:not(:disabled) {
+  background: rgb(var(--nu-cream-rgb) / 0.24);
+}
+
+.nu-reel-viewer__step:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.nu-reel-viewer__foot {
+  display: grid;
+  gap: var(--nu-space-3);
+  justify-items: center;
+  text-align: center;
+}
+
+.nu-reel-viewer__caption {
+  font-size: var(--nu-text-sm);
+  line-height: 1.6;
+  max-width: 46rem;
+  color: rgb(var(--nu-cream-rgb) / 0.86);
+}
+
+.nu-reel-viewer__date {
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(var(--nu-cream-rgb) / 0.55);
+}
+
+.nu-reel-viewer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--nu-space-2);
+}
+
+/* On a phone the reel is the screen: the step buttons move under the video so
+   they do not eat the width the video needs. */
+@media (max-width: 720px) {
+  .nu-reel-viewer {
+    padding: var(--nu-space-3);
+  }
+
+  .nu-reel-viewer__stage {
+    flex-wrap: wrap;
+  }
+
+  .nu-reel-viewer__media {
+    order: -1;
+    width: 100%;
+    height: auto;
+  }
+
+  .nu-reel-viewer__step {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
 /* --- Booking CTA --------------------------------------------------------- */
 .nu-cta {
   background: var(--nu-ink);

@@ -42,6 +42,12 @@ const envSchema = z.object({
   STORAGE_DRIVER: z.enum(['local']).default('local'),
   UPLOAD_DIR: z.string().default('uploads'),
   MAX_UPLOAD_MB: positiveInt.default(15),
+  /**
+   * Reel videos only. A minute of 1080p vertical footage is comfortably more
+   * than a photograph, so it gets its own ceiling rather than dragging the
+   * image limit up with it.
+   */
+  MAX_VIDEO_UPLOAD_MB: positiveInt.default(80),
 });
 
 const parsed = envSchema.safeParse(process.env);

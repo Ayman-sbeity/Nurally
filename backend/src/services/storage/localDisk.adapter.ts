@@ -4,7 +4,7 @@ import { mkdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Readable } from 'node:stream';
 import { logger } from '../../utils/logger';
-import type { SaveOptions, StorageAdapter, StoredObject } from './types';
+import type { ByteRange, SaveOptions, StorageAdapter, StoredObject } from './types';
 
 /**
  * Filesystem storage.
@@ -50,16 +50,20 @@ export class LocalDiskAdapter implements StorageAdapter {
     return { key, sizeBytes: buffer.byteLength };
   }
 
-  createReadStream(key: string): Readable {
-    return createReadStream(this.resolveKey(key));
+  createReadStream(key: string, range?: ByteRange): Readable {
+    return createReadStream(this.resolveKey(key), range);
   }
 
   async exists(key: string): Promise<boolean> {
+    return (await this.size(key)) !== null;
+  }
+
+  async size(key: string): Promise<number | null> {
     try {
       const info = await stat(this.resolveKey(key));
-      return info.isFile();
+      return info.isFile() ? info.size : null;
     } catch {
-      return false;
+      return null;
     }
   }
 

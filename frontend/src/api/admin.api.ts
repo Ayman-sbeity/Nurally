@@ -10,6 +10,7 @@ import type {
   ClientPhotoSet,
   DashboardData,
   GalleryImage,
+  InstagramReel,
   Paginated,
   PhotoPhase,
   Service,
@@ -18,6 +19,12 @@ import type {
 } from '@/types/api';
 
 type AppointmentResponse = ApiEnvelope<{ appointment: Appointment }>;
+
+/**
+ * What the admin sends for a reel. `shortcode` is derived from the permalink by
+ * the server, so it is never part of the request.
+ */
+export type ReelPayload = Omit<InstagramReel, '_id' | 'shortcode'>;
 
 export const adminApi = {
   // --- Overview ------------------------------------------------------------
@@ -134,6 +141,24 @@ export const adminApi = {
     );
   },
 
+  /**
+   * Uploads a reel video. Videos are large enough that the progress callback is
+   * worth wiring up — an admin watching a still button for a minute assumes it
+   * is broken and clicks it again.
+   */
+  uploadVideo: (file: File, onProgress?: (percent: number) => void) => {
+    const body = new FormData();
+    body.append('file', file);
+    return request<{ url: string }>(
+      api.post<ApiEnvelope<{ url: string }>>('/admin/media/videos', body, {
+        headers: { 'Content-Type': undefined },
+        onUploadProgress: (event) => {
+          if (onProgress && event.total) onProgress(Math.round((event.loaded / event.total) * 100));
+        },
+      }),
+    );
+  },
+
   // --- Services ------------------------------------------------------------
   createService: (payload: Partial<Service> & { name: string; category: string; durationMinutes: number }) =>
     request<{ service: Service }>(
@@ -205,6 +230,28 @@ export const adminApi = {
   deleteGalleryImage: (id: string) =>
     request<{ message: string }>(
       api.delete<ApiEnvelope<{ message: string }>>(`/admin/gallery/${id}`),
+    ),
+
+  // --- Instagram reels -----------------------------------------------------
+  /** Includes hidden reels, unlike the public endpoint. */
+  listReels: () =>
+    request<{ reels: InstagramReel[] }>(
+      api.get<ApiEnvelope<{ reels: InstagramReel[] }>>('/admin/instagram/reels'),
+    ),
+
+  createReel: (payload: ReelPayload) =>
+    request<{ reel: InstagramReel }>(
+      api.post<ApiEnvelope<{ reel: InstagramReel }>>('/admin/instagram/reels', payload),
+    ),
+
+  updateReel: (id: string, payload: Partial<ReelPayload>) =>
+    request<{ reel: InstagramReel }>(
+      api.patch<ApiEnvelope<{ reel: InstagramReel }>>(`/admin/instagram/reels/${id}`, payload),
+    ),
+
+  deleteReel: (id: string) =>
+    request<{ message: string }>(
+      api.delete<ApiEnvelope<{ message: string }>>(`/admin/instagram/reels/${id}`),
     ),
 
   // --- Client media --------------------------------------------------------

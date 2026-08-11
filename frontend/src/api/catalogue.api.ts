@@ -5,6 +5,7 @@ import type {
   BookingSettings,
   DayAvailability,
   GalleryImage,
+  InstagramReel,
   Service,
   ServiceCategory,
 } from '@/types/api';
@@ -49,5 +50,10 @@ export const catalogueApi = {
       api.get<ApiEnvelope<{ images: GalleryImage[] }>>('/gallery', {
         params: category ? { category } : {},
       }),
+    ),
+
+  listReels: () =>
+    request<{ reels: InstagramReel[] }>(
+      api.get<ApiEnvelope<{ reels: InstagramReel[] }>>('/instagram/reels'),
     ),
 };

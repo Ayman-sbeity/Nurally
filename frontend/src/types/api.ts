@@ -228,6 +228,26 @@ export interface GalleryImage {
   displayOrder: number;
 }
 
+/**
+ * A reel featured on the website. Curated in the admin rather than fetched
+ * from Instagram, so the section keeps working without an API token.
+ *
+ * `videoUrl` present → it plays from our own server. Absent → the viewer falls
+ * back to Instagram's embed for that one reel.
+ */
+export interface InstagramReel {
+  _id: string;
+  permalink: string;
+  shortcode: string;
+  caption?: string;
+  coverImageUrl: string;
+  altText: string;
+  videoUrl?: string;
+  postedAt?: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
 export interface DashboardStats {
   todayCount: number;
   pendingCount: number;

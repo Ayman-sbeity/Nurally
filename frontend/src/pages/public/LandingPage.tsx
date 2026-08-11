@@ -5,6 +5,7 @@ import { ServicesSection } from '@/components/landing/ServicesSection';
 import { ConcernsSection } from '@/components/landing/ConcernsSection';
 import { PhilosophySection } from '@/components/landing/PhilosophySection';
 import { GallerySection } from '@/components/landing/GallerySection';
+import { InstagramSection } from '@/components/landing/InstagramSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { FaqSection } from '@/components/landing/FaqSection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
@@ -24,6 +25,8 @@ export function LandingPage() {
       <ConcernsSection />
       <PhilosophySection />
       <GallerySection limit={6} />
+      {/* Renders nothing until reels are featured in the admin. */}
+      <InstagramSection />
       <TestimonialsSection />
       {/* A short, question-phrased answer block; the full set lives at /faq,
           which is where the FAQPage structured data is declared. */}

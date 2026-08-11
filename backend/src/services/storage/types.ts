@@ -23,12 +23,25 @@ export interface SaveOptions {
   prefix?: string;
 }
 
+/** Inclusive byte offsets, matching the HTTP `Range` header's semantics. */
+export interface ByteRange {
+  start: number;
+  end: number;
+}
+
 export interface StorageAdapter {
   readonly name: string;
   /** Persists bytes and returns the key needed to read them back. */
   save(buffer: Buffer, options: SaveOptions): Promise<StoredObject>;
-  createReadStream(key: string): Readable;
+  /**
+   * Reads an object, optionally a slice of it. The range exists for video:
+   * seeking in a `<video>` element is a range request, and without it the
+   * browser has to pull the whole file back to jump to the middle.
+   */
+  createReadStream(key: string, range?: ByteRange): Readable;
   exists(key: string): Promise<boolean>;
+  /** Byte length, or null when the object is not there. */
+  size(key: string): Promise<number | null>;
   /** Must resolve even when the object is already gone — deletes are idempotent. */
   remove(key: string): Promise<void>;
 }

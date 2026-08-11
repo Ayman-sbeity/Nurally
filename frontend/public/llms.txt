@@ -103,7 +103,7 @@ Non-surgical facial treatments that work on proportion and definition — facial
   - [Cheek Enhancement](http://localhost:5173/services/cheek-enhancement)
   - [Chin & Jawline Contouring](http://localhost:5173/services/chin-jawline-contouring)
   - [Non-Surgical Face Sculpting](http://localhost:5173/services/non-surgical-face-sculpting)
-  - [Botox](http://localhost:5173/services/botox)
+  - [Anti-Wrinkle Treatments](http://localhost:5173/services/anti-wrinkle-treatments)
   - [Face Slimming Treatments](http://localhost:5173/services/face-slimming-treatments)
   - [Under-Eye Rejuvenation](http://localhost:5173/services/under-eye-rejuvenation)
 

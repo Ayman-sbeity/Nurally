@@ -4,10 +4,11 @@ import * as appointmentController from '../controllers/appointment.controller';
 import * as availabilityController from '../controllers/availability.controller';
 import * as clientAssetController from '../controllers/clientAsset.controller';
 import * as galleryController from '../controllers/gallery.controller';
+import * as instagramController from '../controllers/instagram.controller';
 import * as mediaController from '../controllers/media.controller';
 import * as serviceController from '../controllers/service.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
-import { singleUpload } from '../middleware/upload';
+import { singleUpload, singleVideoUpload } from '../middleware/upload';
 import { validate } from '../middleware/validate';
 import { UserRole } from '../types/domain';
 import {
@@ -32,6 +33,7 @@ import {
   updateGalleryImageSchema,
   updateServiceSchema,
 } from '../validators/catalogue.validators';
+import { createReelSchema, updateReelSchema } from '../validators/instagram.validators';
 import {
   assetIdParamSchema,
   createClientSchema,
@@ -173,6 +175,7 @@ router.delete(
 // One uploader for every public image field in the admin. It returns a URL the
 // caller saves onto the record it is editing.
 router.post('/media/images', singleUpload('file'), mediaController.uploadImage);
+router.post('/media/videos', singleVideoUpload('file'), mediaController.uploadVideo);
 
 // --- Services --------------------------------------------------------------
 router.post('/services', validate({ body: createServiceSchema }), serviceController.createService);
@@ -227,6 +230,29 @@ router.delete(
   '/gallery/:id',
   validate({ params: idParamSchema }),
   galleryController.deleteGalleryImage,
+);
+
+// --- Instagram reels -------------------------------------------------------
+router.get('/instagram/reels', instagramController.listReels);
+router.post(
+  '/instagram/reels',
+  validate({ body: createReelSchema }),
+  instagramController.createReel,
+);
+router.post(
+  '/instagram/reels/reorder',
+  validate({ body: reorderSchema }),
+  instagramController.reorderReels,
+);
+router.patch(
+  '/instagram/reels/:id',
+  validate({ params: idParamSchema, body: updateReelSchema }),
+  instagramController.updateReel,
+);
+router.delete(
+  '/instagram/reels/:id',
+  validate({ params: idParamSchema }),
+  instagramController.deleteReel,
 );
 
 export default router;

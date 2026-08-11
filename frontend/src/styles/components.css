@@ -435,7 +435,15 @@
   border-radius: var(--nu-radius);
 }
 
-.nu-image-field__preview img {
+/* Reel videos are 9:16, so their preview is a tall frame rather than the wide
+   crop the treatment cards use. */
+.nu-image-field__preview--portrait {
+  width: 7rem;
+  height: 12.5rem;
+}
+
+.nu-image-field__preview img,
+.nu-image-field__preview video {
   width: 100%;
   height: 100%;
   object-fit: cover;

@@ -12,6 +12,7 @@ const NAV = [
   { to: '/admin/services', label: 'Services' },
   { to: '/admin/availability', label: 'Availability' },
   { to: '/admin/gallery', label: 'Gallery' },
+  { to: '/admin/instagram', label: 'Instagram' },
   { to: '/admin/settings', label: 'Settings' },
 ];
 

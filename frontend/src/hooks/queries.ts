@@ -11,6 +11,7 @@ export const qk = {
   services: (params?: Record<string, unknown>) => ['services', params ?? {}] as const,
   service: (idOrSlug: string) => ['service', idOrSlug] as const,
   gallery: (category?: string) => ['gallery', category ?? 'all'] as const,
+  reels: (scope: 'public' | 'admin' = 'public') => ['instagram-reels', scope] as const,
   bookingSettings: ['booking-settings'] as const,
   availability: (serviceId: string, date: string) => ['availability', serviceId, date] as const,
   availabilityOverview: (serviceId: string, from: string, days: number) =>
@@ -52,6 +53,19 @@ export function useGallery(category?: string) {
   return useQuery({
     queryKey: qk.gallery(category),
     queryFn: () => catalogueApi.listGallery(category),
+    staleTime: 10 * 60_000,
+  });
+}
+
+/**
+ * The featured reels. `admin` includes hidden ones and is cached separately, so
+ * a reel the admin has just unpublished cannot appear on the public site from
+ * a warm cache.
+ */
+export function useInstagramReels(scope: 'public' | 'admin' = 'public') {
+  return useQuery({
+    queryKey: qk.reels(scope),
+    queryFn: () => (scope === 'admin' ? adminApi.listReels() : catalogueApi.listReels()),
     staleTime: 10 * 60_000,
   });
 }

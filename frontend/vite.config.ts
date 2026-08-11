@@ -73,8 +73,17 @@ export default defineConfig({
           {
             // Uploaded website artwork. Keys are random and never rewritten, so
             // a cached copy can only ever be the right one.
+            //
+            // Reel videos are deliberately excluded. They are served as range
+            // requests, and a cache that answers `bytes=5000-` with a stored
+            // whole-file 200 leaves the player unable to seek — the browser's
+            // own HTTP cache handles ranges correctly, and the route already
+            // marks these responses immutable. They would also evict every
+            // image in the quota on their way in.
             urlPattern: ({ url, request }) =>
-              request.method === 'GET' && url.pathname.startsWith('/api/media/'),
+              request.method === 'GET' &&
+              url.pathname.startsWith('/api/media/') &&
+              !url.pathname.startsWith('/api/media/video/'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'nurella-media',
