@@ -31,8 +31,19 @@ export interface DayAvailability {
   date: string;
   isOpen: boolean;
   /** Why the day has no slots — lets the UI explain rather than show an empty list. */
-  closedReason?: 'DAY_OFF' | 'BLOCKED' | 'FULLY_BOOKED' | 'PAST' | 'TOO_FAR_AHEAD';
+  closedReason?:
+    | 'DAY_OFF'
+    | 'BLOCKED'
+    | 'FULLY_BOOKED'
+    | 'PAST'
+    | 'TOO_FAR_AHEAD'
+    | 'SERVICE_DAY_OFF';
   serviceDurationMinutes: number;
+  /**
+   * Set only when the treatment itself is restricted to particular weekdays, so
+   * the UI can name the days to pick instead of just refusing the current one.
+   */
+  serviceAvailableWeekdays?: number[];
   slots: AvailableSlot[];
 }
 
@@ -43,6 +54,11 @@ interface ComputeOptions {
   excludeAppointmentId?: Types.ObjectId;
   /** Admins may place appointments inside the minimum-notice window. */
   ignoreNotice?: boolean;
+  /**
+   * Weekdays this particular treatment can be performed on. Omitted or empty
+   * means the lounge's own opening days are the only constraint.
+   */
+  availableWeekdays?: number[];
 }
 
 function assertValidDateKey(dateKey: string): void {
@@ -65,7 +81,13 @@ export function maxBookableDateKey(): string {
  * during booking run through this function, so the two can never disagree.
  */
 export async function computeDayAvailability(options: ComputeOptions): Promise<DayAvailability> {
-  const { dateKey, durationMinutes, excludeAppointmentId, ignoreNotice = false } = options;
+  const {
+    dateKey,
+    durationMinutes,
+    excludeAppointmentId,
+    ignoreNotice = false,
+    availableWeekdays,
+  } = options;
   assertValidDateKey(dateKey);
 
   const empty = (closedReason: DayAvailability['closedReason']): DayAvailability => ({
@@ -85,6 +107,13 @@ export async function computeDayAvailability(options: ComputeOptions): Promise<D
   }
 
   const weekday = weekdayInZone(dayStart);
+
+  // Reported separately from DAY_OFF: the lounge is open, this treatment just
+  // is not performed today, and the client needs to be told which day to pick.
+  if (availableWeekdays?.length && !availableWeekdays.includes(weekday)) {
+    return { ...empty('SERVICE_DAY_OFF'), serviceAvailableWeekdays: [...availableWeekdays].sort() };
+  }
+
   const hours = await WorkingHours.findOne({ weekday }).lean();
   if (!hours || !hours.isOpen) return empty('DAY_OFF');
 
@@ -168,26 +197,49 @@ export async function getAvailabilityForService(
   return computeDayAvailability({
     dateKey,
     durationMinutes: service.durationMinutes,
+    ...(service.availableWeekdays.length ? { availableWeekdays: service.availableWeekdays } : {}),
     ...options,
   });
 }
 
 /**
+ * The weekday restriction on an appointment's service, read live rather than
+ * snapshotted onto the appointment: when the lounge changes which day a
+ * visiting practitioner works, reschedules should follow the new rule.
+ *
+ * Returns `undefined` for an unrestricted service, or one whose service record
+ * has since been removed.
+ */
+export async function serviceWeekdaysFor(
+  serviceId: Types.ObjectId,
+): Promise<number[] | undefined> {
+  const service = await Service.findById(serviceId).select('availableWeekdays').lean();
+  return service?.availableWeekdays?.length ? service.availableWeekdays : undefined;
+}
+
+/**
  * Re-validates a specific instant server-side before an appointment is written.
  * The frontend's slot list is a convenience; this is the authority.
+ *
+ * `availableWeekdays` is required rather than optional so that a new caller
+ * cannot quietly skip the treatment's weekday restriction — pass `undefined`
+ * only when the service genuinely has none.
  */
 export async function assertSlotIsBookable(params: {
   startAt: Date;
   durationMinutes: number;
+  availableWeekdays: number[] | undefined;
   excludeAppointmentId?: Types.ObjectId;
   ignoreNotice?: boolean;
 }): Promise<void> {
-  const { startAt, durationMinutes, excludeAppointmentId, ignoreNotice } = params;
+  const { startAt, durationMinutes, availableWeekdays, excludeAppointmentId, ignoreNotice } =
+    params;
   const dateKey = dateKeyInZone(startAt);
 
   const availability = await computeDayAvailability({
     dateKey,
     durationMinutes,
+    ...(availableWeekdays ? { availableWeekdays } : {}),
     ...(excludeAppointmentId ? { excludeAppointmentId } : {}),
     ...(ignoreNotice ? { ignoreNotice } : {}),
   });
@@ -222,6 +274,9 @@ export async function getAvailabilityOverview(
     const availability = await computeDayAvailability({
       dateKey,
       durationMinutes: service.durationMinutes,
+      ...(service.availableWeekdays.length
+        ? { availableWeekdays: service.availableWeekdays }
+        : {}),
     });
     results.push({
       date: dateKey,

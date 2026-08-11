@@ -17,7 +17,25 @@ const CLOSED_MESSAGE: Record<string, string> = {
   FULLY_BOOKED: 'No appointments are available for this date.',
   PAST: 'This date has already passed.',
   TOO_FAR_AHEAD: 'This date is beyond the current booking window.',
+  SERVICE_DAY_OFF: 'This treatment is not performed on this day.',
 };
+
+const WEEKDAY_NAMES = [
+  'Sundays',
+  'Mondays',
+  'Tuesdays',
+  'Wednesdays',
+  'Thursdays',
+  'Fridays',
+  'Saturdays',
+];
+
+/** "Wednesdays", "Mondays and Wednesdays", "Mondays, Wednesdays and Fridays". */
+function listWeekdays(days: number[]): string {
+  const names = days.map((day) => WEEKDAY_NAMES[day]).filter(Boolean);
+  if (names.length <= 1) return names[0] ?? '';
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
 
 export function TimeStep({
   serviceId,
@@ -49,7 +67,11 @@ export function TimeStep({
         <div className="nu-notice nu-notice--warn" role="status">
           <div>
             <p>{CLOSED_MESSAGE[data.closedReason ?? 'FULLY_BOOKED'] ?? CLOSED_MESSAGE.FULLY_BOOKED}</p>
-            <p style={{ marginTop: 'var(--nu-space-2)' }}>Please select another date.</p>
+            <p style={{ marginTop: 'var(--nu-space-2)' }}>
+              {data.serviceAvailableWeekdays?.length
+                ? `It is available on ${listWeekdays(data.serviceAvailableWeekdays)} — please pick one of those dates.`
+                : 'Please select another date.'}
+            </p>
           </div>
         </div>
       ) : (

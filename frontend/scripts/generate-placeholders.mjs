@@ -107,6 +107,7 @@ const CATEGORY_ART = {
   'advanced-skin-treatments': [BRAND.taupeDeep, BRAND.sand, BRAND.champagneDeep],
   'lifting-contouring': [BRAND.espresso, BRAND.taupe, BRAND.champagne],
   'beauty-nails': [BRAND.blushDeep, BRAND.sandDeep, BRAND.champagneSoft],
+  piercing: [BRAND.ink, BRAND.taupe, BRAND.champagneDeep],
   /* Used for any category the API adds before artwork is commissioned. */
   default: [BRAND.ink, BRAND.taupeDeep, BRAND.champagne],
 };

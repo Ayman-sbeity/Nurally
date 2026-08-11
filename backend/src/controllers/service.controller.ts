@@ -19,6 +19,7 @@ export const CATEGORY_LABELS: Record<ServiceCategorySlug, string> = {
   'advanced-skin-treatments': 'Advanced Skin Treatments',
   'lifting-contouring': 'Lifting & Contouring',
   'beauty-nails': 'Beauty & Nails',
+  piercing: 'Piercing',
 };
 
 const CATEGORY_ORDER = Object.keys(CATEGORY_LABELS) as ServiceCategorySlug[];

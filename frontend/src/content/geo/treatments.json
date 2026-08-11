@@ -1,26 +1,40 @@
 {
   "$comment": "PLAIN-LANGUAGE CATEGORY FACTS. Step 3 of the GEO guide: state what a treatment category is, who it is for and what it addresses, in fact-dense sentences placed before any marketing copy. `addresses` is the inverse of CONCERN_CATEGORIES in src/content/brand.ts — keep the two in step. Nothing here makes a clinical or outcome claim, and every category ends at the consultation, matching the wording Nurella supplied.",
-
   "categories": {
     "laser": {
       "whatItIs": "Laser treatments use focused light energy, delivered by a device, to work on hair growth or the surface and deeper layers of the skin. The lounge's laser menu covers laser hair removal, CO2 laser, HIFU and RF microneedling.",
       "whoItIsFor": "People looking for longer-term hair reduction, or for skin-surface and firmness work that a topical facial cannot reach.",
-      "addresses": ["Pigmentation & Uneven Tone", "Unwanted hair", "Skin texture"]
+      "addresses": [
+        "Pigmentation & Uneven Tone",
+        "Unwanted hair",
+        "Skin texture"
+      ]
     },
     "skin-care": {
       "whatItIs": "Professional facial treatments performed in the lounge — deep cleansing, HydraFacial, diamond technique, meso lifting and microneedling — focused on cleansing, hydration and the condition of the skin's surface.",
       "whoItIsFor": "Anyone maintaining their skin, preparing it before an event, or dealing with congestion, dullness or rough texture.",
-      "addresses": ["Dull & Dehydrated Skin", "Acne & Acne Scars", "Large Pores & Skin Texture"]
+      "addresses": [
+        "Dull & Dehydrated Skin",
+        "Acne & Acne Scars",
+        "Large Pores & Skin Texture"
+      ]
     },
     "permanent-makeup": {
       "whatItIs": "Semi-permanent cosmetic tattooing of the brows, lips and eyeline — microblading, nano blading, lip blush and eyeliner — designed to follow your natural features.",
       "whoItIsFor": "People who want their brows, lips or eyeline defined without applying makeup daily, including anyone with sparse or uneven brows.",
-      "addresses": ["Sparse or uneven brows", "Lip definition and colour", "Daily makeup time"]
+      "addresses": [
+        "Sparse or uneven brows",
+        "Lip definition and colour",
+        "Daily makeup time"
+      ]
     },
     "nails": {
       "whatItIs": "Nail care and finishing: manicure, pedicure, gel polish and gel extensions.",
       "whoItIsFor": "Clients booking routine nail maintenance or a longer-lasting finish for an occasion.",
-      "addresses": ["Nail care and maintenance", "Long-lasting nail finish"]
+      "addresses": [
+        "Nail care and maintenance",
+        "Long-lasting nail finish"
+      ]
     },
     "facial-aesthetics": {
       "whatItIs": "Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, Botox, face slimming and under-eye rejuvenation.",
@@ -63,12 +77,27 @@
     "lifting-contouring": {
       "whatItIs": "Non-surgical lifting and contouring treatments that work on facial firmness and definition along the cheeks, jawline and neck.",
       "whoItIsFor": "People seeing sagging or a softening jawline who are not looking for surgery.",
-      "addresses": ["Sagging & Loss of Firmness", "Facial Contouring"]
+      "addresses": [
+        "Sagging & Loss of Firmness",
+        "Facial Contouring"
+      ]
     },
     "beauty-nails": {
       "whatItIs": "Beauty and nail services grouped together for clients combining a beauty appointment with nail care.",
       "whoItIsFor": "Clients booking beauty and nail services in the same visit.",
-      "addresses": ["Nail care and maintenance", "Beauty maintenance"]
+      "addresses": [
+        "Nail care and maintenance",
+        "Beauty maintenance"
+      ]
+    },
+    "piercing": {
+      "whatItIs": "Body and ear piercing carried out in the lounge with sterile, single-use needles and professionally fitted jewellery — belly, surface, dermal and ear placements.",
+      "whoItIsFor": "Anyone wanting a new piercing placed and fitted properly, or replacing jewellery from an existing piercing.",
+      "addresses": [
+        "New ear and body piercings",
+        "Correct placement and jewellery fit",
+        "Safe, sterile technique"
+      ]
     }
   }
 }

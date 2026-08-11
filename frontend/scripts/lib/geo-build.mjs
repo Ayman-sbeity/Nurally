@@ -46,6 +46,43 @@ export function loadEnv(mode = process.env.NODE_ENV || 'production') {
   return env;
 }
 
+/**
+ * Refuses to generate canonical URLs, a sitemap and an `llms.txt` that all
+ * point at a development origin.
+ *
+ * This is a build stopper rather than a warning because the failure is silent
+ * and total: a deployed page whose canonical says `localhost` tells every
+ * crawler that the real copy lives somewhere unreachable, so the site is
+ * dropped from the index entirely — and nothing about the running site looks
+ * wrong. A warning in the build log has already been missed once.
+ *
+ * Building locally without a production origin is legitimate; set
+ * `GEO_ALLOW_LOCAL_SITE_URL=1` to say so deliberately.
+ */
+export function assertPublicSiteUrl(env) {
+  const siteUrl = env.VITE_SITE_URL ?? '';
+  const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:|\/|$)/i.test(siteUrl);
+
+  if (!isLocal && siteUrl) return;
+  if (process.env.GEO_ALLOW_LOCAL_SITE_URL === '1') {
+    console.warn(
+      `  ! VITE_SITE_URL is ${siteUrl || 'unset'} — canonical URLs, the sitemap and llms.txt ` +
+        'will point at it. Allowed by GEO_ALLOW_LOCAL_SITE_URL=1. Do not deploy this build.',
+    );
+    return;
+  }
+
+  throw new Error(
+    `VITE_SITE_URL is ${siteUrl || 'not set'}.\n\n` +
+      '  Every canonical URL, Open Graph URL, sitemap entry and llms.txt link is built from it,\n' +
+      '  so a deployed build carrying this value would be de-indexed by search engines and\n' +
+      '  uncitable by AI assistants.\n\n' +
+      '  Set it to the production origin in frontend/.env, e.g.\n' +
+      '      VITE_SITE_URL=https://nurellabeautylounge.com\n\n' +
+      '  To build locally anyway: GEO_ALLOW_LOCAL_SITE_URL=1 npm run build\n',
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /* Content                                                                    */
 /* -------------------------------------------------------------------------- */
@@ -54,6 +91,8 @@ const readJson = (relativePath) =>
   JSON.parse(readFileSync(resolve(frontendRoot, relativePath), 'utf8'));
 
 export function loadGeoContent(env = loadEnv()) {
+  assertPublicSiteUrl(env);
+
   const businessJson = readJson('src/content/geo/business.json');
   const faqJson = readJson('src/content/geo/faq.json');
   const treatmentsJson = readJson('src/content/geo/treatments.json');

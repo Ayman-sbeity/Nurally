@@ -31,7 +31,8 @@ export type ServiceCategorySlug =
   | 'skin-boosters-rejuvenation'
   | 'advanced-skin-treatments'
   | 'lifting-contouring'
-  | 'beauty-nails';
+  | 'beauty-nails'
+  | 'piercing';
 
 export interface ApiEnvelope<T> {
   success: true;
@@ -89,6 +90,8 @@ export interface Service {
   price?: number;
   currency?: string;
   imageUrl?: string;
+  /** 0 = Sunday … 6 = Saturday. Empty means any day the lounge is open. */
+  availableWeekdays: number[];
   isActive: boolean;
   displayOrder: number;
 }
@@ -149,7 +152,15 @@ export interface AvailableSlot {
 export interface DayAvailability {
   date: string;
   isOpen: boolean;
-  closedReason?: 'DAY_OFF' | 'BLOCKED' | 'FULLY_BOOKED' | 'PAST' | 'TOO_FAR_AHEAD';
+  closedReason?:
+    | 'DAY_OFF'
+    | 'BLOCKED'
+    | 'FULLY_BOOKED'
+    | 'PAST'
+    | 'TOO_FAR_AHEAD'
+    | 'SERVICE_DAY_OFF';
+  /** Present only when the treatment is restricted to particular weekdays. */
+  serviceAvailableWeekdays?: number[];
   serviceDurationMinutes: number;
   slots: AvailableSlot[];
   timezone: string;

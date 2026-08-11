@@ -119,6 +119,7 @@ export const ServiceCategorySlug = {
   ADVANCED_SKIN_TREATMENTS: 'advanced-skin-treatments',
   LIFTING_CONTOURING: 'lifting-contouring',
   BEAUTY_NAILS: 'beauty-nails',
+  PIERCING: 'piercing',
 } as const;
 export type ServiceCategorySlug =
   (typeof ServiceCategorySlug)[keyof typeof ServiceCategorySlug];

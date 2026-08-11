@@ -5,7 +5,11 @@ import { User } from '../models/User';
 import { AppointmentStatus, NotificationType, UserRole, canTransition } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
 import { formatInLoungeZone, isOnGrid } from '../utils/time';
-import { assertSlotIsBookable, getServiceForBooking } from './availability.service';
+import {
+  assertSlotIsBookable,
+  getServiceForBooking,
+  serviceWeekdaysFor,
+} from './availability.service';
 import { createNotification, notifyAdmins } from './notification.service';
 import { acquireSlot, moveSlot, releaseSlot } from './slotLock.service';
 
@@ -108,7 +112,11 @@ export async function createBooking(
   const startAt = parseStartAt(input.startAt);
 
   // Authoritative re-check: the slot list the client saw may be stale.
-  await assertSlotIsBookable({ startAt, durationMinutes: service.durationMinutes });
+  await assertSlotIsBookable({
+    startAt,
+    durationMinutes: service.durationMinutes,
+    availableWeekdays: service.availableWeekdays.length ? service.availableWeekdays : undefined,
+  });
 
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60_000);
   const appointment = new Appointment({
@@ -240,6 +248,7 @@ export async function offerTime(
   await assertSlotIsBookable({
     startAt,
     durationMinutes: appointment.durationMinutes,
+    availableWeekdays: await serviceWeekdaysFor(appointment.service),
     excludeAppointmentId: appointment._id,
     ignoreNotice: true,
   });
@@ -291,6 +300,7 @@ export async function rescheduleByAdmin(
   await assertSlotIsBookable({
     startAt,
     durationMinutes: appointment.durationMinutes,
+    availableWeekdays: await serviceWeekdaysFor(appointment.service),
     excludeAppointmentId: appointment._id,
     ignoreNotice: true,
   });
@@ -440,6 +450,7 @@ export async function requestReschedule(
   await assertSlotIsBookable({
     startAt: proposedStartAt,
     durationMinutes: appointment.durationMinutes,
+    availableWeekdays: await serviceWeekdaysFor(appointment.service),
     excludeAppointmentId: appointment._id,
   });
 
@@ -483,6 +494,7 @@ export async function approveReschedule(
   await assertSlotIsBookable({
     startAt: proposed,
     durationMinutes: appointment.durationMinutes,
+    availableWeekdays: await serviceWeekdaysFor(appointment.service),
     excludeAppointmentId: appointment._id,
     ignoreNotice: true,
   });

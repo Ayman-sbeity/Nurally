@@ -23,6 +23,7 @@ interface FormState {
   price: string;
   currency: string;
   imageUrl: string;
+  availableWeekdays: number[];
   displayOrder: string;
   isActive: boolean;
 }
@@ -35,9 +36,13 @@ const emptyForm: FormState = {
   price: '',
   currency: '',
   imageUrl: '',
+  availableWeekdays: [],
   displayOrder: '0',
   isActive: true,
 };
+
+/** Index is the weekday number the API uses: 0 = Sunday … 6 = Saturday. */
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function AdminServicesPage() {
   const queryClient = useQueryClient();
@@ -76,6 +81,8 @@ export function AdminServicesPage() {
     displayOrder: Number(values.displayOrder) || 0,
     isActive: values.isActive,
     imageUrl: values.imageUrl.trim(),
+    // Always sent: an emptied list is how a weekday restriction is removed.
+    availableWeekdays: [...values.availableWeekdays].sort(),
     ...(values.description.trim() ? { description: values.description.trim() } : {}),
     ...(values.price.trim() ? { price: Number(values.price) } : {}),
     ...(values.currency.trim() ? { currency: values.currency.trim() } : {}),
@@ -109,6 +116,7 @@ export function AdminServicesPage() {
       price: service.price === undefined ? '' : String(service.price),
       currency: service.currency ?? '',
       imageUrl: service.imageUrl ?? '',
+      availableWeekdays: service.availableWeekdays ?? [],
       displayOrder: String(service.displayOrder),
       isActive: service.isActive,
     });
@@ -288,6 +296,36 @@ export function AdminServicesPage() {
             fallbackNote="Showing the default artwork for this category."
             hint="Appears on the treatment cards and the treatment page. Wide images work best — they are cropped to a band."
           />
+          <fieldset className="nu-field nu-field--group">
+            <legend className="nu-label">Available days</legend>
+            <p className="nu-hint">
+              Leave every day unselected for treatments offered whenever the lounge is open. Select
+              days only when a treatment is limited to them — the booking calendar will then offer
+              no other day.
+            </p>
+            <div className="nu-row nu-row--wrap" style={{ gap: 'var(--nu-space-2)' }}>
+              {WEEKDAYS.map((label, weekday) => {
+                const selected = form.availableWeekdays.includes(weekday);
+                return (
+                  <label key={label} className="nu-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() =>
+                        setForm({
+                          ...form,
+                          availableWeekdays: selected
+                            ? form.availableWeekdays.filter((day) => day !== weekday)
+                            : [...form.availableWeekdays, weekday],
+                        })
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
           <TextField
             label="Display order"
             type="number"

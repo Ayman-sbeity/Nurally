@@ -427,6 +427,20 @@
   color: var(--nu-text-muted);
 }
 
+/* A `fieldset` grouping related controls under a `legend`, stripped of the
+   browser's default border and inset so it sits flush with the plain fields
+   above and below it. */
+.nu-field--group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.nu-field--group > legend {
+  padding: 0;
+}
+
 /* Picture control: preview beside the upload / paste-a-URL controls. */
 .nu-image-field {
   display: flex;

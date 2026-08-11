@@ -32,6 +32,16 @@ export const createServiceSchema = z.object({
   price: z.coerce.number().min(0).optional(),
   currency: z.string().trim().max(8).optional(),
   imageUrl: imageUrlSchema.optional(),
+  // 0 = Sunday … 6 = Saturday. Empty means every day the lounge is open; a
+  // non-empty list restricts the treatment to a visiting practitioner's days.
+  availableWeekdays: z
+    .array(z.coerce.number().int().min(0).max(6))
+    .max(7)
+    .optional()
+    .default([])
+    .refine((days) => new Set(days).size === days.length, {
+      message: 'Available weekdays must not repeat.',
+    }),
   isActive: z.boolean().optional().default(true),
   displayOrder: z.coerce.number().int().optional().default(0),
 });

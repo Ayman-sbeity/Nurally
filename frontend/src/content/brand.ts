@@ -122,6 +122,7 @@ export const CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'advanced-skin-treatments': '/images/categories/advanced-skin-treatments.svg',
   'lifting-contouring': '/images/categories/lifting-contouring.svg',
   'beauty-nails': '/images/categories/beauty-nails.svg',
+  piercing: '/images/categories/piercing.svg',
 };
 
 /** Falls back to neutral brand artwork for categories added after this list. */
@@ -140,6 +141,7 @@ export const CATEGORY_ORDER = [
   'advanced-skin-treatments',
   'lifting-contouring',
   'beauty-nails',
+  'piercing',
 ] as const;
 
 /**

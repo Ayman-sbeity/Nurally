@@ -15,6 +15,15 @@ export interface ServiceAttrs {
   price?: number;
   currency?: string;
   imageUrl?: string;
+  /**
+   * Weekdays this treatment can be booked on (0 = Sunday … 6 = Saturday).
+   *
+   * Empty means "any day the lounge is open", which is the case for almost
+   * everything. It exists for treatments performed by a visiting practitioner
+   * — the permanent-makeup and piercing work only happens on Wednesdays — so
+   * the booking engine stops offering days nobody can actually work.
+   */
+  availableWeekdays: number[];
   isActive: boolean;
   displayOrder: number;
 }
@@ -36,6 +45,14 @@ const serviceSchema = new Schema<ServiceAttrs>(
     price: { type: Number, min: 0 },
     currency: { type: String, trim: true, maxlength: 8 },
     imageUrl: { type: String, trim: true },
+    availableWeekdays: {
+      type: [{ type: Number, min: 0, max: 6 }],
+      default: [],
+      validate: {
+        validator: (days: number[]) => new Set(days).size === days.length,
+        message: 'Available weekdays must not repeat.',
+      },
+    },
     isActive: { type: Boolean, default: true, index: true },
     displayOrder: { type: Number, default: 0 },
   },

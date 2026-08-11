@@ -11,7 +11,9 @@
     "seed": "tsx src/seed/seed.ts",
     "seed:demo": "tsx src/seed/seed.ts --demo",
     "seed:reset": "tsx src/seed/seed.ts --reset --demo",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "catalogue": "tsx src/scripts/updateCatalogue.ts",
+    "catalogue:apply": "tsx src/scripts/updateCatalogue.ts --apply"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
