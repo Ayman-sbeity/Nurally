@@ -59,11 +59,10 @@ function useCanPreview(): boolean {
 interface ReelCardProps {
   reel: InstagramReel;
   onOpen: () => void;
-  eager: boolean;
   canPreview: boolean;
 }
 
-function ReelCard({ reel, onOpen, eager, canPreview }: ReelCardProps) {
+function ReelCard({ reel, onOpen, canPreview }: ReelCardProps) {
   const [previewing, setPreviewing] = useState(false);
 
   // The preview element is mounted on hover and unmounted on leave, so a reel
@@ -85,7 +84,10 @@ function ReelCard({ reel, onOpen, eager, canPreview }: ReelCardProps) {
           className="nu-reel__cover"
           src={mediaSrc(reel.coverImageUrl)}
           alt={reel.altText}
-          loading={eager ? 'eager' : 'lazy'}
+          // Every cover is lazy, including the first: this section sits below
+          // the gallery and is never the largest paint, so eager-loading it
+          // would only take priority away from what is actually on screen.
+          loading="lazy"
           decoding="async"
         />
 
@@ -184,7 +186,6 @@ export function InstagramSection({ limit = 8 }: { limit?: number }) {
             <ReelCard
               key={reel._id}
               reel={reel}
-              eager={index < 2}
               canPreview={canPreview}
               onOpen={() => setOpenIndex(index)}
             />
