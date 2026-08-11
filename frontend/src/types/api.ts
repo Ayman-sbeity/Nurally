@@ -67,6 +67,8 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   clientProfile?: ClientProfile;
+  /** Present only when the user has a profile photo; also its cache version. */
+  avatarUpdatedAt?: string;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
@@ -93,8 +94,18 @@ export function AdminClientsPage() {
                 {data.items.map((client) => (
                   <tr key={client._id}>
                     <td>
-                      <div>{client.fullName}</div>
-                      {!client.isActive && <span className="nu-badge">Deactivated</span>}
+                      <div className="nu-row" style={{ gap: 'var(--nu-space-3)' }}>
+                        <Avatar
+                          userId={client._id}
+                          fullName={client.fullName}
+                          updatedAt={client.avatarUpdatedAt}
+                          size={36}
+                        />
+                        <div>
+                          <div>{client.fullName}</div>
+                          {!client.isActive && <span className="nu-badge">Deactivated</span>}
+                        </div>
+                      </div>
                     </td>
                     <td>
                       <div className="nu-hint">{client.email}</div>

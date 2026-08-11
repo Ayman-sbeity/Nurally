@@ -11,6 +11,7 @@ import appointmentRoutes from './appointment.routes';
 import authRoutes from './auth.routes';
 import availabilityRoutes from './availability.routes';
 import serviceRoutes from './service.routes';
+import userRoutes from './user.routes';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.get('/health', (_req, res) => {
 
 router.use('/auth', authRoutes);
 router.use('/services', serviceRoutes);
+router.use('/users', userRoutes);
 router.use('/availability', availabilityRoutes);
 router.use('/appointments', appointmentRoutes);
 

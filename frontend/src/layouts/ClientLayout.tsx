@@ -2,8 +2,8 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useNotifications } from '@/hooks/queries';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 import { useAuth } from '@/context/AuthContext';
+import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { initials } from '@/utils/format';
 
 const TABS = [
   { to: '/app', label: 'Home', end: true, icon: 'M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5' },
@@ -58,7 +58,14 @@ export function ClientLayout() {
             </Link>
 
             <Link to="/app/profile" className="nu-app__avatar" aria-label="Your profile">
-              {initials(user?.fullName ?? '')}
+              {user ? (
+                <Avatar
+                  userId={user._id}
+                  fullName={user.fullName}
+                  updatedAt={user.avatarUpdatedAt}
+                  size={36}
+                />
+              ) : null}
             </Link>
           </div>
         </div>

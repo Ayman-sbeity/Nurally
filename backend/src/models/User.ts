@@ -30,6 +30,18 @@ export interface UserAttrs {
   lastLoginAt?: Date;
   passwordResetTokenHash?: string;
   passwordResetExpiresAt?: Date;
+  /**
+   * Profile photo. The key is never serialised — it is a storage path, and the
+   * bytes are only reachable through the authenticated avatar route.
+   *
+   * `avatarUpdatedAt` is what the client sees: its presence means "this user
+   * has a photo", and its value doubles as the cache-busting version in the
+   * URL, so replacing a photo cannot leave a stale one on screen. It is a
+   * plain field rather than a virtual because the admin client list is a
+   * `.lean()` query, and lean documents do not carry virtuals.
+   */
+  avatarKey?: string;
+  avatarUpdatedAt?: Date;
 }
 
 export interface UserDocument extends HydratedDocument<UserAttrs> {
@@ -85,13 +97,22 @@ const userSchema = new Schema<UserAttrs, UserModel>(
     lastLoginAt: { type: Date },
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpiresAt: { type: Date, select: false },
+    avatarKey: { type: String, select: false },
+    avatarUpdatedAt: { type: Date },
   },
   {
     timestamps: true,
     toJSON: {
       virtuals: true,
       transform: (_doc, ret) =>
-        omitInternal(ret, ['passwordHash', 'passwordResetTokenHash', 'passwordResetExpiresAt']),
+        omitInternal(ret, [
+          'passwordHash',
+          'passwordResetTokenHash',
+          'passwordResetExpiresAt',
+          // select:false already keeps it out of most reads; listing it here
+          // means an explicit `.select('+avatarKey')` cannot leak it either.
+          'avatarKey',
+        ]),
     },
   },
 );

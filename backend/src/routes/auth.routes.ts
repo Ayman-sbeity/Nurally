@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as controller from '../controllers/auth.controller';
 import { requireAuth } from '../middleware/auth';
 import { authLimiter } from '../middleware/rateLimit';
+import { singleUpload } from '../middleware/upload';
 import { validate } from '../middleware/validate';
 import {
   changePasswordSchema,
@@ -34,6 +35,9 @@ router.post(
 
 router.get('/me', requireAuth, controller.me);
 router.patch('/me', requireAuth, validate({ body: updateProfileSchema }), controller.updateProfile);
+router.post('/me/avatar', requireAuth, singleUpload('avatar'), controller.uploadAvatar);
+router.delete('/me/avatar', requireAuth, controller.deleteAvatar);
+
 router.post(
   '/change-password',
   requireAuth,

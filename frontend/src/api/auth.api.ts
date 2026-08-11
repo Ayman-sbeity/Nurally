@@ -25,6 +25,29 @@ export const authApi = {
   updateProfile: (payload: { fullName?: string; phone?: string; marketingOptIn?: boolean }) =>
     request<{ user: User }>(api.patch<ApiEnvelope<{ user: User }>>('/auth/me', payload)),
 
+  /**
+   * Multipart; the field name must match `singleUpload('avatar')` on the API.
+   *
+   * Content-Type is explicitly cleared so the browser can set it with the
+   * multipart boundary. Without this the client's `application/json` default
+   * applies, and axios serialises the FormData to JSON — the file silently
+   * never leaves the browser.
+   */
+  uploadAvatar: (file: File) => {
+    const form = new FormData();
+    form.append('avatar', file);
+    return request<{ avatarUpdatedAt: string }>(
+      api.post<ApiEnvelope<{ avatarUpdatedAt: string }>>('/auth/me/avatar', form, {
+        headers: { 'Content-Type': undefined },
+      }),
+    );
+  },
+
+  removeAvatar: () =>
+    request<{ message: string }>(
+      api.delete<ApiEnvelope<{ message: string }>>('/auth/me/avatar'),
+    ),
+
   changePassword: (currentPassword: string, newPassword: string) =>
     request<{ message: string }>(
       api.post<ApiEnvelope<{ message: string }>>('/auth/change-password', {

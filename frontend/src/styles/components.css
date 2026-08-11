@@ -767,3 +767,40 @@
   font-size: var(--nu-text-sm);
   color: var(--nu-text-muted);
 }
+
+/* --- Avatar ---------------------------------------------------------------
+   One element, two states: initials on a tinted disc, or the photograph in
+   the same box. Sizing comes from the component so a table cell and a profile
+   page can share it without a modifier class each. */
+.nu-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 50%;
+  background: var(--nu-surface-alt);
+  color: var(--nu-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow: hidden;
+  /* Keeps the disc crisp against both the cream page and a white card. */
+  box-shadow: inset 0 0 0 1px var(--nu-line);
+}
+
+.nu-avatar--image {
+  object-fit: cover;
+  background: var(--nu-surface-alt);
+}
+
+/* --- Avatar upload (client profile) -------------------------------------- */
+.nu-avatar-field {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-5);
+  flex-wrap: wrap;
+}
+
+.nu-avatar-field__controls {
+  flex: 1 1 14rem;
+}

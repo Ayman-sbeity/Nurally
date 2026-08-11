@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { authApi } from '@/api/auth.api';
 import { ApiRequestError } from '@/api/client';
+import { AvatarField } from '@/components/client/AvatarField';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
@@ -84,6 +85,10 @@ export function ClientProfilePage() {
       </div>
 
       <div className="nu-stack" style={{ gap: 'var(--nu-space-6)' }}>
+        <section className="nu-card">
+          <AvatarField />
+        </section>
+
         <section className="nu-card">
           <h2 className="nu-label" style={{ marginBottom: 'var(--nu-space-4)' }}>
             Your details
