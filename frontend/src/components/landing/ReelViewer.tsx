@@ -34,8 +34,13 @@ export function ReelViewer({ reels, index, onIndexChange, onClose }: ReelViewerP
   // Sound is a property of the session, not of one reel — turning it on once
   // should hold as the visitor moves through the rail.
   const [muted, setMuted] = useState(false);
+  // Read by the autoplay effect below without making it a dependency, so
+  // toggling sound never restarts the reel. Written after render rather than
+  // during it, which is the only assignment order concurrent rendering allows.
   const mutedRef = useRef(muted);
-  mutedRef.current = muted;
+  useEffect(() => {
+    mutedRef.current = muted;
+  });
 
   const reel = reels[index];
   const hasPrevious = index > 0;

@@ -33,7 +33,11 @@ import {
   updateGalleryImageSchema,
   updateServiceSchema,
 } from '../validators/catalogue.validators';
-import { createReelSchema, updateReelSchema } from '../validators/instagram.validators';
+import {
+  createReelSchema,
+  lookupReelSchema,
+  updateReelSchema,
+} from '../validators/instagram.validators';
 import {
   assetIdParamSchema,
   createClientSchema,
@@ -234,6 +238,13 @@ router.delete(
 
 // --- Instagram reels -------------------------------------------------------
 router.get('/instagram/reels', instagramController.listReels);
+// Reaches out to Instagram, so it is a POST rather than a GET: it is not
+// cacheable and it stores the cover it downloads.
+router.post(
+  '/instagram/reels/lookup',
+  validate({ body: lookupReelSchema }),
+  instagramController.lookupReel,
+);
 router.post(
   '/instagram/reels',
   validate({ body: createReelSchema }),

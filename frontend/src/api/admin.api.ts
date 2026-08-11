@@ -26,6 +26,15 @@ type AppointmentResponse = ApiEnvelope<{ appointment: Appointment }>;
  */
 export type ReelPayload = Omit<InstagramReel, '_id' | 'shortcode'>;
 
+/** What Instagram could tell us about a reel. Everything but the link is
+ *  best-effort — the form stays fillable by hand when a field comes back empty. */
+export interface ReelLookup {
+  permalink: string;
+  shortcode: string;
+  coverImageUrl?: string;
+  caption?: string;
+}
+
 export const adminApi = {
   // --- Overview ------------------------------------------------------------
   dashboard: () => request<DashboardData>(api.get<ApiEnvelope<DashboardData>>('/admin/dashboard')),
@@ -237,6 +246,19 @@ export const adminApi = {
   listReels: () =>
     request<{ reels: InstagramReel[] }>(
       api.get<ApiEnvelope<{ reels: InstagramReel[] }>>('/admin/instagram/reels'),
+    ),
+
+  /**
+   * Reads a reel's cover and caption from Instagram to prefill the form.
+   * Saves nothing except the cover image, which is re-hosted so it cannot
+   * expire out from under the site.
+   */
+  lookupReel: (permalink: string) =>
+    request<{ reel: ReelLookup; alreadyFeatured: boolean }>(
+      api.post<ApiEnvelope<{ reel: ReelLookup; alreadyFeatured: boolean }>>(
+        '/admin/instagram/reels/lookup',
+        { permalink },
+      ),
     ),
 
   createReel: (payload: ReelPayload) =>

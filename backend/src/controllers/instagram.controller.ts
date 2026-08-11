@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { InstagramReel } from '../models/InstagramReel';
+import * as instagramService from '../services/instagram.service';
 import { UserRole } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -35,6 +36,22 @@ export const listReels = asyncHandler(async (req: Request, res: Response) => {
 
   const reels = await InstagramReel.find(filter).sort({ displayOrder: 1, createdAt: -1 }).lean();
   ok(res, { reels });
+});
+
+/**
+ * Reads a reel's cover and caption from Instagram so the admin only has to
+ * paste a link. Nothing is saved — the response prefills the form, and the
+ * admin still decides what is actually featured.
+ */
+export const lookupReel = asyncHandler(async (req: Request, res: Response) => {
+  const { permalink } = req.body as { permalink: string };
+  const reel = await instagramService.lookupReel(permalink);
+
+  // Featuring the same reel twice is refused on save; saying so now means the
+  // admin does not fill in the rest of the form before finding out.
+  const alreadyFeatured = Boolean(await InstagramReel.exists({ shortcode: reel.shortcode }));
+
+  ok(res, { reel, alreadyFeatured });
 });
 
 export const createReel = asyncHandler(async (req: Request, res: Response) => {

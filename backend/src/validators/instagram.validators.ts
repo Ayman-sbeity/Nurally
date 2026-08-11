@@ -47,6 +47,8 @@ const mediaUrlSchema = z
     message: 'Enter an https:// address or a path beginning with /.',
   });
 
+export const lookupReelSchema = z.object({ permalink: permalinkSchema });
+
 export const createReelSchema = z.object({
   permalink: permalinkSchema,
   caption: z.string().trim().max(600).optional(),

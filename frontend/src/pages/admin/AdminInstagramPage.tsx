@@ -99,6 +99,36 @@ export function AdminInstagramPage() {
     onError,
   });
 
+  /**
+   * Fills the form from the pasted link.
+   *
+   * Only empty fields are written, so pressing it again after editing the
+   * caption does not throw that work away. Alt text is never auto-filled: a
+   * marketing caption is not a description of what is on screen, and putting
+   * one in the alt attribute is worse for a screen reader than leaving it to
+   * the admin.
+   */
+  const lookup = useMutation({
+    mutationFn: () => adminApi.lookupReel(form.permalink.trim()),
+    onSuccess: ({ reel, alreadyFeatured }) => {
+      setForm((current) => ({
+        ...current,
+        permalink: reel.permalink,
+        coverImageUrl: current.coverImageUrl || reel.coverImageUrl || '',
+        caption: current.caption || reel.caption || '',
+      }));
+
+      if (alreadyFeatured && !editing) {
+        notify('That reel is already featured — check the list before adding it again.', 'error');
+      } else if (!reel.coverImageUrl) {
+        notify('Instagram did not give us a cover image. Upload one below.', 'error');
+      } else {
+        notify('Filled in from Instagram.', 'success');
+      }
+    },
+    onError,
+  });
+
   const openEdit = (reel: InstagramReel) => {
     setForm({
       permalink: reel.permalink,
@@ -210,6 +240,21 @@ export function AdminInstagramPage() {
             hint="Open the reel on Instagram, tap Share, then Copy link."
             onChange={(event) => setForm({ ...form, permalink: event.target.value })}
           />
+          <div className="nu-row" style={{ gap: 'var(--nu-space-3)', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={lookup.isPending}
+              disabled={!form.permalink.trim()}
+              onClick={() => lookup.mutate()}
+            >
+              Fetch from Instagram
+            </Button>
+            <span className="nu-hint">
+              Pulls the cover image and caption. The video is not downloadable this way — upload it
+              below to play the reel on the site.
+            </span>
+          </div>
           <ImageField
             label="Cover image"
             value={form.coverImageUrl}
