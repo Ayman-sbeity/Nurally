@@ -3,7 +3,7 @@ import { Seo } from '@/components/ui/Seo';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { FaqSection } from '@/components/landing/FaqSection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
-import { BUSINESS, FAQ_ENTRIES, FAQ_SECTIONS } from '@/content/business';
+import { BUSINESS, FAQ_ENTRIES } from '@/content/business';
 import { breadcrumbSchema, faqSchema } from '@/lib/geo.js';
 
 export function FaqPage() {
@@ -40,20 +40,12 @@ export function FaqPage() {
             consultation. If your question is not here, the fastest route to an answer is a booking
             request — the lounge replies to every one.
           </p>
-
-          {FAQ_SECTIONS.length > 1 && (
-            <nav className="nu-faq__jump" aria-label="Jump to a section" style={{ marginTop: 'var(--nu-space-6)' }}>
-              {FAQ_SECTIONS.map((section) => (
-                <a className="nu-facts__tag" href={`#faq-${section.id}`} key={section.id}>
-                  {section.title}
-                </a>
-              ))}
-            </nav>
-          )}
         </div>
       </div>
 
-      <FaqSection grouped heading="Answers" eyebrow="In detail" />
+      {/* The jump links live in the section's own sticky column, so they stay
+          reachable while reading rather than scrolling away with the intro. */}
+      <FaqSection grouped showSectionNav eyebrow="" heading="" />
       <BookingCtaSection />
     </>
   );

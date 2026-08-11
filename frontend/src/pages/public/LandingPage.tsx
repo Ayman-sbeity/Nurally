@@ -27,7 +27,11 @@ export function LandingPage() {
       <TestimonialsSection />
       {/* A short, question-phrased answer block; the full set lives at /faq,
           which is where the FAQPage structured data is declared. */}
-      <FaqSection limit={5} showViewAll />
+      <FaqSection
+        limit={5}
+        showViewAll
+        intro="Straight answers about our treatments, how appointments work, and what happens at your consultation."
+      />
       <BookingCtaSection />
     </>
   );
