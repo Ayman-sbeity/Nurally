@@ -385,6 +385,19 @@
   box-shadow: 0 0 0 3px rgb(var(--nu-champagne-rgb) / 0.18);
 }
 
+/*
+ * iOS Safari zooms the whole page when a focused field is smaller than 16px,
+ * and does not zoom back out — every tap through the booking form leaves the
+ * layout scaled. Only touch devices are affected, so the desktop scale stays.
+ */
+@media (pointer: coarse) {
+  .nu-input,
+  .nu-textarea,
+  .nu-select {
+    font-size: 1rem;
+  }
+}
+
 .nu-input[aria-invalid='true'],
 .nu-textarea[aria-invalid='true'] {
   border-color: var(--nu-danger);

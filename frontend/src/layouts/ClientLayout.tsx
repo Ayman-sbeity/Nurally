@@ -28,7 +28,7 @@ function TabIcon({ path }: { path: string }) {
 export function ClientLayout() {
   const { user } = useAuth();
   const { data } = useNotifications();
-  const { canInstall, showIosHint, promptInstall, dismiss } = usePwaInstall();
+  const { canInstall, showIosHint, showOpenInSafariHint, promptInstall, dismiss } = usePwaInstall();
   const unread = data?.unreadCount ?? 0;
 
   return (
@@ -71,14 +71,16 @@ export function ClientLayout() {
         </div>
       </header>
 
-      {(canInstall || showIosHint) && (
+      {(canInstall || showIosHint || showOpenInSafariHint) && (
         <div className="nu-install-banner" role="region" aria-label="Install the Nurella app">
           <div>
             <p className="nu-install-banner__title">Add Nurella to your home screen</p>
             <p className="nu-install-banner__body">
-              {showIosHint
-                ? 'Tap the Share button, then “Add to Home Screen”.'
-                : 'Book and check your appointments like a native app.'}
+              {showOpenInSafariHint
+                ? 'Tap the ••• menu, then “Open in Safari” — you can add it from there.'
+                : showIosHint
+                  ? 'Tap the Share button, then “Add to Home Screen”.'
+                  : 'Book and check your appointments like a native app.'}
             </p>
           </div>
           <div className="nu-row" style={{ gap: 'var(--nu-space-2)' }}>
