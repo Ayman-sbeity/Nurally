@@ -1,6 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { Schema, model, type HydratedDocument, type Model, type Types } from 'mongoose';
-import { UserRole } from '../types/domain';
+import {
+  AdminResource,
+  PERMISSION_ACTIONS,
+  UserRole,
+  type StaffPermission,
+} from '../types/domain';
 import { omitInternal } from './serialization';
 
 const SALT_ROUNDS = 12;
@@ -29,6 +34,15 @@ export interface UserAttrs {
   role: UserRole;
   isActive: boolean;
   clientProfile: ClientProfile;
+  /**
+   * Which admin sections a STAFF account may open, and what it may do in each.
+   * Empty on clients, and ignored on admins — the owner is allowed everything
+   * unconditionally, so storing a grant for them would be a second source of
+   * truth that could disagree with the first.
+   */
+  staffPermissions: StaffPermission[];
+  /** Free-text job title, shown next to the name in the staff list. */
+  jobTitle?: string;
   tokenVersion: number;
   lastLoginAt?: Date;
   passwordResetTokenHash?: string;
@@ -60,6 +74,18 @@ const clientProfileSchema = new Schema<ClientProfile>(
     notes: { type: String, trim: true, maxlength: 2000 },
     preferredServices: [{ type: Schema.Types.ObjectId, ref: 'Service' }],
     marketingOptIn: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+const staffPermissionSchema = new Schema<StaffPermission>(
+  {
+    resource: { type: String, enum: Object.values(AdminResource), required: true },
+    actions: {
+      type: [String],
+      enum: PERMISSION_ACTIONS,
+      default: [],
+    },
   },
   { _id: false },
 );
@@ -103,6 +129,8 @@ const userSchema = new Schema<UserAttrs, UserModel>(
     },
     isActive: { type: Boolean, default: true, index: true },
     clientProfile: { type: clientProfileSchema, default: () => ({}) },
+    staffPermissions: { type: [staffPermissionSchema], default: [] },
+    jobTitle: { type: String, trim: true, maxlength: 80 },
     /**
      * Bumped on logout-everywhere and password change; refresh tokens carrying
      * an older version are rejected.

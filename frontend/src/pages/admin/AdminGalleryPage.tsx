@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { CATEGORY_ORDER } from '@/content/brand';
 import { useGallery, useServices } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import type { GalleryImage, ServiceCategorySlug } from '@/types/api';
 
 interface FormState {
@@ -38,6 +39,7 @@ const emptyForm: FormState = {
 export function AdminGalleryPage() {
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const [editing, setEditing] = useState<GalleryImage | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -119,14 +121,16 @@ export function AdminGalleryPage() {
           <h1 className="nu-admin-head__title">Gallery</h1>
           <p className="nu-admin-head__sub">{data.images.length} images</p>
         </div>
-        <Button
-          onClick={() => {
-            setForm(emptyForm);
-            setCreating(true);
-          }}
-        >
-          Add image
-        </Button>
+        {can('GALLERY', 'CREATE') && (
+          <Button
+            onClick={() => {
+              setForm(emptyForm);
+              setCreating(true);
+            }}
+          >
+            Add image
+          </Button>
+        )}
       </div>
 
       <div className="nu-notice" style={{ marginBottom: 'var(--nu-space-5)' }}>
@@ -154,12 +158,16 @@ export function AdminGalleryPage() {
                   {image.isActive ? 'Visible' : 'Hidden'} · order {image.displayOrder}
                 </p>
                 <div className="nu-row" style={{ marginTop: 'var(--nu-space-3)', gap: 'var(--nu-space-2)' }}>
-                  <Button size="sm" variant="outline" onClick={() => openEdit(image)}>
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="danger" onClick={() => setDeleteId(image._id)}>
-                    Remove
-                  </Button>
+                  {can('GALLERY', 'EDIT') && (
+                    <Button size="sm" variant="outline" onClick={() => openEdit(image)}>
+                      Edit
+                    </Button>
+                  )}
+                  {can('GALLERY', 'DELETE') && (
+                    <Button size="sm" variant="danger" onClick={() => setDeleteId(image._id)}>
+                      Remove
+                    </Button>
+                  )}
                 </div>
               </figcaption>
             </figure>

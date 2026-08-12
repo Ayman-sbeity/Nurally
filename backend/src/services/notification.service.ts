@@ -1,7 +1,14 @@
 import type { Types } from 'mongoose';
 import { Notification } from '../models/Notification';
 import { User } from '../models/User';
-import { NotificationChannel, NotificationType, UserRole } from '../types/domain';
+import {
+  AdminResource,
+  NotificationChannel,
+  NotificationType,
+  PermissionAction,
+  UserRole,
+  isLoungeSide,
+} from '../types/domain';
 import { logger } from '../utils/logger';
 import { isPushEnabled, sendToUser } from './push.service';
 
@@ -26,9 +33,9 @@ interface CreateNotificationInput {
  * so the same appointment has a different address for each side.
  */
 function linkFor(input: CreateNotificationInput): string {
-  const isAdmin = input.recipientRole === UserRole.ADMIN;
-  if (!input.appointment) return isAdmin ? '/admin' : '/app';
-  return isAdmin
+  const loungeSide = input.recipientRole ? isLoungeSide(input.recipientRole) : false;
+  if (!input.appointment) return loungeSide ? '/admin' : '/app';
+  return loungeSide
     ? `/admin/appointments/${input.appointment.toString()}`
     : `/app/appointments/${input.appointment.toString()}`;
 }
@@ -97,18 +104,42 @@ export async function createNotification(input: CreateNotificationInput): Promis
   }
 }
 
-/** Fans a notification out to every active admin. */
+/**
+ * Fans a notification out to everyone who works the desk: the owner, and any
+ * employee granted sight of appointments.
+ *
+ * Staff are filtered by permission rather than by role alone — someone who only
+ * maintains the gallery has no use for a booking alert, and telling them about
+ * a named client's treatment would leak a detail they were not given access to.
+ */
 export async function notifyAdmins(
   input: Omit<CreateNotificationInput, 'recipient'>,
 ): Promise<void> {
-  const admins = await User.find({ role: UserRole.ADMIN, isActive: true }).select('_id').lean();
-  if (admins.length === 0) {
+  const recipients = await User.find({
+    isActive: true,
+    $or: [
+      { role: UserRole.ADMIN },
+      {
+        role: UserRole.STAFF,
+        staffPermissions: {
+          $elemMatch: {
+            resource: AdminResource.APPOINTMENTS,
+            actions: PermissionAction.VIEW,
+          },
+        },
+      },
+    ],
+  })
+    .select('_id role')
+    .lean();
+
+  if (recipients.length === 0) {
     logger.warn('No active admin to notify', { type: input.type });
     return;
   }
   await Promise.all(
-    admins.map((admin) =>
-      createNotification({ ...input, recipient: admin._id, recipientRole: UserRole.ADMIN }),
+    recipients.map((recipient) =>
+      createNotification({ ...input, recipient: recipient._id, recipientRole: recipient.role }),
     ),
   );
 }

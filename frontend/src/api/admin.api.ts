@@ -13,8 +13,11 @@ import type {
   GalleryImage,
   InstagramReel,
   Paginated,
+  PermissionSchema,
   PhotoPhase,
   Service,
+  StaffMember,
+  StaffPermission,
   User,
   WorkingHours,
 } from '@/types/api';
@@ -400,4 +403,50 @@ export const adminApi = {
     });
     return response.data;
   },
+};
+
+/**
+ * Team members and their access. Owner-only on the server, so every call here
+ * is refused for a STAFF account regardless of what it was granted.
+ */
+export const staffApi = {
+  list: () =>
+    request<{ staff: StaffMember[]; permissionSchema: PermissionSchema }>(
+      api.get<ApiEnvelope<{ staff: StaffMember[]; permissionSchema: PermissionSchema }>>(
+        '/admin/staff',
+      ),
+    ),
+
+  create: (payload: CreateStaffPayload) =>
+    request<{ staff: StaffMember; message: string }>(
+      api.post<ApiEnvelope<{ staff: StaffMember; message: string }>>('/admin/staff', payload),
+    ),
+
+  update: (id: string, payload: UpdateStaffPayload) =>
+    request<{ staff: StaffMember; message: string }>(
+      api.patch<ApiEnvelope<{ staff: StaffMember; message: string }>>(
+        `/admin/staff/${id}`,
+        payload,
+      ),
+    ),
+
+  remove: (id: string) =>
+    request<{ message: string }>(
+      api.delete<ApiEnvelope<{ message: string }>>(`/admin/staff/${id}`),
+    ),
+};
+
+export interface CreateStaffPayload {
+  fullName: string;
+  email: string;
+  phone?: string;
+  jobTitle?: string;
+  password: string;
+  permissions: StaffPermission[];
+}
+
+/** Every field optional: the permission grid saves without the account details. */
+export type UpdateStaffPayload = Partial<Omit<CreateStaffPayload, 'password'>> & {
+  password?: string;
+  isActive?: boolean;
 };

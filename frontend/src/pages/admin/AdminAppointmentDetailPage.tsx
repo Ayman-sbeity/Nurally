@@ -12,6 +12,7 @@ import { SlotPickerDialog } from '@/components/admin/SlotPickerDialog';
 import { clientOf } from '@/components/client/AppointmentCard';
 import { useAppointment } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import {
   STATUS_LABEL,
   formatDateTime,
@@ -103,6 +104,12 @@ export function AdminAppointmentDetailPage() {
   const isPendingRequest = status === 'PENDING';
   const isReschedule = status === 'RESCHEDULE_REQUESTED';
 
+  // Cancelling is the one desk action held behind Delete; everything else that
+  // moves an appointment along is an edit.
+  const { can } = usePermissions();
+  const canEdit = can('APPOINTMENTS', 'EDIT');
+  const canCancel = can('APPOINTMENTS', 'DELETE');
+
   return (
     <>
       <Seo title={`${appointment.serviceNameSnapshot} — Nurella Admin`} noIndex />
@@ -135,18 +142,23 @@ export function AdminAppointmentDetailPage() {
                     “{appointment.rescheduleRequest.message}”
                   </p>
                 )}
-                <div className="nu-row" style={{ marginTop: 'var(--nu-space-4)', gap: 'var(--nu-space-2)' }}>
-                  <Button
-                    size="sm"
-                    loading={approveReschedule.isPending}
-                    onClick={() => approveReschedule.mutate()}
+                {canEdit && (
+                  <div
+                    className="nu-row"
+                    style={{ marginTop: 'var(--nu-space-4)', gap: 'var(--nu-space-2)' }}
                   >
-                    Approve proposed time
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => setDialog('offer')}>
-                    Offer a different time
-                  </Button>
-                </div>
+                    <Button
+                      size="sm"
+                      loading={approveReschedule.isPending}
+                      onClick={() => approveReschedule.mutate()}
+                    >
+                      Approve proposed time
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setDialog('offer')}>
+                      Offer a different time
+                    </Button>
+                  </div>
+                )}
                 {/* The client keeps their original slot until this is resolved. */}
                 <p className="nu-hint" style={{ marginTop: 'var(--nu-space-3)' }}>
                   Their original time ({formatShortDateTime(appointment.startAt)}) is still held.
@@ -267,22 +279,22 @@ export function AdminAppointmentDetailPage() {
               {/* The action set is driven by the status, mirroring the
                   server-side state machine — nothing invalid is offered. */}
               <div className="nu-actions">
-                {isPendingRequest && (
+                {canEdit && isPendingRequest && (
                   <Button loading={approve.isPending} onClick={() => approve.mutate()}>
                     Approve
                   </Button>
                 )}
-                {(isPendingRequest || status === 'TIME_OFFERED' || isReschedule) && (
+                {canEdit && (isPendingRequest || status === 'TIME_OFFERED' || isReschedule) && (
                   <Button variant="danger" onClick={() => setDialog('reject')}>
                     Reject
                   </Button>
                 )}
-                {(isPendingRequest || status === 'CONFIRMED' || isReschedule) && (
+                {canEdit && (isPendingRequest || status === 'CONFIRMED' || isReschedule) && (
                   <Button variant="outline" onClick={() => setDialog('offer')}>
                     Offer another time
                   </Button>
                 )}
-                {status === 'CONFIRMED' && (
+                {canEdit && status === 'CONFIRMED' && (
                   <>
                     <Button variant="outline" onClick={() => setDialog('reschedule')}>
                       Reschedule
@@ -295,17 +307,25 @@ export function AdminAppointmentDetailPage() {
                     </Button>
                   </>
                 )}
-                {['PENDING', 'CONFIRMED', 'TIME_OFFERED', 'RESCHEDULE_REQUESTED'].includes(status) && (
+                {canCancel &&
+                  ['PENDING', 'CONFIRMED', 'TIME_OFFERED', 'RESCHEDULE_REQUESTED'].includes(status) && (
                   <Button variant="danger" onClick={() => setDialog('cancel')}>
                     Cancel
                   </Button>
                 )}
               </div>
 
-              {['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(status) && (
+              {['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(status) ? (
                 <p className="nu-hint">
                   This appointment is closed. No further changes are possible.
                 </p>
+              ) : (
+                !canEdit &&
+                !canCancel && (
+                  <p className="nu-hint">
+                    Your account can view appointments but not change them.
+                  </p>
+                )
               )}
             </div>
           </section>

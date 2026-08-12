@@ -3,7 +3,7 @@ import { Types, type FilterQuery } from 'mongoose';
 import { Appointment, type AppointmentAttrs } from '../models/Appointment';
 import { User } from '../models/User';
 import * as appointmentService from '../services/appointment.service';
-import { AppointmentStatus, UserRole, allowedTransitions } from '../types/domain';
+import { AppointmentStatus, UserRole, allowedTransitions, isLoungeSide } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok, paginate } from '../utils/respond';
@@ -106,7 +106,7 @@ export const getAppointment = asyncHandler(async (req: Request, res: Response) =
   const appointment = await appointmentService.loadAppointment(req.params.id as string, actor);
   await appointment.populate([
     { path: 'service', select: SERVICE_FIELDS },
-    { path: 'client', select: actor.role === UserRole.ADMIN ? CLIENT_FIELDS : 'fullName' },
+    { path: 'client', select: isLoungeSide(actor.role) ? CLIENT_FIELDS : 'fullName' },
   ]);
 
   ok(res, {

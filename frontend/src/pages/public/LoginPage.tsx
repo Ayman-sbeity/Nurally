@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { homePathFor } from '@/components/RouteGuards';
 import { ApiRequestError } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/Field';
@@ -40,7 +41,7 @@ export function LoginPage() {
     setFormError(null);
     try {
       const user = await login(values.identifier, values.password);
-      const fallback = user.role === 'ADMIN' ? '/admin' : '/app';
+      const fallback = homePathFor(user);
       navigate(redirectTo ?? fallback, { replace: true });
     } catch (error) {
       setFormError(

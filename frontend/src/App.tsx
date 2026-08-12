@@ -1,6 +1,11 @@
 import { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { RedirectIfAuthenticated, RequireAuth, ScrollToTop } from '@/components/RouteGuards';
+import {
+  RedirectIfAuthenticated,
+  RequireAuth,
+  RequirePermission,
+  ScrollToTop,
+} from '@/components/RouteGuards';
 import { LoadingState } from '@/components/ui/States';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
@@ -40,6 +45,7 @@ const AdminServicesPage = lazy(() => import('@/pages/admin/AdminServicesPage'));
 const AdminAvailabilityPage = lazy(() => import('@/pages/admin/AdminAvailabilityPage'));
 const AdminGalleryPage = lazy(() => import('@/pages/admin/AdminGalleryPage'));
 const AdminInstagramPage = lazy(() => import('@/pages/admin/AdminInstagramPage'));
+const AdminStaffPage = lazy(() => import('@/pages/admin/AdminStaffPage'));
 const AdminSettingsPage = lazy(() => import('@/pages/admin/AdminSettingsPage'));
 
 function RouteFallback() {
@@ -96,7 +102,7 @@ export function App() {
           <Route
             path="app"
             element={
-              <RequireAuth role="CLIENT">
+              <RequireAuth area="CLIENT">
                 <ClientLayout />
               </RequireAuth>
             }
@@ -113,21 +119,99 @@ export function App() {
           <Route
             path="admin"
             element={
-              <RequireAuth role="ADMIN">
+              <RequireAuth area="ADMIN">
                 <AdminLayout />
               </RequireAuth>
             }
           >
-            <Route index element={<AdminDashboardPage />} />
-            <Route path="calendar" element={<AdminCalendarPage />} />
-            <Route path="appointments" element={<AdminAppointmentsPage />} />
-            <Route path="appointments/:id" element={<AdminAppointmentDetailPage />} />
-            <Route path="clients" element={<AdminClientsPage />} />
-            <Route path="clients/:id" element={<AdminClientDetailPage />} />
-            <Route path="services" element={<AdminServicesPage />} />
-            <Route path="availability" element={<AdminAvailabilityPage />} />
-            <Route path="gallery" element={<AdminGalleryPage />} />
-            <Route path="instagram" element={<AdminInstagramPage />} />
+            {/* Each section re-states the permission that opens it, so a URL
+                typed or bookmarked by an employee is checked the same way the
+                sidebar is. The server checks it again on every request. */}
+            <Route
+              index
+              element={
+                <RequirePermission resource="DASHBOARD">
+                  <AdminDashboardPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="calendar"
+              element={
+                <RequirePermission resource="CALENDAR">
+                  <AdminCalendarPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="appointments"
+              element={
+                <RequirePermission resource="APPOINTMENTS">
+                  <AdminAppointmentsPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="appointments/:id"
+              element={
+                <RequirePermission resource="APPOINTMENTS">
+                  <AdminAppointmentDetailPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="clients"
+              element={
+                <RequirePermission resource="CLIENTS">
+                  <AdminClientsPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="clients/:id"
+              element={
+                <RequirePermission resource="CLIENTS">
+                  <AdminClientDetailPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="services"
+              element={
+                <RequirePermission resource="SERVICES">
+                  <AdminServicesPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="availability"
+              element={
+                <RequirePermission resource="AVAILABILITY">
+                  <AdminAvailabilityPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="gallery"
+              element={
+                <RequirePermission resource="GALLERY">
+                  <AdminGalleryPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="instagram"
+              element={
+                <RequirePermission resource="INSTAGRAM">
+                  <AdminInstagramPage />
+                </RequirePermission>
+              }
+            />
+            {/* Owner-only, and not delegable: whoever can edit staff can grant
+                themselves everything else. */}
+            <Route path="staff" element={<AdminStaffPage />} />
+            {/* Reachable by every employee — it is where they turn on their own
+                notifications. The page itself hides the booking-engine panel. */}
             <Route path="settings" element={<AdminSettingsPage />} />
           </Route>
 

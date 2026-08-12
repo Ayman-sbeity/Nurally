@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { InstagramReel } from '../models/InstagramReel';
 import * as instagramService from '../services/instagram.service';
-import { UserRole } from '../types/domain';
+import { isLoungeSide } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
@@ -32,7 +32,7 @@ function toRecord(body: Record<string, unknown>): Record<string, unknown> {
 }
 
 export const listReels = asyncHandler(async (req: Request, res: Response) => {
-  const filter = req.user?.role === UserRole.ADMIN ? {} : { isActive: true };
+  const filter = req.user && isLoungeSide(req.user.role) ? {} : { isActive: true };
 
   const reels = await InstagramReel.find(filter).sort({ displayOrder: 1, createdAt: -1 }).lean();
   ok(res, { reels });

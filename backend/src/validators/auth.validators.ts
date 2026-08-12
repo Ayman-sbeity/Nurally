@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { optionalEmail } from './common';
 
 const password = z
   .string()
@@ -30,10 +31,7 @@ const phone = z
  */
 export const registerSchema = z.object({
   fullName: z.string().trim().min(2, 'Please enter your full name.').max(120),
-  email: z
-    .union([email, z.literal('')])
-    .optional()
-    .transform((value) => (value ? value : undefined)),
+  email: optionalEmail,
   phone,
   password,
 });

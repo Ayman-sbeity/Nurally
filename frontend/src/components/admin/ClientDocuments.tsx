@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/States';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useClientDocuments } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { formatShortDateTime } from '@/utils/format';
 import type { ClientAsset } from '@/types/api';
 
@@ -24,6 +25,7 @@ function humanSize(bytes: number): string {
 export function ClientDocuments({ clientId }: Props) {
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const { data, isPending } = useClientDocuments(clientId);
   const inputRef = useRef<HTMLInputElement>(null);
   const [pendingDelete, setPendingDelete] = useState<ClientAsset | null>(null);
@@ -77,9 +79,16 @@ export function ClientDocuments({ clientId }: Props) {
     <section className="nu-panel" style={{ marginTop: 'var(--nu-space-6)' }}>
       <header className="nu-panel__head">
         <h2 className="nu-panel__title">Files</h2>
-        <Button size="sm" variant="outline" loading={upload.isPending} onClick={() => inputRef.current?.click()}>
-          Upload file
-        </Button>
+        {can('CLIENTS', 'CREATE') && (
+          <Button
+            size="sm"
+            variant="outline"
+            loading={upload.isPending}
+            onClick={() => inputRef.current?.click()}
+          >
+            Upload file
+          </Button>
+        )}
       </header>
 
       <input
@@ -117,9 +126,11 @@ export function ClientDocuments({ clientId }: Props) {
                     {doc.caption ? ` · ${doc.caption}` : ''}
                   </p>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => setPendingDelete(doc)}>
-                  Delete
-                </Button>
+                {can('CLIENTS', 'DELETE') && (
+                  <Button size="sm" variant="ghost" onClick={() => setPendingDelete(doc)}>
+                    Delete
+                  </Button>
+                )}
               </li>
             ))}
           </ul>

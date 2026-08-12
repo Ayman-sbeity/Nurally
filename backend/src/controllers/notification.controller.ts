@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as notificationService from '../services/notification.service';
 import * as pushService from '../services/push.service';
+import { isLoungeSide } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
@@ -80,7 +81,7 @@ export const sendTestPush = asyncHandler(async (req: Request, res: Response) => 
   const delivered = await pushService.sendToUser(req.user._id, {
     title: 'Nurella test notification',
     body: 'Notifications are working. New booking requests will appear like this.',
-    url: req.user.role === 'ADMIN' ? '/admin/appointments' : '/app/notifications',
+    url: isLoungeSide(req.user.role) ? '/admin/appointments' : '/app/notifications',
     tag: 'nurella-test',
   });
 

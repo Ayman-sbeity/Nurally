@@ -2,26 +2,23 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useAdminDashboard } from '@/hooks/queries';
+import { usePermissions } from '@/hooks/usePermissions';
+import { visibleAdminNav } from '@/lib/adminNav';
 import { Button } from '@/components/ui/Button';
-
-const NAV = [
-  { to: '/admin', label: 'Overview', end: true },
-  { to: '/admin/calendar', label: 'Calendar' },
-  { to: '/admin/appointments', label: 'Appointments', badge: 'pending' as const },
-  { to: '/admin/clients', label: 'Clients' },
-  { to: '/admin/services', label: 'Services' },
-  { to: '/admin/availability', label: 'Availability' },
-  { to: '/admin/gallery', label: 'Gallery' },
-  { to: '/admin/instagram', label: 'Instagram' },
-  { to: '/admin/settings', label: 'Settings' },
-];
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
+  const { canView, isOwner } = usePermissions();
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
-  const { data } = useAdminDashboard();
+
+  // The pending badge is the only thing the sidebar reads from the dashboard,
+  // so an employee without sight of appointments should not be fetching it.
+  const canSeeAppointments = canView('APPOINTMENTS');
+  const { data } = useAdminDashboard({ enabled: canView('DASHBOARD') && canSeeAppointments });
   const pendingCount = data?.stats.pendingCount ?? 0;
+
+  const nav = visibleAdminNav(user);
 
   useEffect(() => setNavOpen(false), [location.pathname]);
 
@@ -36,7 +33,7 @@ export function AdminLayout() {
         </div>
 
         <nav className="nu-admin__nav" aria-label="Admin sections">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -55,7 +52,9 @@ export function AdminLayout() {
 
         <div className="nu-admin__sidebar-foot">
           <p className="nu-admin__user">{user?.fullName}</p>
-          <p className="nu-hint">{user?.email}</p>
+          {/* An employee sees a limited sidebar; naming their role explains why
+              rather than leaving them to wonder what is missing. */}
+          <p className="nu-hint">{isOwner ? user?.email : (user?.jobTitle ?? 'Team member')}</p>
           <div className="nu-row" style={{ marginTop: 'var(--nu-space-3)', gap: 'var(--nu-space-2)' }}>
             <Link to="/" className="nu-btn nu-btn--ghost nu-btn--sm">
               View site

@@ -4,7 +4,7 @@ import { verifyUpload } from '../middleware/upload';
 import { User } from '../models/User';
 import * as authService from '../services/auth.service';
 import * as avatarService from '../services/avatar.service';
-import { UserRole } from '../types/domain';
+import { UserRole, isLoungeSide } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { REFRESH_COOKIE_NAME, refreshCookieOptions } from '../utils/jwt';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -127,7 +127,7 @@ export const streamAvatar = asyncHandler(async (req: Request, res: Response) => 
 
   const targetId = req.params.id as string;
   const isSelf = req.user.id === targetId;
-  if (!isSelf && req.user.role !== UserRole.ADMIN) {
+  if (!isSelf && !isLoungeSide(req.user.role)) {
     throw ApiError.forbidden('You may only view your own photo.');
   }
 

@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { Seo } from '@/components/ui/Seo';
 import { ErrorState, LoadingState } from '@/components/ui/States';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import {
   qk,
   useAdminCalendar,
@@ -60,6 +61,7 @@ interface MoveVars {
 }
 
 export function AdminCalendarPage() {
+  const { can } = usePermissions();
   const [view, setView] = useState<View>('week');
   const [anchor, setAnchor] = useState(() => new Date());
   const [selected, setSelected] = useState<Appointment | null>(null);
@@ -280,7 +282,9 @@ export function AdminCalendarPage() {
               </button>
             ))}
           </div>
-          <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
+          {can('APPOINTMENTS', 'CREATE') && (
+            <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
+          )}
         </div>
       </div>
 

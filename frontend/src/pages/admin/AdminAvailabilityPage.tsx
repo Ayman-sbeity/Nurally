@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useBlockedPeriods, useBookingSettings, useWorkingHours } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import type { WorkingHours } from '@/types/api';
 import { WEEKDAY_NAMES, formatShortDateTime, minutesToTime, timeToMinutes } from '@/utils/format';
 
@@ -23,6 +24,7 @@ const DEFAULT_DAY: Omit<WorkingHours, 'weekday'> = {
 export function AdminAvailabilityPage() {
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const [days, setDays] = useState<WorkingHours[]>([]);
   const [blockOpen, setBlockOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -111,9 +113,11 @@ export function AdminAvailabilityPage() {
       <section className="nu-panel" style={{ marginBottom: 'var(--nu-space-5)' }}>
         <div className="nu-panel__head">
           <h2 className="nu-panel__title">Working hours</h2>
-          <Button loading={saveHours.isPending} onClick={() => saveHours.mutate()}>
-            Save schedule
-          </Button>
+          {can('AVAILABILITY', 'EDIT') && (
+            <Button loading={saveHours.isPending} onClick={() => saveHours.mutate()}>
+              Save schedule
+            </Button>
+          )}
         </div>
         <div className="nu-panel__body">
           {days.map((day) => (
@@ -223,9 +227,11 @@ export function AdminAvailabilityPage() {
       <section className="nu-panel">
         <div className="nu-panel__head">
           <h2 className="nu-panel__title">Blocked periods</h2>
-          <Button variant="outline" onClick={() => setBlockOpen(true)}>
-            Block a period
-          </Button>
+          {can('AVAILABILITY', 'CREATE') && (
+            <Button variant="outline" onClick={() => setBlockOpen(true)}>
+              Block a period
+            </Button>
+          )}
         </div>
         <div className="nu-panel__body">
           {blocked.isPending && <LoadingState />}
@@ -244,9 +250,11 @@ export function AdminAvailabilityPage() {
                   </p>
                   {period.reason && <p className="nu-hint">{period.reason}</p>}
                 </div>
-                <Button size="sm" variant="danger" onClick={() => setDeleteId(period._id)}>
-                  Remove
-                </Button>
+                {can('AVAILABILITY', 'DELETE') && (
+                  <Button size="sm" variant="danger" onClick={() => setDeleteId(period._id)}>
+                    Remove
+                  </Button>
+                )}
               </div>
             ))}
           </div>

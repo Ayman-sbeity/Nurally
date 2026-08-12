@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { Service } from '../models/Service';
 import * as mediaService from '../services/media.service';
-import { UserRole, type ServiceCategorySlug } from '../types/domain';
+import { isLoungeSide, type ServiceCategorySlug } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
@@ -32,7 +32,7 @@ export const listServices = asyncHandler(async (req: Request, res: Response) => 
   };
 
   // Only an admin may see deactivated services.
-  const canSeeInactive = includeInactive && req.user?.role === UserRole.ADMIN;
+  const canSeeInactive = includeInactive && Boolean(req.user) && isLoungeSide(req.user!.role);
 
   const filter: Record<string, unknown> = {};
   if (!canSeeInactive) filter.isActive = true;
@@ -60,7 +60,7 @@ export const getService = asyncHandler(async (req: Request, res: Response) => {
     : await Service.findOne({ slug: id }).lean();
 
   if (!service) throw ApiError.notFound('That service could not be found.');
-  if (!service.isActive && req.user?.role !== UserRole.ADMIN) {
+  if (!service.isActive && (!req.user || !isLoungeSide(req.user.role))) {
     throw ApiError.notFound('That service could not be found.');
   }
   ok(res, { service });

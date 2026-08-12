@@ -14,12 +14,14 @@ import { CreateAppointmentDialog } from '@/components/admin/CreateAppointmentDia
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useAdminClient } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { formatDate, formatShortDateTime } from '@/utils/format';
 
 export function AdminClientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const [notes, setNotes] = useState('');
   const [deactivateOpen, setDeactivateOpen] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
@@ -69,7 +71,9 @@ export function AdminClientDetailPage() {
           <p className="nu-admin-head__sub">Client since {formatDate(client.createdAt)}</p>
         </div>
         {client.isActive ? (
-          <Button onClick={() => setBookOpen(true)}>Book appointment</Button>
+          can('APPOINTMENTS', 'CREATE') && (
+            <Button onClick={() => setBookOpen(true)}>Book appointment</Button>
+          )
         ) : (
           <span className="nu-badge">Deactivated</span>
         )}

@@ -26,6 +26,7 @@ authentication works, and the booking engine is the server-side authority on wha
 - [API reference](#api-reference)
 - [Client records, photos and files](#client-records-photos-and-files)
 - [Frontend routes](#frontend-routes)
+- [Staff and permissions](#staff-and-permissions)
 - [PWA installation](#pwa-installation)
 - [Push notifications](#push-notifications)
 - [Design system](#design-system)
@@ -144,6 +145,7 @@ seed warns you when the default is still in use.
 | `npm run seed:demo`  | The above plus clearly-labelled demo bookings                 |
 | `npm run seed:reset` | **Wipes** appointments/catalogue/gallery/clients, then reseeds |
 | `npm run push:keys --workspace backend` | Print a VAPID key pair for push notifications      |
+| `npm run audit:permissions --workspace backend` | Print the permission guarding every admin route; fails if one is ungated |
 
 ---
 
@@ -344,12 +346,23 @@ contract and drive the UI's error states.
 | POST   | `/api/notifications/push/unsubscribe` | Unregister this device      |
 | POST   | `/api/notifications/push/test`        | Send yourself a test push   |
 
-### Admin (`ADMIN` role required)
+### Admin (owner, or staff with the matching permission)
 
 `GET /api/admin/dashboard` · `/calendar` · `/appointments` · `/appointments/:id` ·
 `/clients` · `/clients/:id` — and the actions
 `approve`, `reject`, `offer-time`, `reschedule`, `approve-reschedule`, `complete`, `no-show`,
 `cancel`; plus service, availability (`working-hours`, `blocked`) and gallery management.
+
+Every one of these carries a `resource:action` permission — run
+`npm run audit:permissions --workspace backend` to print the full table. Staff management is
+owner-only:
+
+| Method   | Route              | Purpose                                    |
+| -------- | ------------------ | ------------------------------------------ |
+| `GET`    | `/admin/staff`     | The team, plus the permission vocabulary    |
+| `POST`   | `/admin/staff`     | Create an employee account                  |
+| `PATCH`  | `/admin/staff/:id` | Rename, reset password, change access       |
+| `DELETE` | `/admin/staff/:id` | Remove an employee                          |
 
 Client records and media:
 
@@ -422,13 +435,85 @@ share one `ClientAsset` collection because their lifecycle is identical; only `k
 | Public | `/`, `/services`, `/services/:slug`, `/about`, `/gallery`, `/faq`                          |
 | Auth   | `/login`, `/register`, `/forgot-password`, `/reset-password`                                 |
 | Client | `/app`, `/app/book`, `/app/appointments`, `/app/appointments/:id`, `/app/profile`, `/app/notifications` |
-| Admin  | `/admin`, `/admin/calendar`, `/admin/appointments[/:id]`, `/admin/clients[/:id]`, `/admin/services`, `/admin/availability`, `/admin/gallery`, `/admin/instagram`, `/admin/settings` |
+| Admin  | `/admin`, `/admin/calendar`, `/admin/appointments[/:id]`, `/admin/clients[/:id]`, `/admin/services`, `/admin/availability`, `/admin/gallery`, `/admin/instagram`, `/admin/staff`, `/admin/settings` |
 
 `/booking` is the landing page's CTA target: it forwards to the booking flow, and the route guard
 sends unauthenticated visitors through sign-in first, returning them to booking afterwards.
 
 Every route except the landing page is lazily loaded, so the marketing site never downloads the
 admin dashboard.
+
+---
+
+## Staff and permissions
+
+The lounge owner can give employees their own sign-in and choose, per person, which admin sections
+they may open and what they may do in each.
+
+### Roles
+
+| Role     | Home     | Access                                                              |
+| -------- | -------- | ------------------------------------------------------------------- |
+| `CLIENT` | `/app`   | Their own appointments only                                          |
+| `STAFF`  | `/admin` | Exactly the sections granted to them, nothing else                   |
+| `ADMIN`  | `/admin` | Everything, unconditionally — the owner. Cannot be limited or deleted |
+
+### Granting access
+
+**Admin → Staff → Add team member.** Each section gets a row with four checkboxes:
+
+| Action     | Means                                                             |
+| ---------- | ----------------------------------------------------------------- |
+| **View**   | The section appears in their sidebar and opens                     |
+| **Add**    | They may create records in it                                      |
+| **Edit**   | They may change existing records                                   |
+| **Delete** | They may remove records                                            |
+
+View is the hinge: clearing it drops the whole section, and ticking any write action turns View on
+with it — a section that cannot be opened but can be written to is not a state worth expressing.
+Overview, Calendar and Settings are read-only projections, so they offer View alone.
+
+Appointments read a little differently, because a booking is never deleted: **Add** books clients
+in, **Edit** approves, offers times, reschedules and completes, and **Delete** cancels. That split
+lets an employee run the front desk without being able to call off a booking.
+
+### Where it is enforced
+
+Server-side, on every request. Each admin route declares a `resource:action` pair, checked against
+the caller's grants before the handler runs:
+
+```bash
+npm run audit:permissions --workspace backend   # prints the guard on all 53 admin routes
+```
+
+The audit **exits non-zero if any admin route is left ungated**, so a route added later without a
+permission cannot quietly ship. The two documented exceptions are the media uploaders, which write
+to the public artwork area and return a URL the destination record's own permission then governs.
+
+The admin UI hides what an employee cannot use — sidebar entries, buttons, whole pages — but that
+is a courtesy, not the protection. A stale bundle or a hand-made request gains nothing.
+
+Two things deliberately cannot be delegated:
+
+- **Staff management is owner-only.** Anyone who can edit staff can grant themselves everything
+  else, so this is the one section with no permission to hand out — otherwise the lock would be
+  kept beside its key.
+- **The owner account cannot be limited, deactivated or deleted**, by itself or anyone else. An
+  account that could lock itself out of its own lounge is a worse failure than any it prevents.
+
+Changing an employee's access or deactivating them **bumps their token version**, which ends every
+session they have open. Narrowing permissions has to reach someone already signed in, or a
+mid-shift change would not take effect until their token happened to expire.
+
+### What staff see
+
+Booking alerts fan out to the owner and to any employee granted `APPOINTMENTS:VIEW` — filtered by
+permission rather than role, so someone who only maintains the gallery is not told a named client's
+treatment. Their own name is recorded in appointment history, and stays there after they leave.
+
+Settings is reachable by every employee regardless of grants: it is where they turn on their own
+[push notifications](#push-notifications) and see their own account. The `SETTINGS` permission
+gates the booking-engine panel inside it.
 
 ---
 

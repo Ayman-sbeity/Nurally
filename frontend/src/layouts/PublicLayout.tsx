@@ -18,7 +18,7 @@ const NAV_LINKS = [
 export function PublicLayout() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isLoungeSide } = useAuth();
   const location = useLocation();
 
   // The catalogue is already cached by the pages that show it; reading it here
@@ -48,7 +48,7 @@ export function PublicLayout() {
   }, [menuOpen]);
 
   const isHome = location.pathname === '/';
-  const appHref = isAdmin ? '/admin' : '/app';
+  const appHref = isLoungeSide ? '/admin' : '/app';
 
   return (
     <>
@@ -88,7 +88,7 @@ export function PublicLayout() {
           <div className="nu-header__actions">
             {isAuthenticated ? (
               <Link to={appHref} className="nu-btn nu-btn--outline nu-btn--sm">
-                {isAdmin ? 'Dashboard' : 'My appointments'}
+                {isLoungeSide ? 'Dashboard' : 'My appointments'}
               </Link>
             ) : (
               <Link to="/login" className="nu-navlink nu-header__signin">
@@ -122,7 +122,7 @@ export function PublicLayout() {
             </NavLink>
           ))}
           <Link to={isAuthenticated ? appHref : '/login'} className="nu-mobile-menu__link">
-            {isAuthenticated ? (isAdmin ? 'Dashboard' : 'My appointments') : 'Sign in'}
+            {isAuthenticated ? (isLoungeSide ? 'Dashboard' : 'My appointments') : 'Sign in'}
           </Link>
         </nav>
         <Link to="/booking" className="nu-btn nu-btn--primary nu-btn--block">

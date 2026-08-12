@@ -7,6 +7,7 @@ import { Seo } from '@/components/ui/Seo';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { CreateClientDialog } from '@/components/admin/CreateClientDialog';
 import { useAdminClients } from '@/hooks/queries';
+import { usePermissions } from '@/hooks/usePermissions';
 import { formatDate } from '@/utils/format';
 
 export function AdminClientsPage() {
@@ -15,6 +16,7 @@ export function AdminClientsPage() {
   const [activeFilter, setActiveFilter] = useState('');
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
+  const { can } = usePermissions();
 
   const { data, isPending, isError, error, refetch } = useAdminClients({
     ...(search ? { search } : {}),
@@ -31,7 +33,9 @@ export function AdminClientsPage() {
           <h1 className="nu-admin-head__title">Clients</h1>
           {data && <p className="nu-admin-head__sub">{data.total} registered</p>}
         </div>
-        <Button onClick={() => setCreateOpen(true)}>Add client</Button>
+        {can('CLIENTS', 'CREATE') && (
+          <Button onClick={() => setCreateOpen(true)}>Add client</Button>
+        )}
       </div>
 
       <CreateClientDialog open={createOpen} onClose={() => setCreateOpen(false)} />

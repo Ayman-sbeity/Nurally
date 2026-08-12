@@ -2,7 +2,13 @@ import { Types } from 'mongoose';
 import { env } from '../config/env';
 import { Appointment, type AppointmentDocument } from '../models/Appointment';
 import { User } from '../models/User';
-import { AppointmentStatus, NotificationType, UserRole, canTransition } from '../types/domain';
+import {
+  AppointmentStatus,
+  NotificationType,
+  UserRole,
+  canTransition,
+  isLoungeSide,
+} from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
 import { formatInLoungeZone, isOnGrid } from '../utils/time';
 import {
@@ -59,7 +65,9 @@ function assertTransition(
 }
 
 function assertOwnership(appointment: AppointmentDocument, actor: Actor): void {
-  if (actor.role === UserRole.ADMIN) return;
+  // Lounge-side actors work across every client's appointments; whether this
+  // employee may touch appointments at all was settled on the route.
+  if (isLoungeSide(actor.role)) return;
   if (!appointment.client.equals(actor.id)) {
     throw ApiError.forbidden('This appointment does not belong to your account.');
   }
@@ -607,7 +615,7 @@ export async function cancelAppointment(
   await appointment.save();
   await releaseSlot(appointment._id);
 
-  if (actor.role === UserRole.ADMIN) {
+  if (isLoungeSide(actor.role)) {
     await createNotification({
       recipient: appointment.client,
       type: NotificationType.APPOINTMENT_CANCELLED,

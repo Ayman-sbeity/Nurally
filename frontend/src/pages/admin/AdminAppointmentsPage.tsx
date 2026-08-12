@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { clientOf, serviceName } from '@/components/client/AppointmentCard';
 import { useAdminAppointments } from '@/hooks/queries';
+import { usePermissions } from '@/hooks/usePermissions';
 import { APPOINTMENT_STATUSES, type AppointmentStatus } from '@/types/api';
 import { STATUS_LABEL, formatShortDateTime } from '@/utils/format';
 
@@ -16,6 +17,7 @@ export function AdminAppointmentsPage() {
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
+  const { can } = usePermissions();
 
   const status = searchParams.get('status') as AppointmentStatus | null;
   const scope = (searchParams.get('scope') as 'upcoming' | 'past' | 'all' | null) ?? 'all';
@@ -42,7 +44,9 @@ export function AdminAppointmentsPage() {
 
       <div className="nu-admin-head">
         <h1 className="nu-admin-head__title">Appointments</h1>
-        <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
+        {can('APPOINTMENTS', 'CREATE') && (
+          <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
+        )}
       </div>
 
       {createOpen && <CreateAppointmentDialog onClose={() => setCreateOpen(false)} />}

@@ -10,7 +10,8 @@ interface AuthContextValue {
   /** True until the initial silent refresh settles — routes must wait for this. */
   isLoading: boolean;
   isAuthenticated: boolean;
-  isAdmin: boolean;
+  /** Owner or employee — anyone whose home is the admin, not the client app. */
+  isLoungeSide: boolean;
   login: (email: string, password: string) => Promise<User>;
   register: (payload: RegisterPayload) => Promise<User>;
   logout: () => Promise<void>;
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isLoading,
       isAuthenticated: Boolean(user),
-      isAdmin: user?.role === 'ADMIN',
+      isLoungeSide: user?.role === 'ADMIN' || user?.role === 'STAFF',
       login,
       register,
       logout,

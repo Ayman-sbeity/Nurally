@@ -11,6 +11,7 @@ import { AuthImage } from '@/components/admin/AuthImage';
 import { useClientPhotoSets } from '@/hooks/queries';
 import { useServices } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { formatDate } from '@/utils/format';
 import type { ClientAsset, ClientPhotoSet, PhotoPhase } from '@/types/api';
 
@@ -24,6 +25,7 @@ const todayKey = () => new Date().toISOString().slice(0, 10);
 export function ClientPhotoSets({ clientId, clientName }: Props) {
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const { data, isPending } = useClientPhotoSets(clientId);
   const { data: servicesData } = useServices();
 
@@ -49,9 +51,11 @@ export function ClientPhotoSets({ clientId, clientName }: Props) {
     <section className="nu-panel" style={{ marginTop: 'var(--nu-space-6)' }}>
       <header className="nu-panel__head">
         <h2 className="nu-panel__title">Before &amp; after</h2>
-        <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)}>
-          New record
-        </Button>
+        {can('CLIENTS', 'CREATE') && (
+          <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)}>
+            New record
+          </Button>
+        )}
       </header>
 
       <div className="nu-panel__body">

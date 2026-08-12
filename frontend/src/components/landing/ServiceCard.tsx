@@ -8,15 +8,15 @@ import { mediaSrc } from '@/utils/media';
 /** Where a "book this" action should go, given the visitor's auth state. */
 export function useBookService() {
   const navigate = useNavigate();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isLoungeSide } = useAuth();
 
   return (serviceId: string) => {
     const target = `/app/book?serviceId=${serviceId}`;
-    if (isAuthenticated && !isAdmin) {
+    if (isAuthenticated && !isLoungeSide) {
       navigate(target);
       return;
     }
-    if (isAdmin) {
+    if (isLoungeSide) {
       navigate('/admin/calendar');
       return;
     }

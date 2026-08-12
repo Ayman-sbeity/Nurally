@@ -129,8 +129,17 @@ export function useNotifications() {
   });
 }
 
-export function useAdminDashboard() {
-  return useQuery({ queryKey: qk.adminDashboard, queryFn: () => adminApi.dashboard() });
+/**
+ * `enabled` lets the sidebar skip the request for an employee who has not been
+ * granted the overview — the server would refuse it, and a 403 on every admin
+ * screen is noise rather than information.
+ */
+export function useAdminDashboard(options: { enabled?: boolean } = {}) {
+  return useQuery({
+    queryKey: qk.adminDashboard,
+    queryFn: () => adminApi.dashboard(),
+    enabled: options.enabled ?? true,
+  });
 }
 
 export function useAdminCalendar(from: string, to: string) {

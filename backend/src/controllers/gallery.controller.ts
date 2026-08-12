@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import { GalleryImage } from '../models/GalleryImage';
-import { UserRole } from '../types/domain';
+import { isLoungeSide } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
 
 export const listGallery = asyncHandler(async (req: Request, res: Response) => {
   const filter: Record<string, unknown> = {};
-  if (req.user?.role !== UserRole.ADMIN) filter.isActive = true;
+  if (!req.user || !isLoungeSide(req.user.role)) filter.isActive = true;
   if (typeof req.query.category === 'string') filter.category = req.query.category;
 
   const images = await GalleryImage.find(filter).sort({ displayOrder: 1, createdAt: -1 }).lean();

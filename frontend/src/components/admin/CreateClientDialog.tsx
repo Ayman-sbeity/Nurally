@@ -79,12 +79,18 @@ export function CreateClientDialog({ open, onClose }: CreateClientDialogProps) {
         </>
       }
     >
+      {/* `noValidate`, as elsewhere in the app: the server is the authority on
+          what is valid, and its messages are the ones written for this lounge.
+          It also stops the browser refusing to submit over a stray space in the
+          optional email field — a native `type="email"` complaint that reads as
+          though an address were required. */}
       <form
         onSubmit={(event) => {
           event.preventDefault();
           create.mutate();
         }}
         style={{ display: 'grid', gap: 'var(--nu-space-4)' }}
+        noValidate
       >
         <TextField
           label="Full name"

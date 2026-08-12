@@ -13,6 +13,7 @@ import { VideoField } from '@/components/admin/VideoField';
 import { BRAND, instagramUrl } from '@/content/brand';
 import { qk, useInstagramReels } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { mediaSrc } from '@/utils/media';
 import type { InstagramReel } from '@/types/api';
 
@@ -41,6 +42,7 @@ const emptyForm: FormState = {
 export function AdminInstagramPage() {
   const queryClient = useQueryClient();
   const { notify } = useToast();
+  const { can } = usePermissions();
   const [editing, setEditing] = useState<InstagramReel | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -158,14 +160,16 @@ export function AdminInstagramPage() {
           <h1 className="nu-admin-head__title">Instagram reels</h1>
           <p className="nu-admin-head__sub">{data.reels.length} featured</p>
         </div>
-        <Button
-          onClick={() => {
-            setForm(emptyForm);
-            setCreating(true);
-          }}
-        >
-          Feature a reel
-        </Button>
+        {can('INSTAGRAM', 'CREATE') && (
+          <Button
+            onClick={() => {
+              setForm(emptyForm);
+              setCreating(true);
+            }}
+          >
+            Feature a reel
+          </Button>
+        )}
       </div>
 
       <div className="nu-notice" style={{ marginBottom: 'var(--nu-space-5)' }}>
@@ -200,12 +204,16 @@ export function AdminInstagramPage() {
                   className="nu-row"
                   style={{ marginTop: 'var(--nu-space-3)', gap: 'var(--nu-space-2)', flexWrap: 'wrap' }}
                 >
-                  <Button size="sm" variant="outline" onClick={() => openEdit(reel)}>
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="danger" onClick={() => setDeleteId(reel._id)}>
-                    Remove
-                  </Button>
+                  {can('INSTAGRAM', 'EDIT') && (
+                    <Button size="sm" variant="outline" onClick={() => openEdit(reel)}>
+                      Edit
+                    </Button>
+                  )}
+                  {can('INSTAGRAM', 'DELETE') && (
+                    <Button size="sm" variant="danger" onClick={() => setDeleteId(reel._id)}>
+                      Remove
+                    </Button>
+                  )}
                 </div>
               </figcaption>
             </figure>

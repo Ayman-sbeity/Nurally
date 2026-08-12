@@ -6,7 +6,51 @@
  * field present on every response shape.
  */
 
-export type UserRole = 'CLIENT' | 'ADMIN';
+export type UserRole = 'CLIENT' | 'ADMIN' | 'STAFF';
+
+/** Admin sections access is granted over — one per sidebar entry. */
+export const ADMIN_RESOURCES = [
+  'DASHBOARD',
+  'CALENDAR',
+  'APPOINTMENTS',
+  'CLIENTS',
+  'SERVICES',
+  'AVAILABILITY',
+  'GALLERY',
+  'INSTAGRAM',
+  'SETTINGS',
+] as const;
+export type AdminResource = (typeof ADMIN_RESOURCES)[number];
+
+export const PERMISSION_ACTIONS = ['VIEW', 'CREATE', 'EDIT', 'DELETE'] as const;
+export type PermissionAction = (typeof PERMISSION_ACTIONS)[number];
+
+export interface StaffPermission {
+  resource: AdminResource;
+  actions: PermissionAction[];
+}
+
+/** The vocabulary, served with the staff list so the grid follows the server. */
+export interface PermissionSchema {
+  resources: AdminResource[];
+  actions: PermissionAction[];
+  readOnlyResources: AdminResource[];
+}
+
+/** A team member as the staff page lists them. */
+export interface StaffMember {
+  _id: string;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  role: 'ADMIN' | 'STAFF';
+  isActive: boolean;
+  staffPermissions: StaffPermission[];
+  lastLoginAt?: string;
+  createdAt: string;
+  avatarUpdatedAt?: string;
+}
 
 export const APPOINTMENT_STATUSES = [
   'PENDING',
@@ -69,6 +113,9 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   clientProfile?: ClientProfile;
+  /** Present on STAFF accounts; the owner is allowed everything regardless. */
+  staffPermissions?: StaffPermission[];
+  jobTitle?: string;
   /** Present only when the user has a profile photo; also its cache version. */
   avatarUpdatedAt?: string;
   lastLoginAt?: string;

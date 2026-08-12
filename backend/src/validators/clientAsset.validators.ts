@@ -1,30 +1,18 @@
 import { z } from 'zod';
 import { PhotoPhase } from '../types/domain';
 import { objectIdSchema } from './appointment.validators';
+import { optionalEmail, phone } from './common';
 
 /**
  * Multipart bodies arrive as strings, so these schemas coerce rather than
  * expect real types — `z.coerce` where a boolean or date is wanted.
  */
 
-const phone = z
-  .string()
-  .trim()
-  .min(6, 'Please enter a valid phone number.')
-  .max(32, 'Please enter a valid phone number.')
-  .regex(/^[+()\d\s-]+$/, 'Phone number may only contain digits, spaces, +, -, ( and ).');
-
 export const createClientSchema = z.object({
   fullName: z.string().trim().min(2, "Please enter the client's full name.").max(120),
   // Optional: a walk-in is often booked in with a name and a number only.
-  // An empty field is "not supplied" rather than a validation error.
-  email: z
-    .union([
-      z.string().trim().toLowerCase().email('Please enter a valid email address.'),
-      z.literal(''),
-    ])
-    .optional()
-    .transform((value) => (value ? value : undefined)),
+  // Blank, whitespace and null all mean "not supplied" rather than failing.
+  email: optionalEmail,
   phone,
   notes: z.string().trim().max(2000).optional(),
   marketingOptIn: z.coerce.boolean().optional().default(false),

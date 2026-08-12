@@ -16,7 +16,8 @@
     "catalogue": "tsx src/scripts/updateCatalogue.ts",
     "catalogue:apply": "tsx src/scripts/updateCatalogue.ts --apply",
     "migrate:user-indexes": "tsx src/scripts/migrateUserIndexes.ts",
-    "migrate:user-indexes:apply": "tsx src/scripts/migrateUserIndexes.ts --apply"
+    "migrate:user-indexes:apply": "tsx src/scripts/migrateUserIndexes.ts --apply",
+    "audit:permissions": "tsx src/scripts/auditPermissions.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

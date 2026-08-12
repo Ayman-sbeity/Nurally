@@ -11,6 +11,7 @@ import { ErrorState, LoadingState } from '@/components/ui/States';
 import { CATEGORY_ORDER, categoryImage } from '@/content/brand';
 import { useServices } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import type { Service, ServiceCategorySlug } from '@/types/api';
 import { formatDuration } from '@/utils/format';
 import { mediaSrc } from '@/utils/media';
@@ -49,6 +50,7 @@ export function AdminServicesPage() {
   const { notify } = useToast();
   const [editing, setEditing] = useState<Service | null>(null);
   const [creating, setCreating] = useState(false);
+  const { can } = usePermissions();
   const [form, setForm] = useState<FormState>(emptyForm);
 
   const { data, isPending, isError, error, refetch } = useServices({ includeInactive: true });
@@ -139,14 +141,16 @@ export function AdminServicesPage() {
             {data.services.length} treatments · only active services can be booked
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setForm(emptyForm);
-            setCreating(true);
-          }}
-        >
-          New service
-        </Button>
+        {can('SERVICES', 'CREATE') && (
+          <Button
+            onClick={() => {
+              setForm(emptyForm);
+              setCreating(true);
+            }}
+          >
+            New service
+          </Button>
+        )}
       </div>
 
       <div className="nu-notice" style={{ marginBottom: 'var(--nu-space-5)' }}>
@@ -201,16 +205,20 @@ export function AdminServicesPage() {
                     </td>
                     <td>
                       <div className="nu-row" style={{ gap: 'var(--nu-space-2)' }}>
-                        <Button size="sm" variant="outline" onClick={() => openEdit(service)}>
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => toggleActive.mutate(service)}
-                        >
-                          {service.isActive ? 'Deactivate' : 'Activate'}
-                        </Button>
+                        {can('SERVICES', 'EDIT') && (
+                          <>
+                            <Button size="sm" variant="outline" onClick={() => openEdit(service)}>
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => toggleActive.mutate(service)}
+                            >
+                              {service.isActive ? 'Deactivate' : 'Activate'}
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

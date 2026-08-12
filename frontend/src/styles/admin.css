@@ -1330,3 +1330,103 @@ body.is-dragging-appointment {
   background: var(--nu-sand);
   border-radius: var(--nu-radius);
 }
+
+/* --- Staff permissions ---------------------------------------------------- */
+
+/* The grid is wider than a phone. It scrolls inside its own box so the page
+   itself never scrolls sideways. */
+.nu-permgrid-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+}
+
+.nu-permgrid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--nu-text-sm);
+}
+
+.nu-permgrid th,
+.nu-permgrid td {
+  padding: var(--nu-space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--nu-line);
+}
+
+.nu-permgrid thead th {
+  font-weight: 500;
+  color: var(--nu-ink-soft);
+  background: var(--nu-sand);
+  white-space: nowrap;
+}
+
+/* Action columns stay narrow so the section name keeps the width it needs. */
+.nu-permgrid thead th:not(:first-child),
+.nu-permgrid td {
+  text-align: center;
+  width: 4.5rem;
+}
+
+.nu-permgrid tbody th {
+  font-weight: 400;
+  min-width: 12rem;
+}
+
+.nu-permgrid tr:last-child th,
+.nu-permgrid tr:last-child td {
+  border-bottom: 0;
+}
+
+.nu-permgrid__name {
+  display: block;
+  font-weight: 500;
+}
+
+.nu-permgrid__hint {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--nu-text-xs);
+  color: var(--nu-ink-soft);
+}
+
+.nu-permgrid__na {
+  color: var(--nu-line);
+}
+
+/* A generous hit area: the checkbox is small, the label around it is not. */
+.nu-permgrid__box {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -0.5rem auto;
+  cursor: pointer;
+}
+
+.nu-permgrid__box input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--nu-ink);
+  cursor: pointer;
+}
+
+.nu-staff-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-4);
+  flex-wrap: wrap;
+  padding: var(--nu-space-4) 0;
+  border-bottom: 1px solid var(--nu-line);
+}
+
+.nu-staff-row:last-child {
+  border-bottom: 0;
+}
+
+.nu-staff-row__actions {
+  display: flex;
+  gap: var(--nu-space-2);
+  flex-wrap: wrap;
+}
