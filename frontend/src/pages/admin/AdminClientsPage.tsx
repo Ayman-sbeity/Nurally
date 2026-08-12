@@ -108,7 +108,7 @@ export function AdminClientsPage() {
                       </div>
                     </td>
                     <td>
-                      <div className="nu-hint">{client.email}</div>
+                      {client.email && <div className="nu-hint">{client.email}</div>}
                       {client.phone && <div className="nu-hint">{client.phone}</div>}
                     </td>
                     <td>

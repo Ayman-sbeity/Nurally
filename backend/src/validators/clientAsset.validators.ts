@@ -16,7 +16,15 @@ const phone = z
 
 export const createClientSchema = z.object({
   fullName: z.string().trim().min(2, "Please enter the client's full name.").max(120),
-  email: z.string().trim().toLowerCase().email('Please enter a valid email address.'),
+  // Optional: a walk-in is often booked in with a name and a number only.
+  // An empty field is "not supplied" rather than a validation error.
+  email: z
+    .union([
+      z.string().trim().toLowerCase().email('Please enter a valid email address.'),
+      z.literal(''),
+    ])
+    .optional()
+    .transform((value) => (value ? value : undefined)),
   phone,
   notes: z.string().trim().max(2000).optional(),
   marketingOptIn: z.coerce.boolean().optional().default(false),

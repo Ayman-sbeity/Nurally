@@ -77,9 +77,12 @@ export function assertPublicSiteUrl(env) {
       '  Every canonical URL, Open Graph URL, sitemap entry and llms.txt link is built from it,\n' +
       '  so a deployed build carrying this value would be de-indexed by search engines and\n' +
       '  uncitable by AI assistants.\n\n' +
-      '  Set it to the production origin in frontend/.env, e.g.\n' +
-      '      VITE_SITE_URL=https://nurellabeautylounge.com\n\n' +
-      '  To build locally anyway: GEO_ALLOW_LOCAL_SITE_URL=1 npm run build\n',
+      '  Set it to the production origin, either in frontend/.env:\n' +
+      '      VITE_SITE_URL=https://nurellabeautylounge.com\n' +
+      '  or as an environment variable, which wins over the file and is how CI and the\n' +
+      '  deploy script should supply it:\n' +
+      '      VITE_SITE_URL=https://nurellabeautylounge.com npm run build\n\n' +
+      '  To build locally without a production origin: GEO_ALLOW_LOCAL_SITE_URL=1 npm run build\n',
   );
 }
 

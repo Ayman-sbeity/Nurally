@@ -47,6 +47,23 @@ export const getBookingSettings = asyncHandler(async (_req: Request, res: Respon
 
 // --- Admin -----------------------------------------------------------------
 
+/**
+ * Slots for a booking the lounge is making itself.
+ *
+ * Identical to the public list except that the minimum-notice window is
+ * ignored: that rule exists to stop clients booking five minutes out, and it
+ * would otherwise stop the front desk entering the walk-in in front of them.
+ */
+export const getAdminAvailability = asyncHandler(async (req: Request, res: Response) => {
+  const { serviceId, date } = req.query as unknown as { serviceId: string; date: string };
+  const availability = await getAvailabilityForService(serviceId, date, { ignoreNotice: true });
+  ok(res, {
+    ...availability,
+    timezone: loungeTimezone,
+    maxBookableDate: maxBookableDateKey(),
+  });
+});
+
 export const listWorkingHours = asyncHandler(async (_req: Request, res: Response) => {
   const workingHours = await WorkingHours.find().sort({ weekday: 1 }).lean();
   ok(res, { workingHours });

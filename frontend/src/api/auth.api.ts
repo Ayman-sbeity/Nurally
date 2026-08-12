@@ -3,7 +3,8 @@ import type { ApiEnvelope, AuthResponse, User } from '@/types/api';
 
 export interface RegisterPayload {
   fullName: string;
-  email: string;
+  /** Optional — an account can be identified by its phone number alone. */
+  email?: string;
   phone: string;
   password: string;
 }
@@ -12,8 +13,11 @@ export const authApi = {
   register: (payload: RegisterPayload) =>
     request<AuthResponse>(api.post<ApiEnvelope<AuthResponse>>('/auth/register', payload)),
 
-  login: (email: string, password: string) =>
-    request<AuthResponse>(api.post<ApiEnvelope<AuthResponse>>('/auth/login', { email, password })),
+  /** `identifier` is an email address or a phone number — the API accepts either. */
+  login: (identifier: string, password: string) =>
+    request<AuthResponse>(
+      api.post<ApiEnvelope<AuthResponse>>('/auth/login', { identifier, password }),
+    ),
 
   /** Exchanges the httpOnly refresh cookie for a fresh access token. */
   refresh: () => request<AuthResponse>(api.post<ApiEnvelope<AuthResponse>>('/auth/refresh')),

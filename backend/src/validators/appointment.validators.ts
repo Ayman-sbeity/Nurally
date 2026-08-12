@@ -15,6 +15,19 @@ export const createAppointmentSchema = z.object({
   clientNotes: z.string().trim().max(1000).optional(),
 });
 
+/**
+ * A booking made at the front desk. The client is named explicitly rather than
+ * taken from the session, and the lounge can record its own note at the same
+ * time — there is no separate approval step to attach one to.
+ */
+export const adminCreateAppointmentSchema = z.object({
+  clientId: objectIdSchema,
+  serviceId: objectIdSchema,
+  startAt: isoDateTime,
+  clientNotes: z.string().trim().max(1000).optional(),
+  adminNotes: z.string().trim().max(1000).optional(),
+});
+
 export const offerTimeSchema = z.object({
   startAt: isoDateTime,
   message: z.string().trim().max(500).optional(),

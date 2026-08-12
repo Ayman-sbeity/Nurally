@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { ClientDocuments } from '@/components/admin/ClientDocuments';
 import { ClientPhotoSets } from '@/components/admin/ClientPhotoSets';
+import { CreateAppointmentDialog } from '@/components/admin/CreateAppointmentDialog';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useAdminClient } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
@@ -21,6 +22,7 @@ export function AdminClientDetailPage() {
   const { notify } = useToast();
   const [notes, setNotes] = useState('');
   const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAdminClient(id);
 
@@ -66,8 +68,16 @@ export function AdminClientDetailPage() {
           <h1 className="nu-admin-head__title">{client.fullName}</h1>
           <p className="nu-admin-head__sub">Client since {formatDate(client.createdAt)}</p>
         </div>
-        {!client.isActive && <span className="nu-badge">Deactivated</span>}
+        {client.isActive ? (
+          <Button onClick={() => setBookOpen(true)}>Book appointment</Button>
+        ) : (
+          <span className="nu-badge">Deactivated</span>
+        )}
       </div>
+
+      {bookOpen && (
+        <CreateAppointmentDialog client={client} onClose={() => setBookOpen(false)} />
+      )}
 
       <div className="nu-detail">
         <section className="nu-panel">
@@ -128,9 +138,15 @@ export function AdminClientDetailPage() {
                   {client.phone}
                 </a>
               )}
-              <a className="nu-link" href={`mailto:${client.email}`}>
-                {client.email}
-              </a>
+              {client.email ? (
+                <a className="nu-link" href={`mailto:${client.email}`}>
+                  {client.email}
+                </a>
+              ) : (
+                <p className="nu-hint">
+                  No email address on file — this client cannot reset their own password.
+                </p>
+              )}
             </div>
           </section>
 

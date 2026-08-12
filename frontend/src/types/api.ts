@@ -63,7 +63,8 @@ export interface ClientProfile {
 export interface User {
   _id: string;
   fullName: string;
-  email: string;
+  /** Absent for clients identified by phone number alone. */
+  email?: string;
   phone?: string;
   role: UserRole;
   isActive: boolean;
@@ -225,6 +226,14 @@ export interface AppNotification {
   appointment?: string;
   readAt?: string;
   createdAt: string;
+}
+
+/** Whether this deployment can send Web Push, and the key needed to subscribe. */
+export interface PushConfig {
+  enabled: boolean;
+  publicKey: string | null;
+  /** How many devices this account has registered. */
+  devices: number;
 }
 
 export interface GalleryImage {

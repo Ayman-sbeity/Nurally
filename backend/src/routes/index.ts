@@ -7,6 +7,7 @@ import * as notificationController from '../controllers/notification.controller'
 import { optionalAuth, requireAuth } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { idParamSchema } from '../validators/appointment.validators';
+import { subscribePushSchema, unsubscribePushSchema } from '../validators/push.validators';
 import adminRoutes from './admin.routes';
 import appointmentRoutes from './appointment.routes';
 import authRoutes from './auth.routes';
@@ -48,6 +49,24 @@ router.get('/media/:year/:month/:file', mediaController.streamPublicImage);
 
 router.get('/notifications', requireAuth, notificationController.listNotifications);
 router.post('/notifications/read-all', requireAuth, notificationController.markAllRead);
+
+// Web Push device registration. Declared before `/:id/read` so `push` is never
+// parsed as a notification id.
+router.get('/notifications/push/config', requireAuth, notificationController.getPushConfig);
+router.post(
+  '/notifications/push/subscribe',
+  requireAuth,
+  validate({ body: subscribePushSchema }),
+  notificationController.subscribePush,
+);
+router.post(
+  '/notifications/push/unsubscribe',
+  requireAuth,
+  validate({ body: unsubscribePushSchema }),
+  notificationController.unsubscribePush,
+);
+router.post('/notifications/push/test', requireAuth, notificationController.sendTestPush);
+
 router.post(
   '/notifications/:id/read',
   requireAuth,

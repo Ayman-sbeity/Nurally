@@ -9,8 +9,13 @@ import { TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { useAuth } from '@/context/AuthContext';
 
+// Either identifier is accepted, so this only checks that something was typed —
+// the API decides which of the two it is and whether it matches an account.
 const schema = z.object({
-  email: z.string().trim().min(1, 'Please enter your email.').email('Please enter a valid email.'),
+  identifier: z
+    .string()
+    .trim()
+    .min(1, 'Please enter your email address or phone number.'),
   password: z.string().min(1, 'Please enter your password.'),
 });
 
@@ -34,7 +39,7 @@ export function LoginPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
     try {
-      const user = await login(values.email, values.password);
+      const user = await login(values.identifier, values.password);
       const fallback = user.role === 'ADMIN' ? '/admin' : '/app';
       navigate(redirectTo ?? fallback, { replace: true });
     } catch (error) {
@@ -65,11 +70,14 @@ export function LoginPage() {
         )}
 
         <TextField
-          label="Email"
-          type="email"
-          autoComplete="email"
-          error={errors.email?.message}
-          {...register('email')}
+          label="Email or phone number"
+          // Not type="email": the field accepts a phone number too, and the
+          // browser would refuse to submit one as an invalid address.
+          type="text"
+          inputMode="email"
+          autoComplete="username"
+          error={errors.identifier?.message}
+          {...register('identifier')}
         />
         <TextField
           label="Password"

@@ -10,6 +10,7 @@ The guiding principle is "Enhance, never change." Nurella aims for natural, eleg
 
 ## Contact and booking
 
+- **Opening hours:** Monday to Saturday 10:00–18:00
 - **Instagram:** https://instagram.com/nurella_beauty_lounge
 - **Booking:** http://localhost:5173/booking
 
@@ -47,6 +48,7 @@ Nurella does not publish fixed treatment prices. Because plans are personalized,
 - Device- and technique-led treatments for the skin's structure and surface, including HIFU, microneedling protocols and resurfacing approaches selected during the consultation. (**for:** People with established concerns — acne marks, pigmentation, enlarged pores or uneven texture — that routine facials have not resolved.)
 - Non-surgical lifting and contouring treatments that work on facial firmness and definition along the cheeks, jawline and neck. (**for:** People seeing sagging or a softening jawline who are not looking for surgery.)
 - Beauty and nail services grouped together for clients combining a beauty appointment with nail care. (**for:** Clients booking beauty and nail services in the same visit.)
+- Body and ear piercing carried out in the lounge with sterile, single-use needles and professionally fitted jewellery — belly, surface, dermal and ear placements. (**for:** Anyone wanting a new piercing placed and fitted properly, or replacing jewellery from an existing piercing.)
 
 ## How booking works
 
@@ -141,6 +143,10 @@ Nurella does not publish a fixed price list, because treatment plans are persona
 ### How do I get in touch with Nurella Beauty Lounge?
 
 Appointments are requested through the booking system on this website, which is the most reliable way to reach the lounge and secure a time. Nurella is also reachable on Instagram at @nurella_beauty_lounge. The lounge reviews and confirms every request rather than accepting bookings automatically.
+
+### What are Nurella Beauty Lounge's opening hours?
+
+Nurella Beauty Lounge is open Monday to Saturday 10:00–18:00. Bookable times within those hours depend on the treatment and on what is already reserved, so the live availability shown in the booking flow is the authoritative answer for any given day.
 
 ### What makes Nurella Beauty Lounge different from other beauty salons?
 

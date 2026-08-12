@@ -51,6 +51,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Push and notification-click handling, added to the generated worker
+        // so the caching rules below stay generated rather than hand-written.
+        importScripts: ['/push-sw.js'],
         // The API is never precached, and navigation requests must not be
         // answered from the app shell — otherwise a logged-out user could be
         // shown a stale authenticated screen.

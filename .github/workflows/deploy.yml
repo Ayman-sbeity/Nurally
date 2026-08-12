@@ -36,7 +36,14 @@ jobs:
       # GEO_API_URL is left unset on purpose: the pre-render falls back to
       # category-level pages, which is enough to prove the build works without
       # exposing the API to the runner.
+      #
+      # VITE_SITE_URL is supplied because the runner has no `.env` — that file
+      # is gitignored and lives only on the droplet. Passing the real origin
+      # rather than the local-build escape hatch means this job exercises the
+      # same canonical URLs, sitemap and llms.txt that production will emit.
       - name: Build
+        env:
+          VITE_SITE_URL: https://134-122-26-199.sslip.io
         run: npm run build
 
   deploy:

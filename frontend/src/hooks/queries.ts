@@ -25,6 +25,8 @@ export const qk = {
   adminAppointment: (id: string) => ['admin', 'appointment', id] as const,
   adminClients: (params: Record<string, unknown>) => ['admin', 'clients', params] as const,
   adminClient: (id: string) => ['admin', 'client', id] as const,
+  adminAvailability: (serviceId: string, date: string) =>
+    ['admin', 'availability', serviceId, date] as const,
   workingHours: ['admin', 'working-hours'] as const,
   blockedPeriods: (params: Record<string, unknown>) => ['admin', 'blocked', params] as const,
   clientPhotoSets: (clientId: string) => ['admin', 'client', clientId, 'photo-sets'] as const,
@@ -177,6 +179,21 @@ export function useClientDocuments(clientId: string | undefined) {
     queryKey: qk.clientDocuments(clientId ?? ''),
     queryFn: () => adminApi.listDocuments(clientId as string),
     enabled: Boolean(clientId),
+  });
+}
+
+/**
+ * Bookable slots as staff see them — including the near-term times the
+ * minimum-notice rule hides from clients. Kept as contested as the public list:
+ * always refetched rather than served from cache.
+ */
+export function useAdminAvailability(serviceId: string | undefined, date: string | undefined) {
+  return useQuery({
+    queryKey: qk.adminAvailability(serviceId ?? '', date ?? ''),
+    queryFn: () => adminApi.availability(serviceId as string, date as string),
+    enabled: Boolean(serviceId && date),
+    staleTime: 0,
+    gcTime: 60_000,
   });
 }
 

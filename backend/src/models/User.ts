@@ -20,8 +20,11 @@ export interface ClientProfile {
 
 export interface UserAttrs {
   fullName: string;
-  email: string;
+  /** Absent for clients who signed up, or were added, with a phone only. */
+  email?: string;
   phone?: string;
+  /** Digits of `phone`, derived. Used for sign-in and duplicate detection. */
+  phoneNormalized?: string;
   passwordHash: string;
   role: UserRole;
   isActive: boolean;
@@ -70,15 +73,26 @@ const userSchema = new Schema<UserAttrs, UserModel>(
       minlength: 2,
       maxlength: 120,
     },
+    /**
+     * Optional: clients are commonly booked in with a phone number and nothing
+     * else. Uniqueness is enforced by a partial index below rather than here,
+     * so that any number of accounts may have no address at all.
+     *
+     * An account with no email cannot use the password-reset flow — there is
+     * nowhere to send the link — and must be reset by the lounge.
+     */
     email: {
       type: String,
-      required: [true, 'Email is required'],
-      unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     phone: { type: String, trim: true, maxlength: 32 },
+    /**
+     * `phone` reduced to digits, so that `+961 70 123 456` and `+96170123456`
+     * are recognised as the same number when signing in and when rejecting a
+     * duplicate. Maintained by the hook below — never set it by hand.
+     */
+    phoneNormalized: { type: String, trim: true },
     passwordHash: { type: String, required: true, select: false },
     role: {
       type: String,
@@ -115,6 +129,38 @@ const userSchema = new Schema<UserAttrs, UserModel>(
         ]),
     },
   },
+);
+
+/** Digits only. `+961 70 123 456` → `96170123456`. */
+export const normalizePhone = (value: string): string => value.replace(/\D/g, '');
+
+/**
+ * Keeps `phoneNormalized` in step with `phone`, including clearing it when the
+ * number is removed, so the unique index below can never be left guarding a
+ * stale value.
+ */
+userSchema.pre('validate', function syncPhoneNormalized(next) {
+  if (this.isModified('phone')) {
+    this.phoneNormalized = this.phone ? normalizePhone(this.phone) : undefined;
+  }
+  next();
+});
+
+/**
+ * Uniqueness on the two sign-in identifiers.
+ *
+ * Both are partial: an account may legitimately have no email, or no phone, and
+ * a plain unique index would treat every such account as a duplicate of the
+ * others. `$type: 'string'` matches a present value and excludes both missing
+ * fields and explicit nulls.
+ */
+userSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: 'string' } } },
+);
+userSchema.index(
+  { phoneNormalized: 1 },
+  { unique: true, partialFilterExpression: { phoneNormalized: { $type: 'string' } } },
 );
 
 // Supports the admin client search (name / email / phone).

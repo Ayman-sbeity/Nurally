@@ -1,3 +1,4 @@
+import { PushNotificationsCard } from '@/components/ui/PushNotificationsCard';
 import { Seo } from '@/components/ui/Seo';
 import { ErrorState, LoadingState } from '@/components/ui/States';
 import { useAuth } from '@/context/AuthContext';
@@ -37,6 +38,8 @@ export function AdminSettingsPage() {
 
       <div className="nu-detail">
         <div className="nu-stack" style={{ gap: 'var(--nu-space-5)' }}>
+          <PushNotificationsCard audience="admin" />
+
           <section className="nu-panel">
             <div className="nu-panel__head">
               <h2 className="nu-panel__title">Booking engine</h2>

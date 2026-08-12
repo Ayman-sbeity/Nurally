@@ -50,7 +50,8 @@ export function ForgotPasswordPage() {
           Reset your password
         </h1>
         <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
-          Enter the email address on your account.
+          Enter the email address on your account. If you signed up with a phone number only, there
+          is no address to send a link to — contact the lounge and we will reset it for you.
         </p>
       </div>
 

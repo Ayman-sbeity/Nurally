@@ -41,7 +41,9 @@ export function CreateClientDialog({ open, onClose }: CreateClientDialogProps) {
     mutationFn: () =>
       adminApi.createClient({
         fullName: form.fullName.trim(),
-        email: form.email.trim(),
+        // Omitted entirely when blank, so the record is stored with no address
+        // rather than an empty one that would collide with the next such client.
+        ...(form.email.trim() ? { email: form.email.trim() } : {}),
         phone: form.phone.trim(),
         ...(form.notes.trim() ? { notes: form.notes.trim() } : {}),
       }),
@@ -65,7 +67,7 @@ export function CreateClientDialog({ open, onClose }: CreateClientDialogProps) {
       open={open}
       onClose={close}
       title="Add a client"
-      description="Creates a client record you can book, photograph and attach files to. No password is set — the client claims their own login with “forgot password” whenever they want app access."
+      description="Creates a client record you can book, photograph and attach files to. No password is set — a client with an email address claims their own login with “forgot password” whenever they want app access."
       footer={
         <>
           <Button variant="ghost" onClick={close} disabled={create.isPending}>
@@ -93,20 +95,20 @@ export function CreateClientDialog({ open, onClose }: CreateClientDialogProps) {
           required
         />
         <TextField
-          label="Email"
+          label="Email (optional)"
           type="email"
           value={form.email}
           onChange={(event) => set('email')(event.target.value)}
           error={issues.email}
-          hint="Used to identify the client and to claim their login later."
+          hint="Leave blank if you do not have one. Without an address the client cannot claim their own login — you would reset it for them."
           autoComplete="off"
-          required
         />
         <TextField
           label="Phone"
           value={form.phone}
           onChange={(event) => set('phone')(event.target.value)}
           error={issues.phone}
+          hint="Required — it identifies the client and is how they sign in when there is no email address."
           autoComplete="off"
           required
         />

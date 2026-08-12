@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { CreateAppointmentDialog } from '@/components/admin/CreateAppointmentDialog';
 import { Button } from '@/components/ui/Button';
 import { SelectField, TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
@@ -14,6 +15,7 @@ export function AdminAppointmentsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [page, setPage] = useState(1);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const status = searchParams.get('status') as AppointmentStatus | null;
   const scope = (searchParams.get('scope') as 'upcoming' | 'past' | 'all' | null) ?? 'all';
@@ -40,7 +42,10 @@ export function AdminAppointmentsPage() {
 
       <div className="nu-admin-head">
         <h1 className="nu-admin-head__title">Appointments</h1>
+        <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
       </div>
+
+      {createOpen && <CreateAppointmentDialog onClose={() => setCreateOpen(false)} />}
 
       <form
         className="nu-filters"

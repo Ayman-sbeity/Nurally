@@ -167,6 +167,79 @@ export async function createBooking(
   return appointment;
 }
 
+export interface CreateBookingForClientInput extends CreateBookingInput {
+  clientId: string;
+  adminNotes?: string;
+}
+
+/**
+ * Books a client in from the front desk.
+ *
+ * Unlike a client's own request this lands CONFIRMED — the lounge is the party
+ * that would otherwise approve it, so making it wait for its own approval would
+ * be theatre — and the minimum-notice window is waived, because a walk-in is
+ * standing at the desk now. Everything else (opening hours, breaks, blocked
+ * periods, double booking) is still checked exactly as it is for a client.
+ */
+export async function createBookingForClient(
+  actor: Actor,
+  input: CreateBookingForClientInput,
+): Promise<AppointmentDocument> {
+  const client = await User.findOne({ _id: input.clientId, role: UserRole.CLIENT })
+    .select('fullName isActive')
+    .lean();
+  if (!client) throw ApiError.notFound('That client could not be found.');
+  if (!client.isActive) {
+    throw ApiError.conflict('That client account is deactivated. Reactivate it before booking.');
+  }
+
+  const service = await getServiceForBooking(input.serviceId);
+  const startAt = parseStartAt(input.startAt);
+
+  await assertSlotIsBookable({
+    startAt,
+    durationMinutes: service.durationMinutes,
+    availableWeekdays: service.availableWeekdays.length ? service.availableWeekdays : undefined,
+    ignoreNotice: true,
+  });
+
+  const endAt = new Date(startAt.getTime() + service.durationMinutes * 60_000);
+  const appointment = new Appointment({
+    client: client._id,
+    service: service._id,
+    serviceNameSnapshot: service.name,
+    durationMinutes: service.durationMinutes,
+    requestedStartAt: startAt,
+    startAt,
+    endAt,
+    status: AppointmentStatus.CONFIRMED,
+    ...(input.clientNotes ? { clientNotes: input.clientNotes } : {}),
+    ...(input.adminNotes ? { adminNotes: input.adminNotes } : {}),
+  });
+
+  pushHistory(appointment, AppointmentStatus.CONFIRMED, actor, 'Booked by the lounge.');
+
+  // Same ordering as a client booking: claim the slot first so a lost race
+  // never leaves an orphan appointment behind.
+  await acquireSlot(appointment._id, startAt, service.durationMinutes);
+  try {
+    await appointment.save();
+  } catch (error) {
+    await releaseSlot(appointment._id);
+    throw error;
+  }
+
+  await createNotification({
+    recipient: client._id,
+    type: NotificationType.BOOKING_APPROVED,
+    title: 'Appointment booked',
+    body: `Nurella booked an appointment for you: ${describe(appointment)}.`,
+    appointment: appointment._id,
+  });
+
+  return appointment;
+}
+
 // ---------------------------------------------------------------------------
 // Admin decisions
 // ---------------------------------------------------------------------------

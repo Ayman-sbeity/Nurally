@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { Request, Response } from 'express';
 import { ClientAsset } from '../models/ClientAsset';
 import { ClientPhotoSet } from '../models/ClientPhotoSet';
-import { User } from '../models/User';
+import { User, normalizePhone } from '../models/User';
 import * as assetService from '../services/clientAsset.service';
 import { AssetKind, UserRole, type PhotoPhase } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
@@ -15,27 +15,41 @@ import { verifyUpload } from '../middleware/upload';
  *
  * The password field is filled with a hash of random bytes nobody holds, which
  * makes the account impossible to sign into rather than merely hard to guess.
- * The client claims it later through the normal forgot-password flow, so staff
- * never handle a client's credentials.
+ * A client with an email claims it later through the normal forgot-password
+ * flow, so staff never handle a client's credentials.
+ *
+ * A client added without an email has no way to claim the record themselves —
+ * the reset link has nowhere to go. That is deliberate: the record exists so the
+ * lounge can hold their history and book them in, and an address can be added
+ * later to turn it into a real account.
  */
 export const createClient = asyncHandler(async (req: Request, res: Response) => {
   const { fullName, email, phone, notes, marketingOptIn } = req.body as {
-    fullName: string;
-    email: string;
+    fullName?: string;
+    email?: string;
     phone: string;
     notes?: string;
     marketingOptIn: boolean;
   };
 
-  const existing = await User.findOne({ email }).select('_id').lean();
-  if (existing) {
-    throw ApiError.conflict('That email address is already registered.', ErrorCode.EMAIL_IN_USE);
+  if (email) {
+    const existing = await User.findOne({ email }).select('_id').lean();
+    if (existing) {
+      throw ApiError.conflict('That email address is already registered.', ErrorCode.EMAIL_IN_USE);
+    }
+  }
+
+  const phoneTaken = await User.findOne({ phoneNormalized: normalizePhone(phone) })
+    .select('_id')
+    .lean();
+  if (phoneTaken) {
+    throw ApiError.conflict('That phone number is already registered.', ErrorCode.EMAIL_IN_USE);
   }
 
   const unusablePassword = randomBytes(48).toString('hex');
   const client = await User.create({
     fullName,
-    email,
+    ...(email ? { email } : {}),
     phone,
     passwordHash: await User.hashPassword(unusablePassword),
     role: UserRole.CLIENT,

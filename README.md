@@ -27,6 +27,7 @@ authentication works, and the booking engine is the server-side authority on wha
 - [Client records, photos and files](#client-records-photos-and-files)
 - [Frontend routes](#frontend-routes)
 - [PWA installation](#pwa-installation)
+- [Push notifications](#push-notifications)
 - [Design system](#design-system)
 - [Search and AI discoverability (GEO)](#search-and-ai-discoverability-geo)
 - [Security](#security)
@@ -142,6 +143,7 @@ seed warns you when the default is still in use.
 | `npm run seed`       | Catalogue, admin, working hours, gallery (safe to re-run)     |
 | `npm run seed:demo`  | The above plus clearly-labelled demo bookings                 |
 | `npm run seed:reset` | **Wipes** appointments/catalogue/gallery/clients, then reseeds |
+| `npm run push:keys --workspace backend` | Print a VAPID key pair for push notifications      |
 
 ---
 
@@ -169,6 +171,9 @@ seed warns you when the default is still in use.
 | `UPLOAD_DIR`                | Directory the `local` driver writes to (default `uploads`)            |
 | `MAX_UPLOAD_MB`             | Per-file upload ceiling (default 15)                                  |
 | `MAX_VIDEO_UPLOAD_MB`       | Ceiling for Instagram reel videos only (default 80)                   |
+| `VAPID_PUBLIC_KEY`          | Web Push key pair — optional; blank keeps notifications in-app only    |
+| `VAPID_PRIVATE_KEY`         | See [Push notifications](#push-notifications); never commit this       |
+| `VAPID_SUBJECT`             | Contact the push service can reach you at (`mailto:` or `https:`)      |
 
 The server validates all of these on boot with Zod and **refuses to start** if anything is
 missing or malformed, rather than failing later in a confusing way.
@@ -332,6 +337,12 @@ contract and drive the UI's error states.
 | POST   | `/api/appointments/:id/reschedule`    | Propose a different time    |
 | POST   | `/api/appointments/:id/cancel`        | Cancel                      |
 | GET    | `/api/notifications`                  | In-app updates              |
+| POST   | `/api/notifications/:id/read`         | Mark one read               |
+| POST   | `/api/notifications/read-all`         | Mark all read               |
+| GET    | `/api/notifications/push/config`      | VAPID key + devices count   |
+| POST   | `/api/notifications/push/subscribe`   | Register this device        |
+| POST   | `/api/notifications/push/unsubscribe` | Unregister this device      |
+| POST   | `/api/notifications/push/test`        | Send yourself a test push   |
 
 ### Admin (`ADMIN` role required)
 
@@ -451,6 +462,68 @@ node scripts/generate-icons.mjs          # PNG monogram icon set
 ```
 
 Replace both with real Nurella artwork when it is available.
+
+---
+
+## Push notifications
+
+The lounge's phone rings when a client books, even with the app closed. Delivery is
+[Web Push](https://developer.mozilla.org/en-US/docs/Web/API/Push_API) with VAPID — no Firebase
+account, no third-party service, no per-message cost.
+
+Every notification the app already created in-app now also goes out as a push: a new booking
+request fans out to all admins, and confirmations, offers, reschedules and cancellations go to
+the client. Push is layered onto the existing `Notification` record rather than living beside it,
+so the in-app inbox and the device alert can never disagree.
+
+### Setup
+
+```bash
+npm run push:keys --workspace backend   # prints a VAPID key pair
+```
+
+Add the pair to `backend/.env` and restart the API:
+
+```
+VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT=mailto:you@example.com
+```
+
+Then open **Admin → Settings → Push notifications** and press *Turn on notifications*, once per
+device. *Send a test* confirms it works without waiting for a real booking. Clients get the same
+switch on their Profile page.
+
+Leaving the keys blank is a supported state: push is skipped and notifications stay in-app only.
+
+> **Keep the key pair stable.** The public key is baked into every subscription already handed
+> out, so rotating it silently invalidates every device and each must re-enable.
+
+### Requirements
+
+| Platform                       | Works                                                      |
+| ------------------------------ | ---------------------------------------------------------- |
+| Android Chrome / Edge / Firefox | Yes, in the browser or installed                           |
+| Desktop Chrome / Edge / Firefox | Yes                                                        |
+| **iOS / iPadOS 16.4+**          | **Only in an installed PWA** — Share → Add to Home Screen   |
+
+Two more constraints worth knowing: the page must be served over **HTTPS** (localhost is exempt),
+and the service worker is only built for production, so `npm run dev` cannot show a push. Test with
+`npm run build --workspace frontend && npm run preview --workspace frontend`.
+
+### How it works
+
+- `PushSubscription` stores one row per device, keyed by its endpoint — the owner may have the
+  admin open on a phone and a laptop, and both ring.
+- `push.service.ts` sends to every device, with a 5s timeout so a slow push service can never
+  stall the booking request that triggered it, and a 24h TTL so a phone that was off overnight
+  still receives it.
+- Endpoints that answer `404`/`410` are permanently gone (permission revoked, app uninstalled) and
+  are deleted on the spot, so dead devices never accumulate.
+- Push handlers live in [`frontend/public/push-sw.js`](frontend/public/push-sw.js), imported into
+  the generated Workbox worker via `workbox.importScripts` — the caching rules stay generated.
+- A tapped notification focuses an already-open window and navigates it to the appointment,
+  rather than opening a second copy of the app.
 
 ---
 

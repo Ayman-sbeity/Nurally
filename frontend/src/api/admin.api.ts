@@ -9,6 +9,7 @@ import type {
   ClientListItem,
   ClientPhotoSet,
   DashboardData,
+  DayAvailability,
   GalleryImage,
   InstagramReel,
   Paginated,
@@ -52,6 +53,22 @@ export const adminApi = {
       api.get<ApiEnvelope<Paginated<Appointment>>>('/admin/appointments', {
         params: toQuery(params),
       }),
+    ),
+
+  /**
+   * Books an existing client in from the front desk. The appointment is
+   * confirmed on creation — the lounge is the one making it — and the client is
+   * notified.
+   */
+  createAppointment: (payload: {
+    clientId: string;
+    serviceId: string;
+    startAt: string;
+    clientNotes?: string;
+    adminNotes?: string;
+  }) =>
+    request<{ appointment: Appointment }>(
+      api.post<AppointmentResponse>('/admin/appointments', payload),
     ),
 
   getAppointment: (id: string) =>
@@ -185,6 +202,17 @@ export const adminApi = {
     ),
 
   // --- Availability --------------------------------------------------------
+  /**
+   * Slots for a booking the lounge makes itself — the same list clients see,
+   * plus the times inside the minimum-notice window that only staff may book.
+   */
+  availability: (serviceId: string, date: string) =>
+    request<DayAvailability>(
+      api.get<ApiEnvelope<DayAvailability>>('/admin/availability/slots', {
+        params: { serviceId, date },
+      }),
+    ),
+
   getWorkingHours: () =>
     request<{ workingHours: WorkingHours[] }>(
       api.get<ApiEnvelope<{ workingHours: WorkingHours[] }>>('/admin/availability/working-hours'),
@@ -279,7 +307,8 @@ export const adminApi = {
   // --- Client media --------------------------------------------------------
   createClient: (payload: {
     fullName: string;
-    email: string;
+    /** Optional — a walk-in may be recorded with a name and number only. */
+    email?: string;
     phone: string;
     notes?: string;
     marketingOptIn?: boolean;

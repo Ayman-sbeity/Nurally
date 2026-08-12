@@ -12,7 +12,11 @@ import { useAuth } from '@/context/AuthContext';
 /** Mirrors the server's rules so the visitor is told before the round trip. */
 const schema = z.object({
   fullName: z.string().trim().min(2, 'Please enter your full name.').max(120),
-  email: z.string().trim().min(1, 'Please enter your email.').email('Please enter a valid email.'),
+  // Optional. The phone number identifies the account when this is left blank —
+  // but without an address the password cannot be reset without the lounge.
+  email: z
+    .union([z.string().trim().email('Please enter a valid email.'), z.literal('')])
+    .optional(),
   phone: z
     .string()
     .trim()
@@ -83,9 +87,10 @@ export function RegisterPage() {
           {...register('fullName')}
         />
         <TextField
-          label="Email"
+          label="Email (optional)"
           type="email"
           autoComplete="email"
+          hint="Add one if you would like to be able to reset your own password. Without it, only the lounge can reset it for you."
           error={errors.email?.message}
           {...register('email')}
         />
@@ -93,7 +98,7 @@ export function RegisterPage() {
           label="Phone"
           type="tel"
           autoComplete="tel"
-          hint="So the lounge can reach you about your appointment."
+          hint="Used to reach you about your appointment, and to sign in if you did not add an email address."
           error={errors.phone?.message}
           {...register('phone')}
         />

@@ -12,6 +12,7 @@ import { singleUpload, singleVideoUpload } from '../middleware/upload';
 import { validate } from '../middleware/validate';
 import { UserRole } from '../types/domain';
 import {
+  adminCreateAppointmentSchema,
   approveSchema,
   idParamSchema,
   listAppointmentsQuerySchema,
@@ -20,6 +21,7 @@ import {
   rescheduleByAdminSchema,
 } from '../validators/appointment.validators';
 import {
+  availabilityQuerySchema,
   createBlockedPeriodSchema,
   listBlockedPeriodsQuerySchema,
   updateWorkingHoursSchema,
@@ -62,6 +64,11 @@ router.get(
   '/appointments',
   validate({ query: listAppointmentsQuerySchema }),
   appointmentController.listAllAppointments,
+);
+router.post(
+  '/appointments',
+  validate({ body: adminCreateAppointmentSchema }),
+  appointmentController.createForClient,
 );
 router.get(
   '/appointments/:id',
@@ -196,6 +203,13 @@ router.delete(
 );
 
 // --- Availability ----------------------------------------------------------
+// The admin's own slot list: same engine as the public one, minus the
+// minimum-notice window the lounge is allowed to book inside.
+router.get(
+  '/availability/slots',
+  validate({ query: availabilityQuerySchema }),
+  availabilityController.getAdminAvailability,
+);
 router.get('/availability/working-hours', availabilityController.listWorkingHours);
 router.put(
   '/availability/working-hours',

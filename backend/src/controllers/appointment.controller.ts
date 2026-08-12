@@ -157,6 +157,16 @@ export const listAllAppointments = asyncHandler(async (req: Request, res: Respon
   await listAppointments(req, res);
 });
 
+/** Front-desk booking: the lounge books an existing client in directly. */
+export const createForClient = asyncHandler(async (req: Request, res: Response) => {
+  const appointment = await appointmentService.createBookingForClient(actorFrom(req), req.body);
+  await appointment.populate([
+    { path: 'service', select: SERVICE_FIELDS },
+    { path: 'client', select: CLIENT_FIELDS },
+  ]);
+  ok(res, { appointment: appointment.toJSON() }, 201);
+});
+
 export const approve = asyncHandler(async (req: Request, res: Response) => {
   const appointment = await appointmentService.approveAppointment(
     req.params.id as string,

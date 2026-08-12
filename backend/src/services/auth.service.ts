@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { env } from '../config/env';
-import { User, type UserDocument } from '../models/User';
+import { User, normalizePhone, type UserDocument } from '../models/User';
 import { UserRole } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
 import { logger } from '../utils/logger';
@@ -22,7 +22,7 @@ export function issueTokens(user: UserDocument): AuthTokens {
 
 export interface RegisterInput {
   fullName: string;
-  email: string;
+  email?: string;
   phone: string;
   password: string;
 }
@@ -32,15 +32,28 @@ export interface RegisterInput {
  * the seed script — the public API can never mint elevated privileges.
  */
 export async function register(input: RegisterInput): Promise<UserDocument> {
-  const existing = await User.findOne({ email: input.email.toLowerCase() }).select('_id').lean();
-  if (existing) {
-    throw new ApiError(409, ErrorCode.EMAIL_IN_USE, 'That email address is already registered.');
+  const email = input.email?.toLowerCase();
+
+  if (email) {
+    const existing = await User.findOne({ email }).select('_id').lean();
+    if (existing) {
+      throw new ApiError(409, ErrorCode.EMAIL_IN_USE, 'That email address is already registered.');
+    }
+  }
+
+  // The phone is an identifier now, so a second account on the same number
+  // would make sign-in ambiguous.
+  const phoneTaken = await User.findOne({ phoneNormalized: normalizePhone(input.phone) })
+    .select('_id')
+    .lean();
+  if (phoneTaken) {
+    throw new ApiError(409, ErrorCode.EMAIL_IN_USE, 'That phone number is already registered.');
   }
 
   const passwordHash = await User.hashPassword(input.password);
   return User.create({
     fullName: input.fullName,
-    email: input.email.toLowerCase(),
+    ...(email ? { email } : {}),
     phone: input.phone,
     passwordHash,
     role: UserRole.CLIENT,
@@ -48,19 +61,38 @@ export async function register(input: RegisterInput): Promise<UserDocument> {
   });
 }
 
-export async function login(email: string, password: string): Promise<UserDocument> {
-  const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
+/**
+ * Resolves a sign-in identifier to an account. Anything containing `@` is
+ * treated as an email address; everything else is matched against the
+ * normalised phone number, so formatting differences do not matter.
+ */
+function identifierFilter(identifier: string): Record<string, string> {
+  const trimmed = identifier.trim();
+  if (trimmed.includes('@')) return { email: trimmed.toLowerCase() };
+  return { phoneNormalized: normalizePhone(trimmed) };
+}
+
+export async function login(identifier: string, password: string): Promise<UserDocument> {
+  const user = await User.findOne(identifierFilter(identifier)).select('+passwordHash');
 
   // Same error and roughly the same work for "no such user" and "wrong
   // password", so the response cannot be used to enumerate accounts.
   if (!user) {
     await User.hashPassword(password);
-    throw new ApiError(401, ErrorCode.INVALID_CREDENTIALS, 'Incorrect email or password.');
+    throw new ApiError(
+      401,
+      ErrorCode.INVALID_CREDENTIALS,
+      'Incorrect email address, phone number or password.',
+    );
   }
 
   const matches = await user.comparePassword(password);
   if (!matches) {
-    throw new ApiError(401, ErrorCode.INVALID_CREDENTIALS, 'Incorrect email or password.');
+    throw new ApiError(
+      401,
+      ErrorCode.INVALID_CREDENTIALS,
+      'Incorrect email address, phone number or password.',
+    );
   }
   if (!user.isActive) {
     throw ApiError.forbidden('This account has been deactivated. Please contact the lounge.');

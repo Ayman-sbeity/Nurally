@@ -27,7 +27,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const user = await authService.login(req.body.email, req.body.password);
+  const user = await authService.login(req.body.identifier, req.body.password);
   const tokens = authService.issueTokens(user);
   setRefreshCookie(res, tokens.refreshToken);
   ok(res, { user: user.toJSON(), accessToken: tokens.accessToken });

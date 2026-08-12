@@ -1285,3 +1285,48 @@ body.is-dragging-appointment {
   height: 100%;
   object-fit: cover;
 }
+
+/* --- Front-desk booking ---------------------------------------------------
+   The client picker in the "book an appointment" dialog: a short list of
+   search results, and the chosen client shown back so staff can see who they
+   are booking without scrolling up. */
+.nu-picker {
+  list-style: none;
+  margin: var(--nu-space-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--nu-space-2);
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.nu-picker__option {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-3);
+  text-align: left;
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    border-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-picker__option:hover {
+  border-color: var(--nu-champagne);
+  background: var(--nu-sand);
+}
+
+.nu-picked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-3) var(--nu-space-4);
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius);
+}

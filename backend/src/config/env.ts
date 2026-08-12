@@ -48,6 +48,16 @@ const envSchema = z.object({
    * image limit up with it.
    */
   MAX_VIDEO_UPLOAD_MB: positiveInt.default(80),
+
+  /**
+   * Web Push (VAPID). Optional: without a key pair the app still works and
+   * notifications stay in-app only, so a deployment that has not generated
+   * keys yet is not a broken one. Generate a pair with `npm run push:keys`.
+   */
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  /** Contact the push service can reach us at, per the VAPID spec. */
+  VAPID_SUBJECT: z.string().default('mailto:admin@nurella.local'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -66,6 +76,12 @@ export const env = {
   ...raw,
   isProduction: raw.NODE_ENV === 'production',
   isDevelopment: raw.NODE_ENV === 'development',
+  /**
+   * Whether Web Push can actually be sent. Both halves of the key pair are
+   * required — a public key alone would let browsers subscribe to a server
+   * that can never deliver.
+   */
+  pushEnabled: Boolean(raw.VAPID_PUBLIC_KEY && raw.VAPID_PRIVATE_KEY),
   /** Every origin allowed to call the API with credentials. */
   corsOrigins: [
     raw.CLIENT_URL,

@@ -8,6 +8,7 @@ import { ApiRequestError } from '@/api/client';
 import { AvatarField } from '@/components/client/AvatarField';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/Field';
+import { PushNotificationsCard } from '@/components/ui/PushNotificationsCard';
 import { Seo } from '@/components/ui/Seo';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -81,7 +82,9 @@ export function ClientProfilePage() {
 
       <div className="nu-page-head">
         <h1 className="nu-page-head__title">Your profile</h1>
-        <p className="nu-page-head__sub">{user?.email}</p>
+        {/* Whichever identifier the account actually has — an account created
+            with a phone number alone has no address to show. */}
+        <p className="nu-page-head__sub">{user?.email ?? user?.phone}</p>
       </div>
 
       <div className="nu-stack" style={{ gap: 'var(--nu-space-6)' }}>
@@ -159,6 +162,8 @@ export function ClientProfilePage() {
             </div>
           </form>
         </section>
+
+        <PushNotificationsCard audience="client" />
 
         <section className="nu-card">
           <h2 className="nu-label" style={{ marginBottom: 'var(--nu-space-3)' }}>

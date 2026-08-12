@@ -5,6 +5,7 @@ import type {
   Appointment,
   AppointmentStatus,
   Paginated,
+  PushConfig,
 } from '@/types/api';
 
 export interface ListAppointmentsParams {
@@ -91,5 +92,26 @@ export const notificationApi = {
   markAllRead: () =>
     request<{ message: string; count: number }>(
       api.post<ApiEnvelope<{ message: string; count: number }>>('/notifications/read-all'),
+    ),
+};
+
+/** Web Push device registration. */
+export const pushApi = {
+  config: () =>
+    request<PushConfig>(api.get<ApiEnvelope<PushConfig>>('/notifications/push/config')),
+
+  subscribe: (subscription: PushSubscriptionJSON) =>
+    request<{ message: string }>(
+      api.post<ApiEnvelope<{ message: string }>>('/notifications/push/subscribe', subscription),
+    ),
+
+  unsubscribe: (endpoint: string) =>
+    request<{ message: string }>(
+      api.post<ApiEnvelope<{ message: string }>>('/notifications/push/unsubscribe', { endpoint }),
+    ),
+
+  sendTest: () =>
+    request<{ message: string; delivered: number }>(
+      api.post<ApiEnvelope<{ message: string; delivered: number }>>('/notifications/push/test'),
     ),
 };

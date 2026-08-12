@@ -3,6 +3,7 @@ import { Notification } from '../models/Notification';
 import { User } from '../models/User';
 import { NotificationChannel, NotificationType, UserRole } from '../types/domain';
 import { logger } from '../utils/logger';
+import { isPushEnabled, sendToUser } from './push.service';
 
 interface CreateNotificationInput {
   recipient: Types.ObjectId;
@@ -12,21 +13,46 @@ interface CreateNotificationInput {
   appointment?: Types.ObjectId;
   /** Extra channels to queue alongside the in-app entry. */
   channels?: NotificationChannel[];
+  /**
+   * Which app the recipient reads, so a tapped push lands on their own screen
+   * for the appointment. Defaults to the client app — every caller but
+   * `notifyAdmins` is notifying a client.
+   */
+  recipientRole?: UserRole;
+}
+
+/**
+ * Deep link for a tapped notification. The two apps are separate route trees,
+ * so the same appointment has a different address for each side.
+ */
+function linkFor(input: CreateNotificationInput): string {
+  const isAdmin = input.recipientRole === UserRole.ADMIN;
+  if (!input.appointment) return isAdmin ? '/admin' : '/app';
+  return isAdmin
+    ? `/admin/appointments/${input.appointment.toString()}`
+    : `/app/appointments/${input.appointment.toString()}`;
 }
 
 /**
  * In-app notifications are written synchronously; any additional channel is
- * recorded as a PENDING delivery row.
+ * recorded as a delivery row.
  *
- * No external provider is wired in — email/SMS/WhatsApp/push become a matter of
- * adding a worker that drains PENDING deliveries once credentials exist.
+ * Web Push is attempted inline when VAPID keys are configured, and its delivery
+ * row is settled with the outcome. It is deliberately not allowed to fail the
+ * caller: a booking must still succeed when a push service is unreachable.
+ * Email/SMS/WhatsApp remain PENDING for a future worker to drain.
  */
 export async function createNotification(input: CreateNotificationInput): Promise<void> {
-  const channels = input.channels?.length
-    ? Array.from(new Set([NotificationChannel.IN_APP, ...input.channels]))
-    : [NotificationChannel.IN_APP];
+  const pushable = isPushEnabled();
+  const channels = Array.from(
+    new Set([
+      NotificationChannel.IN_APP,
+      ...(pushable ? [NotificationChannel.PUSH] : []),
+      ...(input.channels ?? []),
+    ]),
+  );
 
-  await Notification.create({
+  const notification = await Notification.create({
     recipient: input.recipient,
     type: input.type,
     title: input.title,
@@ -37,6 +63,38 @@ export async function createNotification(input: CreateNotificationInput): Promis
       .filter((channel) => channel !== NotificationChannel.IN_APP)
       .map((channel) => ({ channel, status: 'PENDING' as const })),
   });
+
+  if (!pushable) return;
+
+  try {
+    const delivered = await sendToUser(input.recipient, {
+      title: input.title,
+      body: input.body,
+      url: linkFor(input),
+      // One appointment's updates replace each other on the lock screen rather
+      // than stacking into a pile the recipient has to dismiss one by one.
+      tag: input.appointment ? `appointment-${input.appointment.toString()}` : input.type,
+    });
+
+    // Zero devices is recorded as FAILED rather than SENT — the push channel
+    // genuinely did not deliver. It is not an incident, though: it usually just
+    // means the recipient has never turned notifications on, and the in-app
+    // entry above still reached them.
+    await Notification.updateOne(
+      { _id: notification._id, 'deliveries.channel': NotificationChannel.PUSH },
+      {
+        $set: {
+          'deliveries.$.status': delivered > 0 ? 'SENT' : 'FAILED',
+          'deliveries.$.sentAt': new Date(),
+          ...(delivered > 0
+            ? {}
+            : { 'deliveries.$.error': 'No registered device accepted the push.' }),
+        },
+      },
+    );
+  } catch (error) {
+    logger.error('Push notification failed', error);
+  }
 }
 
 /** Fans a notification out to every active admin. */
@@ -49,7 +107,9 @@ export async function notifyAdmins(
     return;
   }
   await Promise.all(
-    admins.map((admin) => createNotification({ ...input, recipient: admin._id })),
+    admins.map((admin) =>
+      createNotification({ ...input, recipient: admin._id, recipientRole: UserRole.ADMIN }),
+    ),
   );
 }
 

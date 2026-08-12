@@ -17,6 +17,7 @@ import { AppointmentPeek } from '@/components/admin/AppointmentPeek';
 import { CalendarMonthGrid } from '@/components/admin/CalendarMonthGrid';
 import { CalendarTimeGrid } from '@/components/admin/CalendarTimeGrid';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { CreateAppointmentDialog } from '@/components/admin/CreateAppointmentDialog';
 import { MoveAppointmentDialog } from '@/components/admin/MoveAppointmentDialog';
 import { SlotPickerDialog } from '@/components/admin/SlotPickerDialog';
 import { Button } from '@/components/ui/Button';
@@ -67,6 +68,7 @@ export function AdminCalendarPage() {
   );
   const [pickTimeFor, setPickTimeFor] = useState<Appointment | null>(null);
   const [cancelFor, setCancelFor] = useState<Appointment | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const { notify } = useToast();
@@ -107,7 +109,7 @@ export function AdminCalendarPage() {
     [view],
   );
 
-  const dialogOpen = Boolean(selected || pendingMove || pickTimeFor || cancelFor);
+  const dialogOpen = Boolean(selected || pendingMove || pickTimeFor || cancelFor || createOpen);
 
   // Calendar keyboard shortcuts, off while a dialog or a text field has focus.
   useEffect(() => {
@@ -264,20 +266,32 @@ export function AdminCalendarPage() {
             {pendingCount > 0 && ` · ${pendingCount} awaiting approval`}
           </p>
         </div>
-        <div className="nu-segmented" role="tablist" aria-label="Calendar view">
-          {VIEWS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              role="tab"
-              aria-selected={view === option}
-              onClick={() => setView(option)}
-            >
-              {option}
-            </button>
-          ))}
+        <div className="nu-row nu-row--wrap">
+          <div className="nu-segmented" role="tablist" aria-label="Calendar view">
+            {VIEWS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                role="tab"
+                aria-selected={view === option}
+                onClick={() => setView(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+          <Button onClick={() => setCreateOpen(true)}>Book appointment</Button>
         </div>
       </div>
+
+      {/* Opens on the day being viewed — the usual reason to book from here is
+          the gap the admin is looking at. */}
+      {createOpen && (
+        <CreateAppointmentDialog
+          defaultDate={dateKey(anchor)}
+          onClose={() => setCreateOpen(false)}
+        />
+      )}
 
       <div className="nu-cal">
         <div className="nu-cal__toolbar">
