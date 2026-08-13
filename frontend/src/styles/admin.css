@@ -516,6 +516,30 @@
   overflow: hidden;
 }
 
+/* The slot under the pointer, previewing what a click would book. */
+.nu-tg__col.is-creatable {
+  cursor: copy;
+}
+
+.nu-tg__new {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border: 1px dashed var(--nu-champagne-deep);
+  border-radius: var(--nu-radius-sm);
+  background: rgb(var(--nu-champagne-rgb) / 0.14);
+  color: var(--nu-accent-text);
+  font-size: 0.625rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .nu-tg__now {
   position: absolute;
   left: 0;

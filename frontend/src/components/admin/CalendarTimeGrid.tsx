@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { addDays, format } from 'date-fns';
 import { clientOf, serviceName } from '@/components/client/AppointmentCard';
@@ -15,6 +15,7 @@ import {
   minuteOfDayIn,
   moveIssue,
   placeDay,
+  slotIssue,
   snapToSlot,
   timeIn,
 } from '@/utils/calendar';
@@ -36,6 +37,11 @@ interface CalendarTimeGridProps {
   onMove: (appointment: Appointment, start: Date) => void;
   onRejectMove: (issue: string) => void;
   onSelectDay?: (day: Date) => void;
+  /**
+   * Book into an empty patch of the grid. Omitted when the admin may not create
+   * appointments, which is also what turns the whole affordance off.
+   */
+  onCreateAt?: (start: Date) => void;
 }
 
 /** Below this height a block only has room for one line. */
@@ -58,9 +64,13 @@ export function CalendarTimeGrid({
   onMove,
   onRejectMove,
   onSelectDay,
+  onCreateAt,
 }: CalendarTimeGridProps) {
   const columnsRef = useRef<HTMLDivElement>(null);
   const pxPerMinute = hourHeight / 60;
+
+  /** The empty slot under the pointer, drawn as a preview of what a click books. */
+  const [hover, setHover] = useState<{ key: string; minute: number } | null>(null);
 
   const keys = useMemo(() => days.map((day) => dateKey(day)), [days]);
 
@@ -165,6 +175,31 @@ export function CalendarTimeGrid({
     onReject: (_appointment, issue) => onRejectMove(issue),
   });
 
+  /**
+   * The bookable slot a pointer position falls on, or null where nothing may
+   * start — closed hours, a break, a blocked period or another appointment.
+   *
+   * The probe is one slot long because the treatment is not chosen yet: this
+   * only answers "could a booking begin here", and the dialog re-checks the real
+   * duration against the server's own slot list once a treatment is picked.
+   */
+  const emptySlotAt = useCallback(
+    (key: string, clientY: number, rect: DOMRect): Date | null => {
+      const hours = hoursForDay(workingHours, key);
+      const anchor = hours?.isOpen ? hours.openMinute : range.startMinute;
+      const raw = range.startMinute + (clientY - rect.top) / pxPerMinute;
+      const minute = clamp(
+        snapToSlot(raw, anchor, slotMinutes),
+        range.startMinute,
+        Math.max(range.startMinute, range.endMinute - slotMinutes),
+      );
+
+      const start = instantAt(key, minute, timezone);
+      return slotIssue({ start, durationMinutes: slotMinutes }, rules, timezone) ? null : start;
+    },
+    [workingHours, range, pxPerMinute, slotMinutes, rules, timezone],
+  );
+
   const hourMarks = useMemo(() => {
     const marks: number[] = [];
     // The closing edge gets no label — there is no hour below it to name.
@@ -231,7 +266,53 @@ export function CalendarTimeGrid({
 
         <div className="nu-tg__cols" ref={columnsRef}>
           {columns.map(({ key, hours, placed, blocks }) => (
-            <div key={key} className={`nu-tg__col${key === todayKey ? ' is-today' : ''}`}>
+            <div
+              key={key}
+              className={[
+                'nu-tg__col',
+                key === todayKey ? 'is-today' : '',
+                onCreateAt ? 'is-creatable' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onPointerMove={
+                onCreateAt &&
+                ((event) => {
+                  // A drag already owns the pointer; two ghosts would compete.
+                  if (session) return;
+                  const start = emptySlotAt(
+                    key,
+                    event.clientY,
+                    event.currentTarget.getBoundingClientRect(),
+                  );
+                  const next = start ? { key, minute: minuteOfDayIn(start, timezone) } : null;
+                  // Pointer moves arrive continuously; only a changed slot is
+                  // worth re-rendering the grid for.
+                  setHover((current) =>
+                    current?.key === next?.key && current?.minute === next?.minute ? current : next,
+                  );
+                })
+              }
+              onPointerLeave={
+                onCreateAt &&
+                (() => setHover((current) => (current?.key === key ? null : current)))
+              }
+              onClick={
+                onCreateAt &&
+                ((event) => {
+                  if (consumedByDrag()) return;
+                  // Clicks on an appointment are its own — opening the booking
+                  // form over the card the admin meant to read would be wrong.
+                  if ((event.target as HTMLElement).closest('.nu-tg__event')) return;
+                  const start = emptySlotAt(
+                    key,
+                    event.clientY,
+                    event.currentTarget.getBoundingClientRect(),
+                  );
+                  if (start) onCreateAt(start);
+                })
+              }
+            >
               {!hours?.isOpen && <div className="nu-tg__closed" title="Closed" />}
 
               {hours?.isOpen && (
@@ -318,6 +399,16 @@ export function CalendarTimeGrid({
                   </button>
                 );
               })}
+
+              {hover?.key === key && !session && (
+                <div
+                  className="nu-tg__new"
+                  style={spanStyle(hover.minute, hover.minute + slotMinutes)}
+                  aria-hidden="true"
+                >
+                  <span>+ {minutesToTime(hover.minute % MINUTES_PER_DAY)}</span>
+                </div>
+              )}
 
               {key === todayKey && showNow && (
                 <div

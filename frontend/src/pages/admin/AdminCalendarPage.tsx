@@ -33,7 +33,7 @@ import {
   useWorkingHours,
 } from '@/hooks/queries';
 import type { Appointment, AppointmentStatus } from '@/types/api';
-import { deviceZone, instantAt, moveKindFor, todayInZone } from '@/utils/calendar';
+import { dayKeyIn, deviceZone, instantAt, moveKindFor, todayInZone } from '@/utils/calendar';
 import { STATUS_LABEL, dateKey } from '@/utils/format';
 
 type View = 'day' | 'week' | 'month';
@@ -71,6 +71,8 @@ export function AdminCalendarPage() {
   const [pickTimeFor, setPickTimeFor] = useState<Appointment | null>(null);
   const [cancelFor, setCancelFor] = useState<Appointment | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  /** Set when the booking form was opened by clicking a slot, not the button. */
+  const [createAt, setCreateAt] = useState<Date | null>(null);
 
   const queryClient = useQueryClient();
   const { notify } = useToast();
@@ -111,7 +113,9 @@ export function AdminCalendarPage() {
     [view],
   );
 
-  const dialogOpen = Boolean(selected || pendingMove || pickTimeFor || cancelFor || createOpen);
+  const dialogOpen = Boolean(
+    selected || pendingMove || pickTimeFor || cancelFor || createOpen || createAt,
+  );
 
   // Calendar keyboard shortcuts, off while a dialog or a text field has focus.
   useEffect(() => {
@@ -289,11 +293,17 @@ export function AdminCalendarPage() {
       </div>
 
       {/* Opens on the day being viewed — the usual reason to book from here is
-          the gap the admin is looking at. */}
-      {createOpen && (
+          the gap the admin is looking at. Clicking the gap itself carries the
+          time along too, so the slot list opens on the moment they pointed at. */}
+      {(createOpen || createAt) && (
         <CreateAppointmentDialog
-          defaultDate={dateKey(anchor)}
-          onClose={() => setCreateOpen(false)}
+          defaultDate={createAt ? dayKeyIn(createAt, timezone) : dateKey(anchor)}
+          {...(createAt ? { defaultStartAt: createAt.toISOString() } : {})}
+          timezone={timezone}
+          onClose={() => {
+            setCreateOpen(false);
+            setCreateAt(null);
+          }}
         />
       )}
 
@@ -369,11 +379,13 @@ export function AdminCalendarPage() {
                   }
                   onRejectMove={(issue) => notify(issue, 'error')}
                   onSelectDay={openDay}
+                  {...(can('APPOINTMENTS', 'CREATE') ? { onCreateAt: setCreateAt } : {})}
                 />
               )}
             </div>
 
             <p className="nu-cal__hint">
+              {can('APPOINTMENTS', 'CREATE') && 'Click a free slot to book into it. '}
               Drag an appointment to move it, or click it for the full card. Arrow keys change
               period · T today · D/W/M change view.
             </p>

@@ -10,6 +10,7 @@ import { ErrorState, LoadingState } from '@/components/ui/States';
 import { useToast } from '@/context/ToastContext';
 import { useAdminAvailability, useAdminClients, useServices } from '@/hooks/queries';
 import type { Appointment, User } from '@/types/api';
+import { dayKeyIn, deviceZone, stampIn } from '@/utils/calendar';
 import { dateKey, formatDayLabel, formatDuration } from '@/utils/format';
 
 /** The subset of a client this dialog needs — a list row or a full record. */
@@ -21,6 +22,14 @@ interface CreateAppointmentDialogProps {
   client?: PickedClient;
   /** Day to open on — the calendar day the admin was looking at. */
   defaultDate?: string;
+  /**
+   * The exact instant the admin clicked in the calendar, ISO. Selected for them
+   * as soon as a treatment makes it a real slot — until one is chosen there is
+   * no duration, so the server has no slot ladder to offer.
+   */
+  defaultStartAt?: string;
+  /** The lounge's timezone, for showing the clicked time as the lounge reads it. */
+  timezone?: string;
   onCreated?: (appointment: Appointment) => void;
 }
 
@@ -46,6 +55,8 @@ export function CreateAppointmentDialog({
   onClose,
   client,
   defaultDate,
+  defaultStartAt,
+  timezone,
   onCreated,
 }: CreateAppointmentDialogProps) {
   const queryClient = useQueryClient();
@@ -78,6 +89,35 @@ export function CreateAppointmentDialog({
   const service = useMemo(
     () => services.data?.services.find((entry) => entry._id === serviceId),
     [services.data, serviceId],
+  );
+
+  const zone = timezone ?? availability.data?.timezone ?? deviceZone();
+  const requestedDay = defaultStartAt ? dayKeyIn(defaultStartAt, zone) : null;
+
+  /**
+   * Takes the clicked time the moment it becomes a real slot — which is only
+   * once a treatment is chosen, since the slot ladder depends on its duration.
+   * Runs again after a treatment change (which clears the selection) so
+   * switching treatment keeps the time rather than silently dropping it.
+   */
+  useEffect(() => {
+    if (!defaultStartAt || slot || date !== requestedDay) return;
+    const match = availability.data?.slots.find((option) => option.startAt === defaultStartAt);
+    if (match) setSlot(match.startAt);
+  }, [defaultStartAt, requestedDay, date, slot, availability.data]);
+
+  /**
+   * The clicked time exists on the grid but not on this treatment's ladder — a
+   * longer treatment runs past closing, or its slots start on a different beat.
+   * Saying so beats leaving the admin to wonder why nothing is selected.
+   */
+  const requestedUnavailable = Boolean(
+    defaultStartAt &&
+      date === requestedDay &&
+      !slot &&
+      availability.data &&
+      availability.data.slots.length > 0 &&
+      !availability.data.slots.some((option) => option.startAt === defaultStartAt),
   );
 
   const create = useMutation({
@@ -125,6 +165,13 @@ export function CreateAppointmentDialog({
       }
     >
       <div className="nu-stack">
+        {defaultStartAt && (
+          <div className="nu-notice nu-notice--info" role="status">
+            Booking the slot you clicked — <strong>{stampIn(defaultStartAt, zone)}</strong>.
+            {!serviceId && ' Choose a treatment to hold it.'}
+          </div>
+        )}
+
         {selectedClient ? (
           <div className="nu-picked">
             <div>
@@ -232,6 +279,13 @@ export function CreateAppointmentDialog({
                   {CLOSED_MESSAGE[availability.data.closedReason ?? 'FULLY_BOOKED'] ??
                     CLOSED_MESSAGE.FULLY_BOOKED}{' '}
                   Please choose another date.
+                </div>
+              )}
+
+              {!availability.isFetching && requestedUnavailable && (
+                <div className="nu-notice nu-notice--warn" role="status">
+                  {stampIn(defaultStartAt as string, zone)} is not available for this treatment —
+                  it may run past closing or overlap another booking. Pick one of the times below.
                 </div>
               )}
 

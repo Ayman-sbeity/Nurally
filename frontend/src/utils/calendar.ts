@@ -230,19 +230,23 @@ const nameOf = (appointment: Appointment): string =>
   typeof appointment.client === 'object' ? appointment.client.fullName : 'another client';
 
 /**
- * Why this appointment cannot start at `start`, or `null` when it can.
+ * Why a span of time cannot be used, or `null` when it can.
  *
  * These are the availability engine's rules minus the minimum notice period —
  * an admin rearranging their own diary is trusted with short notice, exactly as
  * the server's `ignoreNotice` flag allows.
+ *
+ * Written against a bare start-and-duration rather than an appointment, because
+ * the same question is asked before one exists: booking from an empty patch of
+ * the grid has no record to reason about, only a time the admin pointed at.
  */
-export function moveIssue(
-  appointment: Appointment,
-  start: Date,
+export function slotIssue(
+  candidate: { start: Date; durationMinutes: number; ignoreAppointmentId?: string },
   rules: MoveRules,
   timezone: string,
 ): string | null {
-  const end = new Date(start.getTime() + appointment.durationMinutes * 60_000);
+  const { start, durationMinutes, ignoreAppointmentId } = candidate;
+  const end = new Date(start.getTime() + durationMinutes * 60_000);
 
   if (end.getTime() <= Date.now()) return 'That time has already passed.';
 
@@ -253,7 +257,7 @@ export function moveIssue(
   }
 
   const from = minuteOfDayIn(start, timezone);
-  const to = from + appointment.durationMinutes;
+  const to = from + durationMinutes;
   if (from < hours.openMinute || to > hours.closeMinute) {
     return `Outside opening hours (${minutesToTime(hours.openMinute)}–${minutesToTime(
       hours.closeMinute,
@@ -271,7 +275,7 @@ export function moveIssue(
 
   const clash = rules.appointments.find(
     (other) =>
-      other._id !== appointment._id &&
+      other._id !== ignoreAppointmentId &&
       occupiesSlot(other) &&
       overlaps(start, end, new Date(other.startAt), new Date(other.endAt)),
   );
@@ -279,3 +283,20 @@ export function moveIssue(
 
   return null;
 }
+
+/** Why this appointment cannot start at `start`, or `null` when it can. */
+export const moveIssue = (
+  appointment: Appointment,
+  start: Date,
+  rules: MoveRules,
+  timezone: string,
+): string | null =>
+  slotIssue(
+    {
+      start,
+      durationMinutes: appointment.durationMinutes,
+      ignoreAppointmentId: appointment._id,
+    },
+    rules,
+    timezone,
+  );
