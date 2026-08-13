@@ -121,6 +121,21 @@ export const adminApi = {
       api.post<AppointmentResponse>(`/admin/appointments/${id}/cancel`, { reason }),
     ),
 
+  /** Corrects a booking in place: treatment, time or notes. */
+  editAppointment: (
+    id: string,
+    payload: { serviceId?: string; startAt?: string; clientNotes?: string; adminNotes?: string },
+  ) =>
+    request<{ appointment: Appointment }>(
+      api.patch<AppointmentResponse>(`/admin/appointments/${id}`, payload),
+    ),
+
+  /** Permanent. `cancel` is the one that keeps the record. */
+  deleteAppointment: (id: string) =>
+    request<{ message: string }>(
+      api.delete<ApiEnvelope<{ message: string }>>(`/admin/appointments/${id}`),
+    ),
+
   // --- Clients -------------------------------------------------------------
   listClients: (params: { search?: string; isActive?: boolean; page?: number; limit?: number } = {}) =>
     request<Paginated<ClientListItem>>(
@@ -149,9 +164,26 @@ export const adminApi = {
       >(`/admin/clients/${id}`),
     ),
 
-  updateClient: (id: string, payload: { notes?: string; isActive?: boolean }) =>
+  updateClient: (
+    id: string,
+    payload: {
+      fullName?: string;
+      phone?: string;
+      email?: string;
+      notes?: string;
+      isActive?: boolean;
+    },
+  ) =>
     request<{ client: User }>(
       api.patch<ApiEnvelope<{ client: User }>>(`/admin/clients/${id}`, payload),
+    ),
+
+  /** Erasure: the client, their appointments, photographs and documents. */
+  deleteClient: (id: string) =>
+    request<{ message: string; appointments: number; photoSets: number; files: number }>(
+      api.delete<
+        ApiEnvelope<{ message: string; appointments: number; photoSets: number; files: number }>
+      >(`/admin/clients/${id}`),
     ),
 
   // --- Website media -------------------------------------------------------

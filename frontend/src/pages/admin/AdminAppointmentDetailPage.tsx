@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
@@ -13,6 +13,7 @@ import { clientOf } from '@/components/client/AppointmentCard';
 import { useAppointment } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import { EditAppointmentDialog } from '@/components/admin/EditAppointmentDialog';
 import {
   STATUS_LABEL,
   formatDateTime,
@@ -24,9 +25,12 @@ type DialogKind = 'reject' | 'cancel' | 'complete' | 'noShow' | 'offer' | 'resch
 
 export function AdminAppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { notify } = useToast();
   const [dialog, setDialog] = useState<DialogKind>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAppointment(id, true);
 
@@ -42,6 +46,16 @@ export function AdminAppointmentDetailPage() {
         : 'That action could not be completed.',
       'error',
     );
+
+  const remove = useMutation({
+    mutationFn: () => adminApi.deleteAppointment(id as string),
+    onSuccess: ({ message }) => {
+      notify(message, 'success');
+      refresh();
+      navigate('/admin/appointments', { replace: true });
+    },
+    onError,
+  });
 
   const onDone = (message: string) => () => {
     setDialog(null);
@@ -109,6 +123,7 @@ export function AdminAppointmentDetailPage() {
   const { can } = usePermissions();
   const canEdit = can('APPOINTMENTS', 'EDIT');
   const canCancel = can('APPOINTMENTS', 'DELETE');
+  const canDelete = canCancel;
 
   return (
     <>
@@ -313,7 +328,29 @@ export function AdminAppointmentDetailPage() {
                     Cancel
                   </Button>
                 )}
+
+                {/* Correcting the record, rather than moving the booking along.
+                    Available while the appointment is still open. */}
+                {canEdit && !['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(status) && (
+                  <Button variant="outline" onClick={() => setEditOpen(true)}>
+                    Edit details
+                  </Button>
+                )}
               </div>
+
+              {/* Erasure, kept away from the actions above: cancelling is what
+                  the desk wants nearly every time, and this leaves no record. */}
+              {canDelete && (
+                <div style={{ marginTop: 'var(--nu-space-5)' }}>
+                  <Button variant="ghost" size="sm" onClick={() => setDeleteOpen(true)}>
+                    Delete permanently
+                  </Button>
+                  <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
+                    For a duplicate or a booking made against the wrong client. Cancelling keeps the
+                    record; this does not.
+                  </p>
+                </div>
+              )}
 
               {['COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW'].includes(status) ? (
                 <p className="nu-hint">
@@ -386,6 +423,25 @@ export function AdminAppointmentDetailPage() {
         serviceId={serviceId}
         loading={offerTime.isPending}
         onConfirm={(startAt, message) => offerTime.mutate({ startAt, message })}
+      />
+
+      {editOpen && (
+        <EditAppointmentDialog
+          appointment={appointment}
+          onClose={() => setEditOpen(false)}
+          onSaved={refresh}
+        />
+      )}
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title="Delete this appointment?"
+        description="It is removed permanently, with its history, and the time is freed. Cancelling instead keeps the record of what was booked."
+        confirmLabel="Delete permanently"
+        confirmVariant="danger"
+        loading={remove.isPending}
+        onConfirm={() => remove.mutate()}
       />
 
       <SlotPickerDialog

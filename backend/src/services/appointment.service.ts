@@ -5,11 +5,13 @@ import { User } from '../models/User';
 import {
   AppointmentStatus,
   NotificationType,
+  TERMINAL_STATUSES,
   UserRole,
   canTransition,
   isLoungeSide,
 } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
+import { logger } from '../utils/logger';
 import { formatInLoungeZone, isOnGrid } from '../utils/time';
 import {
   assertSlotIsBookable,
@@ -644,6 +646,107 @@ export async function cancelAppointment(
  * Cancels time offers the client never answered, freeing the held slot.
  * Run periodically; also safe to call on demand.
  */
+/**
+ * Edits an appointment in place: its treatment, its time, its notes.
+ *
+ * Distinct from `rescheduleByAdmin`, which only moves a confirmed appointment
+ * and tells the client it moved. This is the correction path — a booking taken
+ * down wrong at the desk — so it also accepts a different service, and works on
+ * any appointment that has not reached a terminal state.
+ *
+ * Changing the service changes the duration, which changes how many slot cells
+ * are held; the lock is re-acquired for the new span rather than patched.
+ */
+export async function editAppointment(
+  appointmentId: string,
+  actor: Actor,
+  input: { serviceId?: string; startAt?: string; clientNotes?: string; adminNotes?: string },
+): Promise<AppointmentDocument> {
+  const appointment = await loadAppointment(appointmentId, actor);
+
+  if (TERMINAL_STATUSES.includes(appointment.status)) {
+    throw new ApiError(
+      409,
+      ErrorCode.INVALID_TRANSITION,
+      'This appointment is closed and can no longer be edited.',
+    );
+  }
+
+  const service = input.serviceId ? await getServiceForBooking(input.serviceId) : null;
+  const durationMinutes = service?.durationMinutes ?? appointment.durationMinutes;
+  const startAt = input.startAt ? parseStartAt(input.startAt) : appointment.startAt;
+
+  const timingChanged =
+    startAt.getTime() !== appointment.startAt.getTime() ||
+    durationMinutes !== appointment.durationMinutes;
+
+  if (timingChanged) {
+    await assertSlotIsBookable({
+      startAt,
+      durationMinutes,
+      availableWeekdays: service
+        ? service.availableWeekdays.length
+          ? service.availableWeekdays
+          : undefined
+        : await serviceWeekdaysFor(appointment.service),
+      excludeAppointmentId: appointment._id,
+      // The lounge is correcting its own record; the notice window is a rule
+      // for clients booking themselves in, not for the desk fixing a mistake.
+      ignoreNotice: true,
+    });
+    await moveSlot(appointment._id, startAt, durationMinutes);
+  }
+
+  if (service) {
+    appointment.service = service._id;
+    appointment.serviceNameSnapshot = service.name;
+    appointment.durationMinutes = service.durationMinutes;
+  }
+  appointment.startAt = startAt;
+  appointment.endAt = new Date(startAt.getTime() + durationMinutes * 60_000);
+  if (input.clientNotes !== undefined) appointment.clientNotes = input.clientNotes || undefined;
+  if (input.adminNotes !== undefined) appointment.adminNotes = input.adminNotes || undefined;
+
+  pushHistory(appointment, appointment.status, actor, 'Appointment details edited.');
+  await appointment.save();
+
+  // Only tell the client when something they would turn up for has changed.
+  // A corrected internal note is not news.
+  if (timingChanged || service) {
+    await createNotification({
+      recipient: appointment.client,
+      type: NotificationType.APPOINTMENT_RESCHEDULED,
+      title: 'Appointment updated',
+      body: `Your appointment has been updated: ${describe(appointment)}.`,
+      appointment: appointment._id,
+    });
+  }
+
+  return appointment;
+}
+
+/**
+ * Removes an appointment permanently.
+ *
+ * Cancelling is almost always the right action — it keeps the record of what
+ * was booked and why it did not happen. This is for entries that should never
+ * have existed: a duplicate, a test, a booking taken against the wrong client.
+ *
+ * The slot lock is released first. An appointment row deleted while its cells
+ * are still held would block that time for good, with nothing left to point at
+ * the cause.
+ */
+export async function deleteAppointment(appointmentId: string, actor: Actor): Promise<void> {
+  const appointment = await loadAppointment(appointmentId, actor);
+  await releaseSlot(appointment._id);
+  await appointment.deleteOne();
+
+  logger.info('Appointment deleted', {
+    appointmentId: appointment._id.toString(),
+    by: actor.id.toString(),
+  });
+}
+
 export async function expireStaleOffers(): Promise<number> {
   const stale = await Appointment.find({
     status: AppointmentStatus.TIME_OFFERED,

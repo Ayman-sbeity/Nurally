@@ -24,6 +24,7 @@ authentication works, and the booking engine is the server-side authority on wha
 - [How double-booking is prevented](#how-double-booking-is-prevented)
 - [Availability engine](#availability-engine)
 - [API reference](#api-reference)
+- [Editing and deleting records](#editing-and-deleting-records)
 - [Client records, photos and files](#client-records-photos-and-files)
 - [Frontend routes](#frontend-routes)
 - [Signing in](#signing-in)
@@ -380,6 +381,51 @@ Client records and media:
 | `POST`   | `/admin/clients/:id/documents`                   | Upload a file                             |
 | `GET`    | `/admin/assets/:assetId/file`                    | Stream the bytes (admin token required)   |
 | `DELETE` | `/admin/assets/:assetId`                         | Delete a file and its stored object       |
+
+---
+
+## Editing and deleting records
+
+Every record type can be corrected or removed, each guarded by its own permission.
+
+| Record | Edit | Remove |
+| ------ | ---- | ------ |
+| **Appointment** | Treatment, time and notes — *Edit details* on the appointment (`APPOINTMENTS:EDIT`) | *Delete permanently* (`APPOINTMENTS:DELETE`) |
+| **Client** | Name, phone, email and notes — *Edit* on the Contact panel (`CLIENTS:EDIT`) | *Delete permanently* (`CLIENTS:DELETE`) |
+| **Staff** | Details, password and access — *Edit access* on Staff (owner only) | *Remove* (owner only) |
+
+### Editing an appointment
+
+*Edit details* corrects a booking taken down wrong; *Reschedule* announces a move to the client.
+Editing leaves the status alone and notifies the client **only when the treatment or time actually
+changed** — a corrected internal note is not news.
+
+Times come from the same availability engine the booking flow uses, so a correction cannot land on
+a closed day or on top of another appointment. Changing the treatment changes the duration, so the
+slot lock is re-acquired for the new span rather than patched. The appointment's own current time
+is always offered, since its cells are held by itself and would otherwise be missing from the list.
+
+Closed appointments (completed, cancelled, rejected, no-show) cannot be edited.
+
+### Deleting vs deactivating
+
+**Cancelling and deactivating are almost always the right action** — they keep the record of what
+was booked and what happened. Delete exists for records that should never have existed: a
+duplicate, a test, a booking taken against the wrong client, or a client exercising a right to
+erasure.
+
+Deleting an appointment **releases its slot lock first**. A row removed while its cells were still
+held would block that time permanently with nothing left to point at the cause.
+
+Deleting a client cascades to **appointments, before/after records, photographs, documents,
+notifications and push subscriptions**, and releases the slot lock of every appointment on the way.
+Stored files are removed after the database rows, so a failure leaves a findable record rather than
+an orphaned file. It is guarded by typing the client's name, and the dialog recommends deactivating
+instead.
+
+> `ClientAsset.uploadedBy` and `ClientPhotoSet.createdBy` also reference a user, but they name the
+> *staff member* who filed the record rather than its subject, so they are deliberately no part of
+> erasing a client.
 
 ---
 

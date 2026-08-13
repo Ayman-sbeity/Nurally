@@ -38,160 +38,17 @@ Nurella does not publish fixed treatment prices. Because plans are personalized,
 
 ## Treatments
 
-### Laser
-
-Laser treatments use focused light energy, delivered by a device, to work on hair growth or the surface and deeper layers of the skin. The lounge's laser menu covers laser hair removal, CO2 laser, HIFU and RF microneedling.
-
-**Who it's for:** People looking for longer-term hair reduction, or for skin-surface and firmness work that a topical facial cannot reach.
-
-**Addresses:** Pigmentation & Uneven Tone, Unwanted hair, Skin texture
-
-  - [Laser hair removal](http://localhost:5173/services/laser-hair-removal)
-  - [Co2 laser](http://localhost:5173/services/co2-laser)
-  - [Hifu](http://localhost:5173/services/hifu)
-  - [Rf microneedling laser](http://localhost:5173/services/rf-microneedling-laser)
-  - [Laser tattoo removal](http://localhost:5173/services/laser-tattoo-removal): Laser breakdown of tattoo pigment across a course of sessions, priced per session. Available Wednesdays only.
-
-### Skin Care
-
-Professional facial treatments performed in the lounge — deep cleansing, HydraFacial, diamond technique, meso lifting and microneedling — focused on cleansing, hydration and the condition of the skin's surface.
-
-**Who it's for:** Anyone maintaining their skin, preparing it before an event, or dealing with congestion, dullness or rough texture.
-
-**Addresses:** Dull & Dehydrated Skin, Acne & Acne Scars, Large Pores & Skin Texture
-
-  - [Deep cleaning](http://localhost:5173/services/deep-cleaning)
-  - [Hydra facial](http://localhost:5173/services/hydra-facial)
-  - [diamond technique](http://localhost:5173/services/diamond-technique)
-  - [messo lifting](http://localhost:5173/services/messo-lifting)
-  - [micro needling](http://localhost:5173/services/micro-needling)
-
-### Permanent Makeup
-
-Semi-permanent cosmetic tattooing of the brows, lips and eyeline — microblading, nano blading, lip blush and eyeliner — designed to follow your natural features.
-
-**Who it's for:** People who want their brows, lips or eyeline defined without applying makeup daily, including anyone with sparse or uneven brows.
-
-**Addresses:** Sparse or uneven brows, Lip definition and colour, Daily makeup time
-
-  - [Lip blush](http://localhost:5173/services/lip-blush)
-  - [Microbalding](http://localhost:5173/services/microbalding): Available Wednesdays only.
-  - [nano balading](http://localhost:5173/services/nano-balading): Available Wednesdays only.
-  - [eye liner](http://localhost:5173/services/eye-liner)
-  - [Brow retouching](http://localhost:5173/services/brow-retouching): Top-up work on existing microblading or nano blading, refreshing colour and shape. Available Wednesdays only.
-
-### Nails
-
-Nail care and finishing: manicure, pedicure, gel polish and gel extensions.
-
-**Who it's for:** Clients booking routine nail maintenance or a longer-lasting finish for an occasion.
-
-**Addresses:** Nail care and maintenance, Long-lasting nail finish
-
-  - [manicure](http://localhost:5173/services/manicure)
-  - [Pedicure](http://localhost:5173/services/pedicure)
-  - [gel pose](http://localhost:5173/services/gel-pose)
-  - [gel extensions](http://localhost:5173/services/gel-extensions)
-
-### Facial Aesthetics
-
-Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, Botox, face slimming and under-eye rejuvenation.
-
-**Who it's for:** People who want to refine facial balance, restore definition or soften expression lines without surgery.
-
-**Addresses:** Fine Lines & Wrinkles, Facial Volume & Definition, Dark Circles & Tired Eyes, Facial Contouring
-
-  - [Facial Contouring](http://localhost:5173/services/facial-contouring)
-  - [Lip Enhancement](http://localhost:5173/services/lip-enhancement)
-  - [Cheek Enhancement](http://localhost:5173/services/cheek-enhancement)
-  - [Chin & Jawline Contouring](http://localhost:5173/services/chin-jawline-contouring)
-  - [Filler — Korean](http://localhost:5173/services/filler-korean): Hyaluronic acid filler using a Korean product, placed to restore volume and definition. The plan and the amount are agreed at the consultation.
-  - [Filler — France](http://localhost:5173/services/filler-france): Hyaluronic acid filler using a French product, placed to restore volume and definition. The plan and the amount are agreed at the consultation.
-  - [Non-Surgical Face Sculpting](http://localhost:5173/services/non-surgical-face-sculpting)
-  - [Anti-Wrinkle Treatments](http://localhost:5173/services/anti-wrinkle-treatments)
-  - [Botox — Korean](http://localhost:5173/services/botox-korean): Muscle-relaxing injections using a Korean product, to soften expression lines. Dosage is decided at the consultation.
-  - [Botox — Dysport (UK)](http://localhost:5173/services/botox-dysport-uk): Muscle-relaxing injections using Dysport, to soften expression lines. Dosage is decided at the consultation.
-  - [Face Slimming Treatments](http://localhost:5173/services/face-slimming-treatments)
-  - [Under-Eye Rejuvenation](http://localhost:5173/services/under-eye-rejuvenation)
-
-### Collagen & Biostimulation
-
-Treatments designed to support the skin's own collagen production over a series of sessions — PLLA collagen stimulation, CaHA biostimulation and personalized collagen-stimulator protocols.
-
-**Who it's for:** People noticing loss of firmness or structure who prefer a gradual, progressive change rather than an immediate one.
-
-**Addresses:** Facial Volume & Definition, Sagging & Loss of Firmness, Skin Rejuvenation
-
-  - [PLLA Collagen Stimulation](http://localhost:5173/services/plla-collagen-stimulation): A progressive collagen-stimulating treatment designed to restore firmness and improve facial structure over time.
-  - [CaHA Biostimulation](http://localhost:5173/services/caha-biostimulation): An advanced treatment focused on skin firmness, contouring, and collagen stimulation.
-  - [Collagen Stimulators](http://localhost:5173/services/collagen-stimulators): Personalized biostimulation protocols selected according to your skin condition, age, and aesthetic goals.
-
-### Skin Boosters & Rejuvenation
-
-Injectable and regenerative skin-quality treatments — skin boosters, polynucleotides, mesotherapy, exosome therapy, glow and brightening protocols and anti-aging protocols — aimed at hydration, radiance, elasticity and texture rather than volume.
-
-**Who it's for:** People whose main concern is skin quality: dryness, dullness, fine crepiness or tired-looking skin.
-
-**Addresses:** Dark Circles & Tired Eyes, Dull & Dehydrated Skin, Skin Rejuvenation
-
-  - [Skin Boosters](http://localhost:5173/services/skin-boosters): Deep hydration and skin-quality treatments designed to improve radiance, elasticity, and texture.
-  - [Polynucleotide Treatments](http://localhost:5173/services/polynucleotide-treatments): Advanced regenerative treatments focused on improving skin quality, hydration, and overall rejuvenation.
-  - [Mesotherapy](http://localhost:5173/services/mesotherapy): Customized skin cocktails selected according to individual concerns and treatment goals.
-  - [Exosome Therapy](http://localhost:5173/services/exosome-therapy): Advanced skin rejuvenation protocols designed to support healthier-looking, refreshed skin.
-  - [Glow & Brightening Treatments](http://localhost:5173/services/glow-brightening-treatments): Personalized treatments targeting dullness, uneven appearance, and loss of radiance.
-  - [Anti-Aging Protocols](http://localhost:5173/services/anti-aging-protocols): Combination treatments designed according to your skin needs to maintain a fresh, refined, and rejuvenated appearance.
-
-### Advanced Skin Treatments
-
-Device- and technique-led treatments for the skin's structure and surface, including HIFU, microneedling protocols and resurfacing approaches selected during the consultation.
-
-**Who it's for:** People with established concerns — acne marks, pigmentation, enlarged pores or uneven texture — that routine facials have not resolved.
-
-**Addresses:** Fine Lines & Wrinkles, Acne & Acne Scars, Pigmentation & Uneven Tone, Large Pores & Skin Texture
-
-  - [Microneedling](http://localhost:5173/services/microneedling): A skin-renewal treatment designed to improve texture and the appearance of pores and superficial imperfections.
-  - [CO₂ Skin Resurfacing](http://localhost:5173/services/co2-skin-resurfacing): Advanced resurfacing designed to improve skin texture and the appearance of selected skin concerns.
-  - [HIFU](http://localhost:5173/services/hifu-2): Non-surgical technology designed to support facial tightening and contouring.
-  - [Radiofrequency](http://localhost:5173/services/radiofrequency): Energy-based skin treatments designed to improve the appearance of firmness and skin quality.
-  - [Acne Scar Treatments](http://localhost:5173/services/acne-scar-treatments): Personalized protocols selected according to scar type, skin condition, and individual needs.
-  - [Pigmentation Treatments](http://localhost:5173/services/pigmentation-treatments): Customized skin treatments targeting the appearance of uneven tone and pigmentation.
-
-### Lifting & Contouring
-
-Non-surgical lifting and contouring treatments that work on facial firmness and definition along the cheeks, jawline and neck.
-
-**Who it's for:** People seeing sagging or a softening jawline who are not looking for surgery.
-
-**Addresses:** Sagging & Loss of Firmness, Facial Contouring
-
-  - [Non-Surgical Thread Lift](http://localhost:5173/services/non-surgical-thread-lift): Customized thread treatments designed to support facial contouring and create a refreshed appearance.
-  - [V-Shape Facial Contouring](http://localhost:5173/services/v-shape-facial-contouring): A personalized combination approach focused on enhancing facial definition and balance.
-
-### Beauty & Nails
-
-Beauty and nail services grouped together for clients combining a beauty appointment with nail care.
-
-**Who it's for:** Clients booking beauty and nail services in the same visit.
-
-**Addresses:** Nail care and maintenance, Beauty maintenance
-
-  - [Manicure](http://localhost:5173/services/manicure-2): Professional nail care with an elegant, refined finish.
-  - [Pedicure](http://localhost:5173/services/pedicure-2): Complete foot and nail care for beautifully maintained results.
-  - [Nail Beauty](http://localhost:5173/services/nail-beauty): Customized nail services designed around your preferred style and look.
-  - [Professional Facials](http://localhost:5173/services/professional-facials): Personalized facial treatments selected according to your skin type and concerns.
-
-### Piercing
-
-Body and ear piercing carried out in the lounge with sterile, single-use needles and professionally fitted jewellery — belly, surface, dermal and ear placements.
-
-**Who it's for:** Anyone wanting a new piercing placed and fitted properly, or replacing jewellery from an existing piercing.
-
-**Addresses:** New ear and body piercings, Correct placement and jewellery fit, Safe, sterile technique
-
-  - [Belly piercing](http://localhost:5173/services/belly-piercing): Navel piercing with a sterile single-use needle and fitted jewellery. Available Wednesdays only.
-  - [Surface piercing](http://localhost:5173/services/surface-piercing): Surface piercing with a sterile single-use needle and fitted jewellery. Available Wednesdays only.
-  - [Dermal piercing](http://localhost:5173/services/dermal-piercing): Single-point dermal anchor placed with a sterile single-use needle. Available Wednesdays only.
-  - [Ear piercing](http://localhost:5173/services/ear-piercing): Ear piercing with a sterile single-use needle and fitted jewellery. Available Wednesdays only.
+- Laser treatments use focused light energy, delivered by a device, to work on hair growth or the surface and deeper layers of the skin. The lounge's laser menu covers laser hair removal, CO2 laser, HIFU and RF microneedling. (**for:** People looking for longer-term hair reduction, or for skin-surface and firmness work that a topical facial cannot reach.)
+- Professional facial treatments performed in the lounge — deep cleansing, HydraFacial, diamond technique, meso lifting and microneedling — focused on cleansing, hydration and the condition of the skin's surface. (**for:** Anyone maintaining their skin, preparing it before an event, or dealing with congestion, dullness or rough texture.)
+- Semi-permanent cosmetic tattooing of the brows, lips and eyeline — microblading, nano blading, lip blush and eyeliner — designed to follow your natural features. (**for:** People who want their brows, lips or eyeline defined without applying makeup daily, including anyone with sparse or uneven brows.)
+- Nail care and finishing: manicure, pedicure, gel polish and gel extensions. (**for:** Clients booking routine nail maintenance or a longer-lasting finish for an occasion.)
+- Non-surgical facial treatments that work on proportion and definition — facial contouring, lip and cheek enhancement, chin and jawline contouring, face sculpting, Botox, face slimming and under-eye rejuvenation. (**for:** People who want to refine facial balance, restore definition or soften expression lines without surgery.)
+- Treatments designed to support the skin's own collagen production over a series of sessions — PLLA collagen stimulation, CaHA biostimulation and personalized collagen-stimulator protocols. (**for:** People noticing loss of firmness or structure who prefer a gradual, progressive change rather than an immediate one.)
+- Injectable and regenerative skin-quality treatments — skin boosters, polynucleotides, mesotherapy, exosome therapy, glow and brightening protocols and anti-aging protocols — aimed at hydration, radiance, elasticity and texture rather than volume. (**for:** People whose main concern is skin quality: dryness, dullness, fine crepiness or tired-looking skin.)
+- Device- and technique-led treatments for the skin's structure and surface, including HIFU, microneedling protocols and resurfacing approaches selected during the consultation. (**for:** People with established concerns — acne marks, pigmentation, enlarged pores or uneven texture — that routine facials have not resolved.)
+- Non-surgical lifting and contouring treatments that work on facial firmness and definition along the cheeks, jawline and neck. (**for:** People seeing sagging or a softening jawline who are not looking for surgery.)
+- Beauty and nail services grouped together for clients combining a beauty appointment with nail care. (**for:** Clients booking beauty and nail services in the same visit.)
+- Body and ear piercing carried out in the lounge with sterile, single-use needles and professionally fitted jewellery — belly, surface, dermal and ear placements. (**for:** Anyone wanting a new piercing placed and fitted properly, or replacing jewellery from an existing piercing.)
 
 ## How booking works
 

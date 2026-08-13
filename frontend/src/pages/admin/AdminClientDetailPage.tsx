@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
-import { TextAreaField } from '@/components/ui/Field';
+import { TextAreaField, TextField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
@@ -20,6 +20,7 @@ import { formatDate, formatShortDateTime } from '@/utils/format';
 
 export function AdminClientDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { notify } = useToast();
   const { can } = usePermissions();
@@ -28,14 +29,38 @@ export function AdminClientDetailPage() {
   const [resetOpen, setResetOpen] = useState(false);
   /** Held only for as long as the dialog is open — never persisted anywhere. */
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
+  const [editingDetails, setEditingDetails] = useState(false);
+  const [details, setDetails] = useState({ fullName: '', phone: '', email: '' });
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [bookOpen, setBookOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAdminClient(id);
 
   // Seed the notes field once the client loads.
   useEffect(() => {
-    if (data?.client) setNotes(data.client.clientProfile?.notes ?? '');
+    if (!data?.client) return;
+    setNotes(data.client.clientProfile?.notes ?? '');
+    setDetails({
+      fullName: data.client.fullName,
+      phone: data.client.phone ?? '',
+      email: data.client.email ?? '',
+    });
   }, [data?.client]);
+
+  const remove = useMutation({
+    mutationFn: () => adminApi.deleteClient(id as string),
+    onSuccess: ({ message }) => {
+      notify(message, 'success');
+      void queryClient.invalidateQueries({ queryKey: ['admin'] });
+      navigate('/admin/clients', { replace: true });
+    },
+    onError: (error) =>
+      notify(
+        error instanceof ApiRequestError ? error.message : 'That client could not be deleted.',
+        'error',
+      ),
+  });
 
   const resetPassword = useMutation({
     mutationFn: () => adminApi.resetClientPassword(id as string),
@@ -53,10 +78,16 @@ export function AdminClientDetailPage() {
   });
 
   const update = useMutation({
-    mutationFn: (payload: { notes?: string; isActive?: boolean }) =>
-      adminApi.updateClient(id as string, payload),
+    mutationFn: (payload: {
+      fullName?: string;
+      phone?: string;
+      email?: string;
+      notes?: string;
+      isActive?: boolean;
+    }) => adminApi.updateClient(id as string, payload),
     onSuccess: () => {
       setDeactivateOpen(false);
+      setEditingDetails(false);
       notify('Client updated.', 'success');
       void queryClient.invalidateQueries({ queryKey: ['admin'] });
     },
@@ -154,23 +185,84 @@ export function AdminClientDetailPage() {
           <section className="nu-panel">
             <div className="nu-panel__head">
               <h2 className="nu-panel__title">Contact</h2>
-            </div>
-            <div className="nu-panel__body nu-stack">
-              {client.phone && (
-                <a className="nu-link" href={`tel:${client.phone.replace(/\s/g, '')}`}>
-                  {client.phone}
-                </a>
-              )}
-              {client.email ? (
-                <a className="nu-link" href={`mailto:${client.email}`}>
-                  {client.email}
-                </a>
-              ) : (
-                <p className="nu-hint">
-                  No email address on file — this client cannot reset their own password.
-                </p>
+              {can('CLIENTS', 'EDIT') && !editingDetails && (
+                <Button variant="ghost" size="sm" onClick={() => setEditingDetails(true)}>
+                  Edit
+                </Button>
               )}
             </div>
+
+            {editingDetails ? (
+              <form
+                className="nu-panel__body nu-stack"
+                noValidate
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  update.mutate({
+                    fullName: details.fullName.trim(),
+                    phone: details.phone.trim(),
+                    // Sent even when blank, so an address can be cleared.
+                    email: details.email.trim(),
+                  });
+                }}
+              >
+                <TextField
+                  label="Full name"
+                  value={details.fullName}
+                  onChange={(event) =>
+                    setDetails((current) => ({ ...current, fullName: event.target.value }))
+                  }
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Phone"
+                  type="tel"
+                  value={details.phone}
+                  hint="Their sign-in identifier. Changing it signs them out."
+                  onChange={(event) =>
+                    setDetails((current) => ({ ...current, phone: event.target.value }))
+                  }
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Email (optional)"
+                  type="email"
+                  value={details.email}
+                  onChange={(event) =>
+                    setDetails((current) => ({ ...current, email: event.target.value }))
+                  }
+                  autoComplete="off"
+                />
+                <div className="nu-row" style={{ gap: 'var(--nu-space-2)' }}>
+                  <Button type="submit" size="sm" loading={update.isPending}>
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditingDetails(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div className="nu-panel__body nu-stack">
+                {client.phone && (
+                  <a className="nu-link" href={`tel:${client.phone.replace(/\s/g, '')}`}>
+                    {client.phone}
+                  </a>
+                )}
+                {client.email ? (
+                  <a className="nu-link" href={`mailto:${client.email}`}>
+                    {client.email}
+                  </a>
+                ) : (
+                  <p className="nu-hint">No email address on file.</p>
+                )}
+              </div>
+            )}
           </section>
 
           {preferredServices.length > 0 && (
@@ -244,12 +336,29 @@ export function AdminClientDetailPage() {
                     <Button variant="danger" onClick={() => setDeactivateOpen(true)}>
                       Deactivate account
                     </Button>
+                    <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
+                      Stops them signing in or booking. Their history is kept.
+                    </p>
                   </div>
                 ) : (
                   <div>
                     <Button variant="outline" onClick={() => update.mutate({ isActive: true })}>
                       Reactivate account
                     </Button>
+                  </div>
+                )}
+
+                {/* Erasure. Deliberately last, visually quieter than Deactivate,
+                    and behind a typed confirmation — there is no undo. */}
+                {can('CLIENTS', 'DELETE') && (
+                  <div>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteOpen(true)}>
+                      Delete permanently
+                    </Button>
+                    <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
+                      Erases the client with every appointment, photograph and document. Cannot be
+                      undone.
+                    </p>
                   </div>
                 )}
               </div>
@@ -290,6 +399,59 @@ export function AdminClientDetailPage() {
             They sign in with their phone number and this password, then change it under Profile →
             Password. Every device they were signed in on has been signed out.
           </p>
+        </div>
+      </Dialog>
+
+      {/* A typed confirmation rather than a plain OK: this erases treatment
+          photographs and appointment history, and a misplaced click on a
+          "Delete" in a list of buttons should not be enough to do it. */}
+      <Dialog
+        open={deleteOpen}
+        onClose={() => {
+          setDeleteOpen(false);
+          setDeleteConfirmation('');
+        }}
+        title={`Delete ${client.fullName}?`}
+        description="This erases the client together with every appointment, before/after photograph and document. It cannot be undone."
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setDeleteOpen(false);
+                setDeleteConfirmation('');
+              }}
+              disabled={remove.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              disabled={deleteConfirmation.trim() !== client.fullName}
+              loading={remove.isPending}
+              onClick={() => remove.mutate()}
+            >
+              Delete permanently
+            </Button>
+          </>
+        }
+      >
+        <div className="nu-stack">
+          <div className="nu-notice nu-notice--danger" role="alert">
+            <div>
+              <p style={{ fontWeight: 500 }}>Consider deactivating instead</p>
+              <p>
+                Deactivating stops them signing in and booking while keeping their treatment
+                history — which is usually what is wanted when a client stops coming.
+              </p>
+            </div>
+          </div>
+          <TextField
+            label={`Type “${client.fullName}” to confirm`}
+            value={deleteConfirmation}
+            onChange={(event) => setDeleteConfirmation(event.target.value)}
+            autoComplete="off"
+          />
         </div>
       </Dialog>
 

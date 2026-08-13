@@ -21,6 +21,7 @@ import { createStaffSchema, updateStaffSchema } from '../validators/staff.valida
 import {
   adminCreateAppointmentSchema,
   approveSchema,
+  editAppointmentSchema,
   idParamSchema,
   listAppointmentsQuerySchema,
   offerTimeSchema,
@@ -141,6 +142,25 @@ router.post(
   validate({ params: idParamSchema }),
   appointmentController.noShow,
 );
+// Correcting a booking taken down wrong: its treatment, its time, its notes.
+// Distinct from the status moves above, and from `reschedule`, which announces
+// a move to the client rather than fixing a mistake.
+router.patch(
+  '/appointments/:id',
+  may(AdminResource.APPOINTMENTS, EDIT),
+  validate({ params: idParamSchema, body: editAppointmentSchema }),
+  appointmentController.edit,
+);
+
+// Permanent, and not the same as cancelling — this is for a duplicate or a
+// booking made against the wrong client, where the record should not survive.
+router.delete(
+  '/appointments/:id',
+  may(AdminResource.APPOINTMENTS, DELETE),
+  validate({ params: idParamSchema }),
+  appointmentController.remove,
+);
+
 // Cancelling ends an appointment rather than editing it, so it is the one desk
 // action an employee can be trusted with the rest of and still be held back from.
 router.post(
@@ -174,6 +194,18 @@ router.patch(
   may(AdminResource.CLIENTS, EDIT),
   validate({ params: idParamSchema, body: updateClientSchema }),
   adminController.updateClient,
+);
+
+/**
+ * Erasure, not deactivation: removes the client with their appointments,
+ * treatment photographs, documents and notifications. Deactivating is the
+ * everyday action and keeps the history — this is for an erasure request.
+ */
+router.delete(
+  '/clients/:id',
+  may(AdminResource.CLIENTS, DELETE),
+  validate({ params: idParamSchema }),
+  adminController.deleteClient,
 );
 
 /**

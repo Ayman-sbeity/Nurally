@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { Appointment } from '../models/Appointment';
 import { User } from '../models/User';
 import { expireStaleOffers } from '../services/appointment.service';
+import * as clientService from '../services/client.service';
 import { AppointmentStatus, UserRole } from '../types/domain';
 import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -256,15 +257,19 @@ export const resetClientPassword = asyncHandler(async (req: Request, res: Respon
 });
 
 export const updateClient = asyncHandler(async (req: Request, res: Response) => {
-  const update: Record<string, unknown> = {};
-  if (req.body.notes !== undefined) update['clientProfile.notes'] = req.body.notes;
-  if (req.body.isActive !== undefined) update.isActive = req.body.isActive;
-
-  const client = await User.findOneAndUpdate(
-    { _id: req.params.id, role: UserRole.CLIENT },
-    { $set: update },
-    { new: true },
-  );
-  if (!client) throw ApiError.notFound('That client could not be found.');
+  const client = await clientService.updateClient(req.params.id as string, req.body);
   ok(res, { client: client.toJSON() });
+});
+
+/**
+ * Erases a client and everything attached to them. Deactivation is the everyday
+ * action; this is for an erasure request or a record made in error.
+ */
+export const deleteClient = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const summary = await clientService.deleteClient(req.params.id as string, req.user._id);
+  ok(res, {
+    message: `Client deleted, along with ${summary.appointments} appointment(s) and ${summary.files} file(s).`,
+    ...summary,
+  });
 });

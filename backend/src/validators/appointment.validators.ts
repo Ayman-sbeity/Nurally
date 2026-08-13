@@ -28,6 +28,23 @@ export const adminCreateAppointmentSchema = z.object({
   adminNotes: z.string().trim().max(1000).optional(),
 });
 
+/**
+ * Editing an appointment in place. Every field optional — the desk corrects one
+ * thing at a time — but at least one has to be present or the request is a
+ * no-op dressed up as a change.
+ */
+export const editAppointmentSchema = z
+  .object({
+    serviceId: objectIdSchema,
+    startAt: isoDateTime,
+    clientNotes: z.string().trim().max(1000),
+    adminNotes: z.string().trim().max(1000),
+  })
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'There is nothing to update.',
+  });
+
 export const offerTimeSchema = z.object({
   startAt: isoDateTime,
   message: z.string().trim().max(500).optional(),

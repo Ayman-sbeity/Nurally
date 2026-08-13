@@ -211,6 +211,20 @@ export const approveReschedule = asyncHandler(async (req: Request, res: Response
   ok(res, { appointment: appointment.toJSON() });
 });
 
+export const edit = asyncHandler(async (req: Request, res: Response) => {
+  const appointment = await appointmentService.editAppointment(
+    req.params.id as string,
+    actorFrom(req),
+    req.body,
+  );
+  ok(res, { appointment: appointment.toJSON() });
+});
+
+export const remove = asyncHandler(async (req: Request, res: Response) => {
+  await appointmentService.deleteAppointment(req.params.id as string, actorFrom(req));
+  ok(res, { message: 'Appointment deleted.' });
+});
+
 export const complete = asyncHandler(async (req: Request, res: Response) => {
   const appointment = await appointmentService.completeAppointment(
     req.params.id as string,

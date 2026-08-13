@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ServiceCategorySlug } from '../types/domain';
 import { objectIdSchema } from './appointment.validators';
+import { optionalEmail, phone } from './common';
 
 const categorySchema = z.enum(
   Object.values(ServiceCategorySlug) as [ServiceCategorySlug, ...ServiceCategorySlug[]],
@@ -86,10 +87,25 @@ export const listClientsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export const updateClientSchema = z.object({
-  notes: z.string().trim().max(2000).optional(),
-  isActive: z.boolean().optional(),
-});
+/**
+ * Every field optional: the notes box and the details form save independently,
+ * and neither should have to resend the other's values.
+ *
+ * Phone stays required *if sent* — it is the client's sign-in identifier, so
+ * clearing it would lock them out of an account they can no longer name.
+ */
+export const updateClientSchema = z
+  .object({
+    fullName: z.string().trim().min(2, "Please enter the client's full name.").max(120),
+    phone,
+    email: optionalEmail,
+    notes: z.string().trim().max(2000),
+    isActive: z.boolean(),
+  })
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'There is nothing to update.',
+  });
 
 export const reorderSchema = z.object({
   items: z
