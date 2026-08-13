@@ -17,6 +17,8 @@
     "catalogue:apply": "tsx src/scripts/updateCatalogue.ts --apply",
     "migrate:user-indexes": "tsx src/scripts/migrateUserIndexes.ts",
     "migrate:user-indexes:apply": "tsx src/scripts/migrateUserIndexes.ts --apply",
+    "admin:create": "tsx src/scripts/createAdmin.ts",
+    "admin:create:apply": "tsx src/scripts/createAdmin.ts --apply",
     "audit:permissions": "tsx src/scripts/auditPermissions.ts"
   },
   "dependencies": {

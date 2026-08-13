@@ -2,7 +2,12 @@ import { z } from 'zod';
 import { ADMIN_RESOURCES, PERMISSION_ACTIONS } from '../types/domain';
 import { optionalEmail, phone } from './common';
 
-const password = z
+/**
+ * Exported so the owner-provisioning script (`scripts/createAdmin.ts`) applies
+ * the same rule the Staff page does, rather than letting an account created
+ * from the server hold a password the UI would have refused.
+ */
+export const password = z
   .string()
   .min(8, 'Password must be at least 8 characters.')
   .max(128, 'Password is too long.')
