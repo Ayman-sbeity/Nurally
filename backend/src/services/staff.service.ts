@@ -64,12 +64,14 @@ export async function getStaff(id: string) {
 }
 
 export async function createStaff(input: CreateStaffInput): Promise<UserDocument> {
-  await assertIdentifiersAreFree(input.email, input.phone);
+  await assertIdentifiersAreFree(input.email ?? undefined, input.phone);
 
   const staff = new User({
     fullName: input.fullName,
-    email: input.email,
-    ...(input.phone ? { phone: input.phone } : {}),
+    phone: input.phone,
+    // Omitted when blank rather than stored empty: the unique index on email is
+    // partial, and a second employee with `''` would collide with the first.
+    ...(input.email ? { email: input.email } : {}),
     ...(input.jobTitle ? { jobTitle: input.jobTitle } : {}),
     passwordHash: await User.hashPassword(input.password),
     role: UserRole.STAFF,
@@ -116,14 +118,16 @@ export async function updateStaff(
 
   if (input.email !== undefined || input.phone !== undefined) {
     await assertIdentifiersAreFree(
-      input.email ?? staff.email,
+      input.email === undefined ? staff.email : (input.email ?? undefined),
       input.phone ?? staff.phone,
       staff._id,
     );
   }
 
   if (input.fullName !== undefined) staff.fullName = input.fullName;
-  if (input.email !== undefined) staff.email = input.email;
+  // `null` means the owner cleared the field; `undefined` means they did not
+  // send it at all. Only the first should erase what is stored.
+  if (input.email !== undefined) staff.email = input.email ?? undefined;
   if (input.phone !== undefined) staff.phone = input.phone;
   if (input.jobTitle !== undefined) staff.jobTitle = input.jobTitle || undefined;
   if (input.isActive !== undefined) staff.isActive = input.isActive;

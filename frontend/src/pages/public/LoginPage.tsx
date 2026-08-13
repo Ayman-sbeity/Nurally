@@ -70,17 +70,15 @@ export function LoginPage() {
           </div>
         )}
 
-        {/* Clients sign in with their phone number. Staff and the owner have
-            email addresses, and the same field still accepts one — the server
-            resolves either — so the label leads with the common case rather
-            than making everyone read an "or". */}
+        {/* Everyone signs in with their phone number — clients and staff alike.
+            The field still accepts an email address, because the owner account
+            has one and older accounts may too; the server resolves either. */}
         <TextField
           label="Phone number"
           // Not type="tel": staff sign in here with an email address, and a
           // tel keypad would make that awkward to type.
           type="text"
           autoComplete="username"
-          hint="Staff: use your email address."
           error={errors.identifier?.message}
           {...register('identifier')}
         />

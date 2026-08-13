@@ -481,8 +481,10 @@ export const staffApi = {
 
 export interface CreateStaffPayload {
   fullName: string;
-  email: string;
-  phone?: string;
+  /** Their sign-in identifier, as for clients. */
+  phone: string;
+  /** Optional. Send `''` on an update to clear an address already stored. */
+  email?: string;
   jobTitle?: string;
   password: string;
   permissions: StaffPermission[];

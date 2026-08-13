@@ -45,8 +45,10 @@ export function StaffDialog({ schema, member, onClose, onSaved }: StaffDialogPro
       if (member) {
         const payload: UpdateStaffPayload = {
           fullName,
-          email,
-          phone: phone.trim() || undefined,
+          phone: phone.trim(),
+          // Sent even when blank: the server reads an empty value as "clear
+          // this", which is the only way to remove an address once added.
+          email: email.trim(),
           jobTitle: jobTitle.trim(),
           permissions,
           // Only sent when the owner typed one, so saving permissions cannot
@@ -58,8 +60,8 @@ export function StaffDialog({ schema, member, onClose, onSaved }: StaffDialogPro
 
       const payload: CreateStaffPayload = {
         fullName,
-        email,
-        ...(phone.trim() ? { phone: phone.trim() } : {}),
+        phone: phone.trim(),
+        ...(email.trim() ? { email: email.trim() } : {}),
         ...(jobTitle.trim() ? { jobTitle: jobTitle.trim() } : {}),
         password,
         permissions,
@@ -81,7 +83,7 @@ export function StaffDialog({ schema, member, onClose, onSaved }: StaffDialogPro
 
   const ready =
     fullName.trim().length >= 2 &&
-    email.trim().length > 0 &&
+    phone.trim().length >= 6 &&
     (isEditing || password.length >= 8);
 
   return (
@@ -92,7 +94,7 @@ export function StaffDialog({ schema, member, onClose, onSaved }: StaffDialogPro
       description={
         isEditing
           ? 'Changing access signs them out, so the new permissions apply straight away.'
-          : 'They sign in with this email address and see only the sections you tick.'
+          : 'They sign in with this phone number and see only the sections you tick.'
       }
       footer={
         <>
@@ -119,19 +121,22 @@ export function StaffDialog({ schema, member, onClose, onSaved }: StaffDialogPro
           autoComplete="off"
           autoFocus={!isEditing}
         />
+        {/* Phone first and required: employees sign in with it, exactly as
+            clients do, so the whole app has one sign-in rule. */}
         <TextField
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          hint="Used to sign in, and to reset their password."
-          autoComplete="off"
-        />
-        <TextField
-          label="Phone (optional)"
+          label="Phone number"
           type="tel"
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
+          hint="This is how they sign in."
+          autoComplete="off"
+        />
+        <TextField
+          label="Email (optional)"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          hint="Only for reaching them. Not needed to sign in — you reset their password from this page."
           autoComplete="off"
         />
         <TextField

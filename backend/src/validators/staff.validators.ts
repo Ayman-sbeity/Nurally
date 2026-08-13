@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ADMIN_RESOURCES, PERMISSION_ACTIONS } from '../types/domain';
-import { email, optionalPhone } from './common';
+import { optionalEmail, phone } from './common';
 
 const password = z
   .string()
@@ -26,13 +26,17 @@ const permissions = z
   .default([]);
 
 /**
- * Staff sign in with an email address, unlike clients: an employee always has
- * one, and it is what a password reset needs.
+ * Employees sign in with their phone number, exactly as clients do — it is the
+ * one identifier everyone here has, and it keeps a single sign-in rule across
+ * the whole app rather than one for staff and another for clients.
+ *
+ * Email is optional. Nothing depends on it: the owner resets an employee's
+ * password from the Staff page, so there is no reset link needing an address.
  */
 export const createStaffSchema = z.object({
   fullName: z.string().trim().min(2, "Please enter the employee's full name.").max(120),
-  email,
-  phone: optionalPhone,
+  phone,
+  email: optionalEmail,
   jobTitle: z.string().trim().max(80).optional(),
   password,
   permissions,
@@ -48,8 +52,8 @@ export const createStaffSchema = z.object({
 export const updateStaffSchema = z
   .object({
     fullName: z.string().trim().min(2, "Please enter the employee's full name.").max(120),
-    email,
-    phone: optionalPhone,
+    phone,
+    email: optionalEmail,
     jobTitle: z.string().trim().max(80).optional(),
     password,
     permissions,

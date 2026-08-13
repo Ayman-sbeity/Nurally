@@ -23,7 +23,8 @@ import { releaseSlot } from './slotLock.service';
 interface UpdateClientInput {
   fullName?: string;
   phone?: string;
-  email?: string;
+  /** `null` clears the address; `undefined` leaves it untouched. */
+  email?: string | null;
   notes?: string;
   isActive?: boolean;
 }
@@ -61,7 +62,7 @@ export async function updateClient(
 
   if (input.phone !== undefined || input.email !== undefined) {
     await assertIdentifiersAreFree(
-      input.email ?? client.email,
+      input.email === undefined ? client.email : (input.email ?? undefined),
       input.phone ?? client.phone,
       client._id,
     );
@@ -69,10 +70,10 @@ export async function updateClient(
 
   if (input.fullName !== undefined) client.fullName = input.fullName;
   if (input.phone !== undefined) client.phone = input.phone;
-  // An explicitly cleared email is removed rather than stored empty — the
-  // partial unique index treats "" as a value, and the second such client
-  // would collide with the first.
-  if (input.email !== undefined) client.email = input.email || undefined;
+  // `null` is an explicit clear, `undefined` is "not part of this request".
+  // The address is removed rather than stored empty: the unique index is
+  // partial, and a second client holding `''` would collide with the first.
+  if (input.email !== undefined) client.email = input.email ?? undefined;
   if (input.notes !== undefined) client.clientProfile.notes = input.notes || undefined;
   if (input.isActive !== undefined) client.isActive = input.isActive;
 

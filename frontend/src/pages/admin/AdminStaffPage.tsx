@@ -85,7 +85,7 @@ export function AdminStaffPage() {
           </div>
           <div className="nu-panel__body">
             <p className="nu-hint" style={{ marginBottom: 'var(--nu-space-4)' }}>
-              Employees sign in with their email address and see only the sections you grant. Your
+              Employees sign in with their phone number and see only the sections you grant. Your
               own account always has full access and cannot be limited or deactivated.
             </p>
 
@@ -109,7 +109,8 @@ export function AdminStaffPage() {
                       {!member.isActive && <span className="nu-hint"> · Deactivated</span>}
                     </p>
                     <p className="nu-hint">
-                      {[member.jobTitle, member.email].filter(Boolean).join(' · ')}
+                      {/* Phone leads: it is what they sign in with. */}
+                      {[member.jobTitle, member.phone, member.email].filter(Boolean).join(' · ')}
                     </p>
                     <p className="nu-hint">
                       {isOwnerAccount

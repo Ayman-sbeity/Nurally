@@ -495,15 +495,25 @@ admin dashboard.
 
 ## Signing in
 
-Clients sign in with their **phone number**. It is the one identifier every client has — several are
-booked in at the desk with nothing else — so it is required at sign-up, while email is optional and
-used only for appointment updates.
+Everyone signs in with their **phone number** — clients and employees alike. It is the one
+identifier everybody has (several clients are booked in at the desk with nothing else), so it is
+required, while email is optional and used only for reaching people.
 
 | Flow | Identifier |
 | ---- | ---------- |
 | Client sign-up | Phone (required) · email optional |
-| Sign-in | Phone for clients, email for staff and the owner — one field accepts either |
+| Adding a team member | Phone (required) · email optional |
+| Sign-in | Phone, for clients and staff alike — the field also accepts an email address |
 | Forgot password | Handled by the lounge, see below |
+
+Employees follow the same rule as clients: **phone required, email optional**. Nothing depends on a
+staff email address — the owner resets an employee's password from the Staff page, so there is no
+reset link needing somewhere to go. The sign-in field still accepts an email, because the owner
+account has one and older accounts may too; the server resolves whichever is given.
+
+An optional field is also **clearable**. A blank value means "remove what is stored" and an absent
+one means "leave it alone" — collapsing the two, which is the obvious simplification, is what makes
+a field impossible to empty once filled.
 
 ### Forgot password
 
