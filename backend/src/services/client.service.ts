@@ -45,8 +45,17 @@ async function assertIdentifiersAreFree(
     .lean();
   if (!clash) return;
 
+  /**
+   * Which identifier actually collided — decided from what was searched for,
+   * not by comparing values that may be absent on both sides. `clash.email ===
+   * email` reads as true when neither account has an address (`undefined ===
+   * undefined`), and then blames the email for a phone collision on a record
+   * where no email was ever entered.
+   */
+  const emailCollided = Boolean(email) && clash.email === email;
+
   throw ApiError.conflict(
-    clash.email === email
+    emailCollided
       ? 'Another account already uses that email address.'
       : 'Another account already uses that phone number.',
     ErrorCode.EMAIL_IN_USE,
