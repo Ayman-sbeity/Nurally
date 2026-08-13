@@ -9,6 +9,7 @@ import { InstagramSection } from '@/components/landing/InstagramSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { FaqSection } from '@/components/landing/FaqSection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
+import { LocationSection } from '@/components/landing/LocationSection';
 
 export function LandingPage() {
   return (
@@ -35,6 +36,7 @@ export function LandingPage() {
         showViewAll
         intro="Straight answers about our treatments, how appointments work, and what happens at your consultation."
       />
+      <LocationSection />
       <BookingCtaSection />
     </>
   );

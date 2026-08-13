@@ -176,6 +176,19 @@ router.patch(
   adminController.updateClient,
 );
 
+/**
+ * The lounge's stand-in for a self-service reset: no mail or SMS transport
+ * exists, so the desk sets a temporary password and reads it to the client.
+ * EDIT rather than a permission of its own — an employee trusted to change a
+ * client's record is trusted to help them back into it.
+ */
+router.post(
+  '/clients/:id/reset-password',
+  may(AdminResource.CLIENTS, EDIT),
+  validate({ params: idParamSchema }),
+  adminController.resetClientPassword,
+);
+
 // --- Client media ----------------------------------------------------------
 // Before/after records group the photographs for one treatment, so consent and
 // context are recorded once for the pair rather than per image.

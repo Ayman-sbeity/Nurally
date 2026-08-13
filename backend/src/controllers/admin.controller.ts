@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import type { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { Appointment } from '../models/Appointment';
@@ -214,6 +215,44 @@ export const getClient = asyncHandler(async (req: Request, res: Response) => {
   ]);
 
   ok(res, { client, appointments, preferredServices: preferred });
+});
+
+/**
+ * Sets a temporary password for a client and returns it **once**.
+ *
+ * This is the lounge's answer to "I forgot my password". There is no mail or
+ * SMS transport, so a self-service reset link cannot reach anyone; the desk
+ * knows its clients and can hand the password over on the phone instead.
+ *
+ * The plaintext is returned rather than stored or logged — it exists in the
+ * response and nowhere else, so reading it out is the only way it is ever used.
+ * Every existing session of theirs ends, which is the point: if the reason they
+ * cannot sign in is that somebody else can, this closes that door.
+ */
+export const resetClientPassword = asyncHandler(async (req: Request, res: Response) => {
+  const client = await User.findOne({ _id: req.params.id, role: UserRole.CLIENT });
+  if (!client) throw ApiError.notFound('That client could not be found.');
+
+  /**
+   * Readable over a phone line and still hard to guess: ~62 bits from an
+   * alphabet with no 0/O or 1/l/I to misread. Deliberately not a word list —
+   * a memorable password is one the client keeps instead of changing.
+   */
+  const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  const bytes = randomBytes(12);
+  const temporaryPassword = Array.from(bytes, (byte) => ALPHABET[byte % ALPHABET.length]).join('');
+
+  client.passwordHash = await User.hashPassword(temporaryPassword);
+  client.tokenVersion += 1;
+  // Any half-finished self-service reset is void now.
+  client.passwordResetTokenHash = undefined;
+  client.passwordResetExpiresAt = undefined;
+  await client.save();
+
+  ok(res, {
+    temporaryPassword,
+    message: `Temporary password set for ${client.fullName}. Read it to them and ask them to change it in their profile.`,
+  });
 });
 
 export const updateClient = asyncHandler(async (req: Request, res: Response) => {

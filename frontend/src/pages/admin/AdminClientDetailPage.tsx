@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
 import { Button } from '@/components/ui/Button';
+import { Dialog } from '@/components/ui/Dialog';
 import { TextAreaField } from '@/components/ui/Field';
 import { Seo } from '@/components/ui/Seo';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -24,6 +25,9 @@ export function AdminClientDetailPage() {
   const { can } = usePermissions();
   const [notes, setNotes] = useState('');
   const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  /** Held only for as long as the dialog is open — never persisted anywhere. */
+  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
   const [bookOpen, setBookOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAdminClient(id);
@@ -32,6 +36,21 @@ export function AdminClientDetailPage() {
   useEffect(() => {
     if (data?.client) setNotes(data.client.clientProfile?.notes ?? '');
   }, [data?.client]);
+
+  const resetPassword = useMutation({
+    mutationFn: () => adminApi.resetClientPassword(id as string),
+    onSuccess: ({ temporaryPassword: password }) => {
+      setTemporaryPassword(password);
+      setResetOpen(true);
+    },
+    onError: (error) =>
+      notify(
+        error instanceof ApiRequestError
+          ? error.message
+          : 'That password could not be reset.',
+        'error',
+      ),
+  });
 
   const update = useMutation({
     mutationFn: (payload: { notes?: string; isActive?: boolean }) =>
@@ -201,15 +220,39 @@ export function AdminClientDetailPage() {
               <h2 className="nu-panel__title">Account</h2>
             </div>
             <div className="nu-panel__body">
-              {client.isActive ? (
-                <Button variant="danger" onClick={() => setDeactivateOpen(true)}>
-                  Deactivate account
-                </Button>
-              ) : (
-                <Button variant="outline" onClick={() => update.mutate({ isActive: true })}>
-                  Reactivate account
-                </Button>
-              )}
+              <div className="nu-stack" style={{ gap: 'var(--nu-space-4)' }}>
+                {/* The lounge's stand-in for a reset link: no mail or SMS
+                    transport exists, so the desk sets one and reads it out. */}
+                {can('CLIENTS', 'EDIT') && (
+                  <div>
+                    <Button
+                      variant="outline"
+                      loading={resetPassword.isPending}
+                      onClick={() => resetPassword.mutate()}
+                    >
+                      Reset password
+                    </Button>
+                    <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
+                      Sets a temporary password to read out over the phone. Signs them out
+                      everywhere.
+                    </p>
+                  </div>
+                )}
+
+                {client.isActive ? (
+                  <div>
+                    <Button variant="danger" onClick={() => setDeactivateOpen(true)}>
+                      Deactivate account
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button variant="outline" onClick={() => update.mutate({ isActive: true })}>
+                      Reactivate account
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         </div>
@@ -218,6 +261,37 @@ export function AdminClientDetailPage() {
       {/* Full width: before/after comparison needs the room. */}
       <ClientPhotoSets clientId={client._id} clientName={client.fullName} />
       <ClientDocuments clientId={client._id} />
+
+      {/* Shown once. The server does not store the plaintext, so closing this
+          dialog is the last chance to read it — hence the explicit dismissal
+          rather than a toast that could scroll away unread. */}
+      <Dialog
+        open={resetOpen}
+        onClose={() => {
+          setResetOpen(false);
+          setTemporaryPassword(null);
+        }}
+        title="Temporary password"
+        description={`Read this to ${client.fullName}. It is shown only now — closing this cannot bring it back.`}
+        footer={
+          <Button
+            onClick={() => {
+              setResetOpen(false);
+              setTemporaryPassword(null);
+            }}
+          >
+            Done
+          </Button>
+        }
+      >
+        <div className="nu-stack">
+          <p className="nu-temppass">{temporaryPassword}</p>
+          <p className="nu-hint">
+            They sign in with their phone number and this password, then change it under Profile →
+            Password. Every device they were signed in on has been signed out.
+          </p>
+        </div>
+      </Dialog>
 
       <ConfirmDialog
         open={deactivateOpen}

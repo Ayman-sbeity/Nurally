@@ -86,21 +86,23 @@ export function RegisterPage() {
           error={errors.fullName?.message}
           {...register('fullName')}
         />
+        {/* Phone first, and above the email field: it is the identifier this
+            lounge signs people in with, and the one every client has. */}
+        <TextField
+          label="Phone number"
+          type="tel"
+          autoComplete="tel"
+          hint="This is how you sign in, and how the lounge reaches you about your appointment."
+          error={errors.phone?.message}
+          {...register('phone')}
+        />
         <TextField
           label="Email (optional)"
           type="email"
           autoComplete="email"
-          hint="Add one if you would like to be able to reset your own password. Without it, only the lounge can reset it for you."
+          hint="Only if you would like appointment updates by email as well. It is not needed to sign in."
           error={errors.email?.message}
           {...register('email')}
-        />
-        <TextField
-          label="Phone"
-          type="tel"
-          autoComplete="tel"
-          hint="Used to reach you about your appointment, and to sign in if you did not add an email address."
-          error={errors.phone?.message}
-          {...register('phone')}
         />
         <TextField
           label="Password"

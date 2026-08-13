@@ -1345,3 +1345,104 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   }
 }
+
+/* --- Visit us / location -------------------------------------------------- */
+
+.nu-location {
+  display: grid;
+  gap: var(--nu-space-6);
+  margin-top: var(--nu-space-6);
+}
+
+@media (min-width: 48rem) {
+  .nu-location {
+    grid-template-columns: minmax(16rem, 1fr) 1.4fr;
+    align-items: start;
+  }
+}
+
+.nu-location__nap {
+  font-style: normal;
+  display: grid;
+  gap: var(--nu-space-2);
+}
+
+.nu-location__address {
+  font-size: var(--nu-text-lg);
+  line-height: 1.5;
+}
+
+.nu-location__nap a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--nu-line-strong);
+}
+
+.nu-location__nap a:hover {
+  border-bottom-color: currentColor;
+}
+
+.nu-location__actions {
+  margin-top: var(--nu-space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-3);
+}
+
+/* Fixed aspect so the facade and the loaded iframe occupy identical space —
+   clicking Show map must not shift the page under the reader. */
+.nu-location__map {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--nu-radius-lg, var(--nu-radius));
+  overflow: hidden;
+  background: var(--nu-sand-deep);
+  border: 1px solid var(--nu-line);
+}
+
+.nu-location__map iframe,
+.nu-map-facade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.nu-map-facade {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--nu-space-2);
+  padding: var(--nu-space-5);
+  text-align: center;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 30% 25%, rgb(var(--nu-champagne-rgb) / 0.18), transparent 55%),
+    radial-gradient(circle at 75% 70%, rgb(var(--nu-ink-rgb) / 0.06), transparent 50%),
+    var(--nu-sand);
+  color: var(--nu-ink);
+  transition: background-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-map-facade:hover {
+  background-color: var(--nu-sand-deep);
+}
+
+.nu-map-facade__pin {
+  font-size: 1.75rem;
+  color: var(--nu-champagne-deep);
+}
+
+.nu-map-facade__label {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: var(--nu-text-sm);
+}
+
+.nu-map-facade__note {
+  font-size: var(--nu-text-xs);
+  color: var(--nu-ink-muted);
+  max-width: 22rem;
+}

@@ -26,7 +26,9 @@ authentication works, and the booking engine is the server-side authority on wha
 - [API reference](#api-reference)
 - [Client records, photos and files](#client-records-photos-and-files)
 - [Frontend routes](#frontend-routes)
+- [Signing in](#signing-in)
 - [Staff and permissions](#staff-and-permissions)
+- [Map and Google Maps visibility](#map-and-google-maps-visibility)
 - [PWA installation](#pwa-installation)
 - [Push notifications](#push-notifications)
 - [Design system](#design-system)
@@ -445,6 +447,42 @@ admin dashboard.
 
 ---
 
+## Signing in
+
+Clients sign in with their **phone number**. It is the one identifier every client has — several are
+booked in at the desk with nothing else — so it is required at sign-up, while email is optional and
+used only for appointment updates.
+
+| Flow | Identifier |
+| ---- | ---------- |
+| Client sign-up | Phone (required) · email optional |
+| Sign-in | Phone for clients, email for staff and the owner — one field accepts either |
+| Forgot password | Handled by the lounge, see below |
+
+### Forgot password
+
+**There is no self-service reset, by design.** The server has no SMS provider and no mail transport,
+so a form promising a code or a link would collect an identifier and send nothing.
+
+Instead the client contacts the lounge, and staff reset it from **Admin → Clients → *client* →
+Reset password**. That sets a temporary password and shows it once, to be read out over the phone.
+The client signs in with it and changes it under Profile → Password.
+
+The temporary password is 12 characters from a 55-character alphabet (~69 bits) with `0/O` and
+`1/l/I` removed so it cannot be misheard or mistyped. It is **returned in the response and stored
+nowhere** — not logged, not persisted in plaintext — so the dialog that displays it is the only
+place it ever exists. Resetting also bumps the client's token version, ending every session they
+had open: if the reason they cannot sign in is that somebody else can, this closes that door.
+
+Requires the `CLIENTS:EDIT` permission — an employee trusted to change a client's record is trusted
+to help them back into it.
+
+> To move to a real self-service reset later, add an SMS or mail transport. The token endpoints
+> (`/api/auth/forgot-password`, `/api/auth/reset-password`) are intact and already generate and
+> verify single-use, expiring tokens — only delivery is missing.
+
+---
+
 ## Staff and permissions
 
 The lounge owner can give employees their own sign-in and choose, per person, which admin sections
@@ -514,6 +552,57 @@ treatment. Their own name is recorded in appointment history, and stays there af
 Settings is reachable by every employee regardless of grants: it is where they turn on their own
 [push notifications](#push-notifications) and see their own account. The `SETTINGS` permission
 gates the booking-engine panel inside it.
+
+---
+
+## Map and Google Maps visibility
+
+### On the site
+
+A **Visit us** section appears on the landing page and `/about`: address, phone, opening hours, a
+**Get directions** button, and an embedded Google map.
+
+It renders only once an address or coordinates are configured, and is omitted entirely otherwise —
+the same rule the rest of the content follows. Nothing about the lounge is invented.
+
+The map is **click-to-load**. Embedding Google's iframe directly would put a third-party request,
+its cookies and around a megabyte of script on the first paint of the landing page, paid by every
+visitor including the majority who never look at the map. A styled placeholder takes its place and
+the real map loads on click, in the same footprint so nothing shifts.
+
+Directions point at `VITE_BUSINESS_MAP_URL` (or `VITE_GOOGLE_BUSINESS_URL`) when set, falling back
+to a coordinate pin. Prefer the real listing URL: it opens the profile with its reviews and photos,
+and every visit is a signal that the listing is the genuine one.
+
+### Being found *in* Google Maps
+
+**This part is not a code task, and the site cannot do it.** Appearing in Maps at all requires a
+**Google Business Profile** that has been created and verified — until then the lounge does not
+exist as a place, and no amount of markup on this site substitutes for it.
+
+What the site already contributes, once the env vars are filled:
+
+| Signal | Where it comes from |
+| ------ | ------------------- |
+| `BeautySalon` structured data with `address`, `geo`, `telephone`, `openingHoursSpecification` | `src/lib/geo.js` → `businessSchema()` |
+| `hasMap` pointing at the lounge's own listing | `VITE_BUSINESS_MAP_URL` |
+| `sameAs` linking Instagram / Facebook / the Google listing — how a search engine confirms these are one business | `VITE_*_URL` |
+| A visible, crawlable NAP block in the footer of every page | `VITE_BUSINESS_*` |
+
+The order that actually works:
+
+1. **Create and verify the Google Business Profile** at
+   [business.google.com](https://business.google.com) — pick the right primary category, add real
+   photos and the true opening hours. Verification is by postcard, phone or video and is the step
+   that takes real time.
+2. **Fill `frontend/.env`** with the *same* address and phone, written exactly as on the profile —
+   see [`docs/GEO-NAP-AUDIT.md`](docs/GEO-NAP-AUDIT.md). A suite number that differs by a comma is
+   enough to split one business into two weaker entities.
+3. **Set `VITE_GOOGLE_BUSINESS_URL` and `VITE_BUSINESS_MAP_URL`** to the listing, then rebuild.
+4. **Ask happy clients for reviews.** Reviews and profile completeness drive Maps ranking far more
+   than anything on the website.
+
+Steps 2 and 3 are the whole of the code side, and they are one file.
 
 ---
 

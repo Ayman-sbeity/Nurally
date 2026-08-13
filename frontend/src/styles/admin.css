@@ -1430,3 +1430,18 @@ body.is-dragging-appointment {
   gap: var(--nu-space-2);
   flex-wrap: wrap;
 }
+
+/* Read aloud over a phone line, so: large, monospaced, and generously spaced
+   so O/0 and l/1 cannot be confused. Selectable for copy-paste. */
+.nu-temppass {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  padding: var(--nu-space-4);
+  background: var(--nu-sand);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius);
+  word-break: break-all;
+  user-select: all;
+}

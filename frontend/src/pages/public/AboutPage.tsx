@@ -5,6 +5,7 @@ import { AboutSection } from '@/components/landing/AboutSection';
 import { EntitySection } from '@/components/landing/EntitySection';
 import { PhilosophySection } from '@/components/landing/PhilosophySection';
 import { BookingCtaSection } from '@/components/landing/BookingCtaSection';
+import { LocationSection } from '@/components/landing/LocationSection';
 import { BUSINESS } from '@/content/business';
 import { aboutPageSchema, breadcrumbSchema } from '@/lib/geo.js';
 
@@ -35,6 +36,7 @@ export function AboutPage() {
           which is what an AI assistant anchors a recommendation to. */}
       <EntitySection />
       <PhilosophySection />
+      <LocationSection />
       <BookingCtaSection />
     </>
   );

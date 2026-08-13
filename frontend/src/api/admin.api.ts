@@ -385,6 +385,17 @@ export const adminApi = {
     );
   },
 
+  /**
+   * Sets a temporary password for a client and returns it once. Nothing stores
+   * the plaintext, so it is shown to the staff member and then gone.
+   */
+  resetClientPassword: (clientId: string) =>
+    request<{ temporaryPassword: string; message: string }>(
+      api.post<ApiEnvelope<{ temporaryPassword: string; message: string }>>(
+        `/admin/clients/${clientId}/reset-password`,
+      ),
+    ),
+
   deleteAsset: (assetId: string) =>
     request<{ deleted: boolean }>(
       api.delete<ApiEnvelope<{ deleted: boolean }>>(`/admin/assets/${assetId}`),
