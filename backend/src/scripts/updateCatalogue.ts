@@ -184,7 +184,30 @@ const CREATIONS: Creation[] = [
  */
 const RETIRE = ['botox'];
 
-function describe(update: Update, before: { durationMinutes: number; price?: number }): string[] {
+/**
+ * Spelling corrections to the customer-facing names.
+ *
+ * Both of these were typed into the catalogue as misspellings of the actual
+ * treatments — the lounge's own price list calls them "microblading" and
+ * "nanoblading" — and the name is what a visitor reads on the treatment menu
+ * and what the WhatsApp assistant repeats back when it quotes the $150.
+ *
+ * Only `name` changes. The slug is the stable key and stays as it is, so every
+ * reference keeps resolving; and past appointments carry their own
+ * `serviceNameSnapshot`, so nobody's booking history is rewritten by this.
+ */
+const RENAMES: { slug: string; name: string }[] = [
+  { slug: 'microbalding', name: 'Microblading' },
+  { slug: 'nano-balading', name: 'Nanoblading' },
+];
+
+const sameDays = (a: number[], b: number[]): boolean =>
+  a.length === b.length && [...a].sort().every((day, index) => day === [...b].sort()[index]);
+
+function describe(
+  update: Update,
+  before: { durationMinutes: number; price?: number; availableWeekdays: number[] },
+): string[] {
   const parts: string[] = [];
   if (before.durationMinutes !== update.durationMinutes) {
     parts.push(`${before.durationMinutes}m → ${update.durationMinutes}m`);
@@ -192,7 +215,12 @@ function describe(update: Update, before: { durationMinutes: number; price?: num
   if (update.price !== undefined && before.price !== update.price) {
     parts.push(`price ${before.price ?? '—'} → $${update.price}`);
   }
-  if (update.availableWeekdays) parts.push('Wednesdays only');
+  // Only when it would actually change. A dry run that reports work it is not
+  // going to do teaches the reader to skim past it, which defeats the purpose
+  // of having a dry run at all.
+  if (update.availableWeekdays && !sameDays(before.availableWeekdays, update.availableWeekdays)) {
+    parts.push('Wednesdays only');
+  }
   return parts;
 }
 
@@ -246,6 +274,23 @@ async function main(): Promise<void> {
       availableWeekdays: creation.availableWeekdays ?? [],
       isActive: true,
     });
+  }
+
+  console.log('\nCorrecting misspelled names');
+  for (const rename of RENAMES) {
+    const service = await Service.findOne({ slug: rename.slug });
+    if (!service) {
+      console.log(`  ?  ${rename.slug} — NOT FOUND, skipped`);
+      continue;
+    }
+    if (service.name === rename.name) {
+      console.log(`  =  ${rename.slug} — already "${rename.name}"`);
+      continue;
+    }
+    console.log(`  ~  ${rename.slug} — "${service.name}" → "${rename.name}"`);
+    if (!APPLY) continue;
+    service.name = rename.name;
+    await service.save();
   }
 
   console.log('\nRetiring superseded treatments');

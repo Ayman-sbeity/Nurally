@@ -839,3 +839,69 @@
 .nu-avatar-field__controls {
   flex: 1 1 14rem;
 }
+
+/* --- Floating WhatsApp button ---------------------------------------------
+   A pill on desktop, a disc on phones — where the label costs thumb room over
+   the page and the icon is already unmistakable.
+
+   Sits below the toast layer on purpose: a message about what just happened
+   must never be covered by a permanent affordance. */
+.nu-whatsapp {
+  position: fixed;
+  right: var(--nu-space-5);
+  bottom: calc(var(--nu-space-5) + var(--nu-safe-bottom));
+  z-index: calc(var(--nu-z-toast) - 1);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-3) var(--nu-space-4);
+  border-radius: var(--nu-radius-pill);
+  /* WhatsApp's own green. Brand recognition is the entire point of the mark,
+     so this is the one element on the site that does not take the palette. */
+  background: #25d366;
+  color: #06331a;
+  font-size: var(--nu-text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: var(--nu-shadow-lg);
+  transition:
+    transform var(--nu-duration-fast) var(--nu-ease),
+    box-shadow var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-whatsapp:hover,
+.nu-whatsapp:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--nu-shadow-xl);
+}
+
+.nu-whatsapp__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+@media (max-width: 640px) {
+  .nu-whatsapp {
+    right: var(--nu-space-4);
+    padding: var(--nu-space-3);
+  }
+
+  /* Removed from the flow, not hidden from screen readers — the link's
+     aria-label still names it. */
+  .nu-whatsapp__label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nu-whatsapp {
+    transition: none;
+  }
+
+  .nu-whatsapp:hover,
+  .nu-whatsapp:focus-visible {
+    transform: none;
+  }
+}

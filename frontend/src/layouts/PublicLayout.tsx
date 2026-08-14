@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { JsonLd } from '@/components/ui/JsonLd';
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { BRAND, instagramUrl } from '@/content/brand';
 import { BUSINESS } from '@/content/business';
 import { useAuth } from '@/context/AuthContext';
@@ -133,6 +134,11 @@ export function PublicLayout() {
       <main id="main">
         <Outlet />
       </main>
+
+      {/* Public pages only. The client app has a bottom tab bar this would
+          land on top of, and someone already signed in has the booking flow. */}
+      <WhatsAppButton />
+
 
       <footer className="nu-footer">
         <div className="nu-container">

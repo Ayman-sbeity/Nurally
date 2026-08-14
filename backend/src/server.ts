@@ -23,6 +23,21 @@ async function bootstrap(): Promise<void> {
         'LOUNGE_TIMEZONE is still UTC — set it to the lounge\'s IANA timezone before going live.',
       );
     }
+
+    // Stated at boot rather than discovered when a customer's message goes
+    // unanswered. See docs/WHATSAPP-SETUP-GUIDE.md.
+    if (env.whatsappEnabled) {
+      logger.info(
+        `WhatsApp assistant enabled (phone number id ${env.WA_PHONE_NUMBER_ID}, model ${env.GEMINI_MODEL})`,
+      );
+      if (!env.WA_APP_SECRET) {
+        logger.warn(
+          'WA_APP_SECRET is not set — webhook signatures are NOT verified. Anyone who learns the webhook URL can talk to the assistant. Set it before going live.',
+        );
+      }
+    } else {
+      logger.info('WhatsApp assistant disabled — WA_TOKEN / WA_PHONE_NUMBER_ID / WA_VERIFY_TOKEN / GEMINI_API_KEY not all set.');
+    }
   });
 
   const sweep = setInterval(() => {

@@ -58,6 +58,42 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().optional(),
   /** Contact the push service can reach us at, per the VAPID spec. */
   VAPID_SUBJECT: z.string().default('mailto:admin@nurella.local'),
+
+  /**
+   * WhatsApp assistant. Every credential is optional and the feature is simply
+   * off without them — the same posture as Web Push above, so a deployment that
+   * has not been through the Meta setup is not a broken one. See
+   * `docs/WHATSAPP-SETUP-GUIDE.md`.
+   */
+  WA_TOKEN: z.string().optional(),
+  /** The numeric *id* of the number, not the number. They are easy to confuse. */
+  WA_PHONE_NUMBER_ID: z.string().optional(),
+  WA_WABA_ID: z.string().optional(),
+  /** Our own invented string; Meta echoes it back when verifying the webhook. */
+  WA_VERIFY_TOKEN: z.string().optional(),
+  /**
+   * Meta app secret, used to prove an incoming webhook really came from Meta.
+   * Optional so local testing through a tunnel stays easy, but a production
+   * deployment without it accepts messages from anyone who finds the URL — the
+   * server warns loudly at boot.
+   */
+  WA_APP_SECRET: z.string().optional(),
+  WA_GRAPH_VERSION: z.string().default('v21.0'),
+
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
+
+  /** Turns of history sent to the model. Cost and latency scale with this. */
+  WA_HISTORY_TURNS: positiveInt.default(20),
+  /** How long the AI stays quiet on a thread after a staff member replies. */
+  WA_HANDOFF_MINUTES: positiveInt.default(30),
+  /** AI replies one number can trigger per minute, before it is throttled. */
+  WA_RATE_LIMIT_PER_MINUTE: positiveInt.default(10),
+  /**
+   * How long a dormant conversation is kept. Chat history is personal data, so
+   * it expires on its own rather than accumulating forever.
+   */
+  WA_HISTORY_RETENTION_DAYS: positiveInt.default(365),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -82,6 +118,15 @@ export const env = {
    * that can never deliver.
    */
   pushEnabled: Boolean(raw.VAPID_PUBLIC_KEY && raw.VAPID_PRIVATE_KEY),
+  /**
+   * Whether the WhatsApp assistant can run. All four are required: a token with
+   * no model key answers nothing, and a model key with no token has nowhere to
+   * answer. Partial configuration keeps the webhook closed rather than half
+   * open.
+   */
+  whatsappEnabled: Boolean(
+    raw.WA_TOKEN && raw.WA_PHONE_NUMBER_ID && raw.WA_VERIFY_TOKEN && raw.GEMINI_API_KEY,
+  ),
   /** Every origin allowed to call the API with credentials. */
   corsOrigins: [
     raw.CLIENT_URL,

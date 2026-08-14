@@ -7,6 +7,7 @@ import { env } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimit';
 import routes from './routes';
+import whatsappRoutes from './routes/whatsapp.routes';
 import { ApiError } from './utils/ApiError';
 
 export function createApp(): Express {
@@ -32,6 +33,14 @@ export function createApp(): Express {
       credentials: true,
     }),
   );
+
+  /**
+   * Meta's webhook, mounted ahead of the global JSON parser and the API rate
+   * limiter. It has to verify a signature over the raw bytes, and it must not
+   * be throttled — Meta retries what it cannot deliver, and a retried message
+   * is a message answered twice. See `routes/whatsapp.routes.ts`.
+   */
+  app.use('/api/whatsapp', whatsappRoutes);
 
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
