@@ -3,12 +3,18 @@ import { addDays, format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/States';
 import { useAvailabilityOverview } from '@/hooks/queries';
-import { dateKey } from '@/utils/format';
+import { dateKey, weekdayRestrictionLabel } from '@/utils/format';
 
 interface DateStepProps {
   serviceId: string;
   selectedDate: string | null;
   onSelect: (date: string) => void;
+  /**
+   * Weekdays this treatment is performed on, when it is limited to some.
+   * Passed through so the strip can say *why* most days are unavailable
+   * instead of leaving the visitor to infer a fully-booked lounge.
+   */
+  availableWeekdays?: number[];
 }
 
 const WINDOW_DAYS = 14;
@@ -20,7 +26,14 @@ const WINDOW_DAYS = 14;
  * with nothing free are disabled rather than letting the visitor tap into an
  * empty screen.
  */
-export function DateStep({ serviceId, selectedDate, onSelect }: DateStepProps) {
+export function DateStep({
+  serviceId,
+  selectedDate,
+  onSelect,
+  availableWeekdays,
+}: DateStepProps) {
+  const restriction = weekdayRestrictionLabel(availableWeekdays);
+
   const [offset, setOffset] = useState(0);
   const from = dateKey(addDays(new Date(), offset));
 
@@ -38,6 +51,15 @@ export function DateStep({ serviceId, selectedDate, onSelect }: DateStepProps) {
 
   return (
     <div className="nu-stack">
+      {/* Stated before the strip, so the disabled days read as this treatment's
+          schedule rather than as a lounge with nothing free. */}
+      {restriction && (
+        <div className="nu-notice" role="note">
+          This treatment is performed on <strong>{restriction.replace(' only', '')}</strong>. Other
+          days are unavailable to book.
+        </div>
+      )}
+
       <div className="nu-row nu-row--between">
         <Button
           variant="ghost"
@@ -97,7 +119,9 @@ export function DateStep({ serviceId, selectedDate, onSelect }: DateStepProps) {
 
       {!isPending && days.every((day) => !day.hasSlots) && (
         <div className="nu-notice nu-notice--warn" role="status">
-          No appointments are available in these dates. Please look at later dates.
+          {restriction
+            ? `No ${restriction.replace(' only', '')} in these dates are free. Please look at later dates.`
+            : 'No appointments are available in these dates. Please look at later dates.'}
         </div>
       )}
     </div>

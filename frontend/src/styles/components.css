@@ -314,6 +314,14 @@
   display: none;
 }
 
+/* A treatment only performed on certain weekdays — the visiting practitioner's
+   Wednesday work. Carries the accent rather than a status colour: it is a fact
+   about the treatment, not a state something is in. */
+.nu-badge--restricted {
+  background: var(--nu-champagne-soft);
+  color: var(--nu-champagne-text);
+}
+
 .nu-badge--PENDING {
   background: var(--nu-status-pending-bg);
   color: var(--nu-status-pending);

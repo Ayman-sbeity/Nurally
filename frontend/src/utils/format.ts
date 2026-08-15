@@ -115,6 +115,25 @@ export const WEEKDAY_NAMES = [
   'Saturday',
 ] as const;
 
+/**
+ * "Wednesdays only" for a treatment restricted to particular days, or `null`
+ * when it can be booked any day the lounge is open.
+ *
+ * The permanent-makeup and piercing work is done by a visiting practitioner
+ * who is only in on Wednesdays. Without this the booking date strip simply
+ * shows thirteen dead days out of fourteen and never says why, which reads as
+ * a fully-booked lounge rather than a treatment with its own schedule.
+ */
+export function weekdayRestrictionLabel(availableWeekdays?: number[]): string | null {
+  if (!availableWeekdays?.length || availableWeekdays.length === 7) return null;
+  const days = [...availableWeekdays].sort().map((day) => `${WEEKDAY_NAMES[day]}s`);
+  const listed =
+    days.length === 1
+      ? days[0]
+      : `${days.slice(0, -1).join(', ')} and ${days[days.length - 1]}`;
+  return `${listed} only`;
+}
+
 export function initials(fullName: string): string {
   return fullName
     .split(/\s+/)

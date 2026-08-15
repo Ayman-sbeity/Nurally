@@ -13,7 +13,7 @@ import { DateStep } from '@/components/booking/DateStep';
 import { TimeStep } from '@/components/booking/TimeStep';
 import { qk } from '@/hooks/queries';
 import type { Appointment, Service } from '@/types/api';
-import { formatDateTime, formatDuration } from '@/utils/format';
+import { formatDateTime, formatDuration, formatPrice } from '@/utils/format';
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -193,6 +193,7 @@ export function BookingPage() {
       {step === 1 && service && (
         <DateStep
           serviceId={service._id}
+          availableWeekdays={service.availableWeekdays}
           selectedDate={date}
           onSelect={(selected) => {
             setDate(selected);
@@ -245,6 +246,16 @@ export function BookingPage() {
               <span className="nu-summary__label">Duration</span>
               <span className="nu-summary__value">{formatDuration(service.durationMinutes)}</span>
             </div>
+            {/* Only where the lounge has set a price. Most treatments are
+                quoted at the consultation, and a blank row would read as free. */}
+            {formatPrice(service.price, service.currency) && (
+              <div className="nu-summary__row">
+                <span className="nu-summary__label">Price</span>
+                <span className="nu-summary__value">
+                  {formatPrice(service.price, service.currency)}
+                </span>
+              </div>
+            )}
           </div>
 
           <TextAreaField
