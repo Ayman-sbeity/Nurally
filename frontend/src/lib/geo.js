@@ -97,6 +97,7 @@
  * @property {string} [facebookUrl]
  * @property {string} [googleProfileUrl]
  * @property {string} [mapUrl]
+ * @property {string|null} mapLink
  * @property {PostalAddressFacts|null} address
  * @property {string|null} addressLine
  * @property {string} [telephone]
@@ -261,6 +262,20 @@ export function resolveBusiness(raw, env = {}) {
   const googleProfileUrl = clean(env.VITE_GOOGLE_BUSINESS_URL);
   const mapUrl = clean(env.VITE_BUSINESS_MAP_URL);
 
+  // `hasMap` wants a link to this place; `sameAs` wants profiles the lounge
+  // controls. They are usually different URLs and are resolved separately — a
+  // bare coordinate pin makes a perfectly good map and a terrible identity
+  // claim, so it belongs in one and not the other.
+  //
+  // The generated form is Google's documented Maps URLs API, which is stable.
+  // A URL copied out of the browser's address bar is not: it carries a `data=`
+  // blob encoding the camera and a short-lived `g_ep` build token, and it
+  // rots. Store coordinates and build the link.
+  const mapLink =
+    mapUrl ??
+    googleProfileUrl ??
+    (hasGeo ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}` : null);
+
   const openingHours = parseOpeningHours(env.VITE_BUSINESS_HOURS);
   const foundingYear = Number(clean(env.VITE_FOUNDING_YEAR)) || raw.foundingYear || null;
   const teamSize = Number(clean(env.VITE_TEAM_SIZE)) || raw.teamSize || null;
@@ -292,6 +307,7 @@ export function resolveBusiness(raw, env = {}) {
     facebookUrl,
     googleProfileUrl,
     mapUrl,
+    mapLink,
 
     address: hasAddress ? address : null,
     addressLine: hasAddress ? formatAddressLine(address) : null,
@@ -430,7 +446,7 @@ export function businessSchema(facts, { categories = [] } = {}) {
     geo: facts.geo
       ? { '@type': 'GeoCoordinates', latitude: facts.geo.latitude, longitude: facts.geo.longitude }
       : undefined,
-    hasMap: facts.mapUrl,
+    hasMap: facts.mapLink,
     areaServed: facts.areaServed,
     openingHoursSpecification: facts.openingHours.map((block) => ({
       '@type': 'OpeningHoursSpecification',

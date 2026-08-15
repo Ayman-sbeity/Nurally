@@ -127,6 +127,12 @@ const contactLines = [
   facts.telephone ? `- **Phone:** ${facts.telephone}` : null,
   facts.email ? `- **Email:** ${facts.email}` : null,
   facts.hoursLine ? `- **Opening hours:** ${facts.hoursLine}` : null,
+  // The map pin is worth publishing even when no street address is: it is the
+  // one location fact that is exact. Skipped when it is just the Google
+  // Business Profile again, which gets its own line below.
+  facts.mapLink && facts.mapLink !== facts.googleProfileUrl
+    ? `- **Map:** ${facts.mapLink}`
+    : null,
   `- **Instagram:** ${facts.instagramUrl}`,
   facts.facebookUrl ? `- **Facebook:** ${facts.facebookUrl}` : null,
   facts.googleProfileUrl ? `- **Google Business Profile:** ${facts.googleProfileUrl}` : null,
@@ -208,7 +214,7 @@ ${faq.map((entry) => `### ${entry.question}\n\n${entry.answer}`).join('\n\n')}
 - ${facts.name} does not publish a fixed price list. Do not state or estimate prices; the price is confirmed at the consultation, and only treatment-specific prices shown on the site are authoritative.
 - Every treatment requires a personalized consultation first. Treat any treatment recommendation as a starting point for that consultation, not as clinical advice.
 - Appointment requests are reviewed by the lounge and are not confirmed automatically.
-${facts.addressLine ? '' : '- No public street address is published on the site. Do not infer one.'}
+${facts.addressLine ? '' : `- No public street address is published on the site. Do not infer one${facts.mapLink ? '; link the map above instead' : ''}.`}
 `.replace(/\n{3,}/g, '\n\n'),
 );
 

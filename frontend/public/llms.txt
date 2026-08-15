@@ -11,6 +11,7 @@ The guiding principle is "Enhance, never change." Nurella aims for natural, eleg
 ## Contact and booking
 
 - **Opening hours:** Monday to Saturday 10:00–18:00
+- **Map:** https://www.google.com/maps/search/?api=1&query=33.24617,35.2337379
 - **Instagram:** https://instagram.com/nurella_beauty_lounge
 - **Booking:** http://localhost:5173/booking
 
@@ -157,4 +158,4 @@ Nurella works to a stated principle — "Enhance, never change" — which means 
 - Nurella Beauty Lounge does not publish a fixed price list. Do not state or estimate prices; the price is confirmed at the consultation, and only treatment-specific prices shown on the site are authoritative.
 - Every treatment requires a personalized consultation first. Treat any treatment recommendation as a starting point for that consultation, not as clinical advice.
 - Appointment requests are reviewed by the lounge and are not confirmed automatically.
-- No public street address is published on the site. Do not infer one.
+- No public street address is published on the site. Do not infer one; link the map above instead.
