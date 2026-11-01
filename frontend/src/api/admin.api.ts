@@ -39,6 +39,9 @@ export interface ReelLookup {
   caption?: string;
 }
 
+/** Client photos and files are up to MAX_UPLOAD_MB (15 MB), so 20s is not enough. */
+const TRANSFER_TIMEOUT_MS = 120_000;
+
 export const adminApi = {
   // --- Overview ------------------------------------------------------------
   dashboard: () => request<DashboardData>(api.get<ApiEnvelope<DashboardData>>('/admin/dashboard')),
@@ -381,6 +384,10 @@ export const adminApi = {
   /**
    * Multipart uploads deliberately omit an explicit Content-Type so the browser
    * sets it along with the multipart boundary — hard-coding it breaks parsing.
+   *
+   * They also lift the client's 20-second timeout: a full-resolution phone
+   * photo over mobile data routinely takes longer than that, and the abort
+   * surfaced as "could not be uploaded" for a perfectly valid file.
    */
   uploadPhoto: (
     clientId: string,
@@ -396,7 +403,7 @@ export const adminApi = {
       api.post<ApiEnvelope<{ asset: ClientAsset }>>(
         `/admin/clients/${clientId}/photo-sets/${setId}/photos`,
         body,
-        { headers: { 'Content-Type': undefined } },
+        { headers: { 'Content-Type': undefined }, timeout: TRANSFER_TIMEOUT_MS },
       ),
     );
   },
@@ -413,6 +420,7 @@ export const adminApi = {
     return request<{ asset: ClientAsset }>(
       api.post<ApiEnvelope<{ asset: ClientAsset }>>(`/admin/clients/${clientId}/documents`, body, {
         headers: { 'Content-Type': undefined },
+        timeout: TRANSFER_TIMEOUT_MS,
       }),
     );
   },
@@ -443,6 +451,8 @@ export const adminApi = {
   fetchAssetBlob: async (assetId: string): Promise<Blob> => {
     const response = await api.get<Blob>(`/admin/assets/${assetId}/file`, {
       responseType: 'blob',
+      // The same multi-megabyte files come back down, so the same allowance.
+      timeout: TRANSFER_TIMEOUT_MS,
     });
     return response.data;
   },

@@ -1176,6 +1176,25 @@ body.is-dragging-appointment {
   position: relative;
 }
 
+.nu-phase__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.nu-phase__preview {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  min-height: 200px;
+  object-fit: contain;
+  border-radius: var(--nu-radius);
+  background: var(--nu-sand);
+}
+
 .nu-phase__photo .nu-authimg {
   width: 100%;
   aspect-ratio: 3 / 4;

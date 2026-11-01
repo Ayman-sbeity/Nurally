@@ -120,6 +120,7 @@ function PhotoSetCard({
   onChanged: () => void;
 }) {
   const { notify } = useToast();
+  const { can } = usePermissions();
 
   /**
    * Mirrored locally so the checkbox responds to the click immediately.
@@ -158,9 +159,11 @@ function PhotoSetCard({
             {serviceName ? ` · ${serviceName}` : ''}
           </p>
         </div>
-        <Button size="sm" variant="ghost" onClick={onDeleted}>
-          Delete
-        </Button>
+        {can('CLIENTS', 'DELETE') && (
+          <Button size="sm" variant="ghost" onClick={onDeleted}>
+            Delete
+          </Button>
+        )}
       </header>
 
       {set.notes && <p className="nu-photoset__notes">{set.notes}</p>}
@@ -234,6 +237,9 @@ function PhaseColumn({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { notify } = useToast();
+  const { can } = usePermissions();
+  const [preview, setPreview] = useState<ClientAsset | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<ClientAsset | null>(null);
 
   const upload = useMutation({
     mutationFn: (file: File) => adminApi.uploadPhoto(clientId, setId, file, { phase }),
@@ -249,6 +255,7 @@ function PhaseColumn({
     mutationFn: (assetId: string) => adminApi.deleteAsset(assetId),
     onSuccess: () => {
       notify('Photo removed.', 'success');
+      setPendingRemove(null);
       onChanged();
     },
     onError: () => notify('We could not remove that photo.', 'error'),
@@ -258,14 +265,16 @@ function PhaseColumn({
     <div className="nu-phase">
       <div className="nu-phase__header">
         <span className="nu-eyebrow">{label}</span>
-        <Button
-          size="sm"
-          variant="ghost"
-          loading={upload.isPending}
-          onClick={() => inputRef.current?.click()}
-        >
-          Add
-        </Button>
+        {can('CLIENTS', 'CREATE') && (
+          <Button
+            size="sm"
+            variant="ghost"
+            loading={upload.isPending}
+            onClick={() => inputRef.current?.click()}
+          >
+            Add
+          </Button>
+        )}
       </div>
 
       <input
@@ -287,20 +296,61 @@ function PhaseColumn({
         <ul className="nu-phase__photos">
           {photos.map((photo) => (
             <li key={photo._id} className="nu-phase__photo">
-              <AuthImage assetId={photo._id} alt={`${label} — ${clientName}`} />
               <button
                 type="button"
-                className="nu-phase__remove"
-                onClick={() => remove.mutate(photo._id)}
-                aria-label={`Remove ${label.toLowerCase()} photo`}
+                className="nu-phase__open"
+                onClick={() => setPreview(photo)}
+                aria-label={`View ${label.toLowerCase()} photo full size`}
               >
-                ×
+                <AuthImage assetId={photo._id} alt={`${label} — ${clientName}`} />
               </button>
+              {/* Asks first: the bytes are deleted with the row, so a stray tap
+                  on a phone would otherwise lose the photograph for good. */}
+              {can('CLIENTS', 'DELETE') && (
+                <button
+                  type="button"
+                  className="nu-phase__remove"
+                  onClick={() => setPendingRemove(photo)}
+                  aria-label={`Remove ${label.toLowerCase()} photo`}
+                >
+                  ×
+                </button>
+              )}
               {photo.caption && <p className="nu-phase__caption">{photo.caption}</p>}
             </li>
           ))}
         </ul>
       )}
+
+      <Dialog
+        open={Boolean(preview)}
+        onClose={() => setPreview(null)}
+        title={`${label} — ${clientName}`}
+        footer={
+          <Button variant="ghost" onClick={() => setPreview(null)}>
+            Close
+          </Button>
+        }
+      >
+        {preview && (
+          <AuthImage
+            assetId={preview._id}
+            alt={`${label} — ${clientName}`}
+            className="nu-phase__preview"
+          />
+        )}
+      </Dialog>
+
+      <ConfirmDialog
+        open={Boolean(pendingRemove)}
+        title={`Remove this ${label.toLowerCase()} photo?`}
+        description="The photograph will be permanently deleted from the client's file. This cannot be undone."
+        confirmLabel="Remove photo"
+        confirmVariant="danger"
+        loading={remove.isPending}
+        onConfirm={() => pendingRemove && remove.mutate(pendingRemove._id)}
+        onClose={() => setPendingRemove(null)}
+      />
     </div>
   );
 }
