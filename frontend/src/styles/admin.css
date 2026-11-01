@@ -1269,6 +1269,36 @@ body.is-dragging-appointment {
 
 .nu-filelist__main {
   min-width: 0;
+  flex: 1;
+}
+
+.nu-filelist__thumb {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--nu-radius);
+  overflow: hidden;
+  background: var(--nu-sand);
+  cursor: pointer;
+}
+
+.nu-filelist__thumb .nu-authimg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nu-filelist__preview {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  min-height: 200px;
+  object-fit: contain;
+  border-radius: var(--nu-radius);
+  background: var(--nu-sand);
 }
 
 .nu-filelist__name {

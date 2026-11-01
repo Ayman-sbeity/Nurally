@@ -3,7 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
 import { Button } from '@/components/ui/Button';
+import { Dialog } from '@/components/ui/Dialog';
 import { EmptyState } from '@/components/ui/States';
+import { AuthImage } from '@/components/admin/AuthImage';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useClientDocuments } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
@@ -22,6 +24,8 @@ function humanSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const isImage = (asset: ClientAsset) => asset.mimeType.startsWith('image/');
+
 export function ClientDocuments({ clientId }: Props) {
   const queryClient = useQueryClient();
   const { notify } = useToast();
@@ -29,6 +33,7 @@ export function ClientDocuments({ clientId }: Props) {
   const { data, isPending } = useClientDocuments(clientId);
   const inputRef = useRef<HTMLInputElement>(null);
   const [pendingDelete, setPendingDelete] = useState<ClientAsset | null>(null);
+  const [preview, setPreview] = useState<ClientAsset | null>(null);
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ['admin', 'client', clientId, 'documents'] });
@@ -67,7 +72,9 @@ export function ClientDocuments({ clientId }: Props) {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      URL.revokeObjectURL(url);
+      // Revoking in the same tick cancels the download in Safari and on most
+      // phones before it has read the blob, so the click appears to do nothing.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch {
       notify('We could not open that file.', 'error');
     }
@@ -117,8 +124,22 @@ export function ClientDocuments({ clientId }: Props) {
           <ul className="nu-filelist">
             {documents.map((doc) => (
               <li key={doc._id} className="nu-filelist__row">
+                {isImage(doc) && (
+                  <button
+                    type="button"
+                    className="nu-filelist__thumb"
+                    onClick={() => setPreview(doc)}
+                    aria-label={`View ${doc.originalName}`}
+                  >
+                    <AuthImage assetId={doc._id} alt="" />
+                  </button>
+                )}
                 <div className="nu-filelist__main">
-                  <button type="button" className="nu-filelist__name" onClick={() => void download(doc)}>
+                  <button
+                    type="button"
+                    className="nu-filelist__name"
+                    onClick={() => (isImage(doc) ? setPreview(doc) : void download(doc))}
+                  >
                     {doc.originalName}
                   </button>
                   <p className="nu-filelist__meta">
@@ -136,6 +157,24 @@ export function ClientDocuments({ clientId }: Props) {
           </ul>
         )}
       </div>
+
+      <Dialog
+        open={Boolean(preview)}
+        onClose={() => setPreview(null)}
+        title={preview?.originalName ?? ''}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setPreview(null)}>
+              Close
+            </Button>
+            <Button onClick={() => preview && void download(preview)}>Download</Button>
+          </>
+        }
+      >
+        {preview && (
+          <AuthImage assetId={preview._id} alt={preview.originalName} className="nu-filelist__preview" />
+        )}
+      </Dialog>
 
       <ConfirmDialog
         open={Boolean(pendingDelete)}
