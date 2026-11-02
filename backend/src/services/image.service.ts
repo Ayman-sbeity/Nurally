@@ -99,6 +99,18 @@ export async function encodeImage(input: Buffer, preset: ImagePreset): Promise<E
   }
 }
 
+/** Format and size of an image, or null when the bytes are not one. */
+export async function readImageInfo(
+  input: Buffer,
+): Promise<{ format: string; width: number; height: number } | null> {
+  try {
+    const { format, width, height } = await sharp(input, { failOn: 'error' }).metadata();
+    return format && width && height ? { format, width, height } : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Re-encodes a signature drawn on a form's signature pad, returned as a PNG
  * data URL ready to store.

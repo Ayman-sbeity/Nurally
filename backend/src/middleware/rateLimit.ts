@@ -29,6 +29,19 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+/**
+ * AI images are billed per picture. Per person rather than per IP — the whole
+ * lounge shares one — so a stuck button or a runaway loop caps one admin's
+ * spend without blocking a colleague. Generous for real use: a full catalogue
+ * with a retry for each treatment fits in an hour.
+ */
+export const aiImageLimiter = rateLimit({
+  ...base,
+  windowMs: 60 * 60 * 1000,
+  max: env.isProduction ? 120 : 400,
+  keyGenerator: (req) => req.user?.id ?? req.ip ?? 'unknown',
+});
+
 /** Booking submission — prevents a client from spamming requests. */
 export const bookingLimiter = rateLimit({
   ...base,

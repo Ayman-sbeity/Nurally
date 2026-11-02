@@ -112,6 +112,22 @@
   font-weight: 300;
 }
 
+/* The one word a heading leans on, in gold italic — as foil where the browser
+   can clip a gradient to text, the bronzed text gold otherwise. Light
+   surfaces only: the dark ones use the brighter foil in the hero. */
+.nu-heading em {
+  color: var(--nu-champagne-text);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .nu-heading em {
+    background: var(--nu-gilded-deep);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 .nu-lede {
   font-size: var(--nu-text-md);
   color: var(--nu-text-muted);

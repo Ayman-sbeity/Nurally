@@ -22,7 +22,7 @@ export function LandingPage() {
       <Hero />
       <AboutSection />
       {/* The landing page previews each category; the full menu lives at /services. */}
-      <ServicesSection limitPerCategory={3} showViewAll />
+      <ServicesSection />
       <ConcernsSection />
       <PhilosophySection />
       <GallerySection limit={6} />

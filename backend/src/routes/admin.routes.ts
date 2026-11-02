@@ -15,6 +15,7 @@ import {
   requireOwner,
   requirePermission,
 } from '../middleware/auth';
+import { aiImageLimiter } from '../middleware/rateLimit';
 import { singleUpload, singleVideoUpload } from '../middleware/upload';
 import { validate } from '../middleware/validate';
 import { AdminResource, PermissionAction } from '../types/domain';
@@ -37,6 +38,7 @@ import {
 } from '../validators/availability.validators';
 import {
   createGalleryImageSchema,
+  generateImageSchema,
   createServiceSchema,
   listClientsQuerySchema,
   reorderSchema,
@@ -343,6 +345,22 @@ router.delete(
 // upload to the public media area is harmless on its own.
 router.post('/media/images', singleUpload('file'), mediaController.uploadImage);
 router.post('/media/videos', singleVideoUpload('file'), mediaController.uploadVideo);
+
+// AI treatment photography. Unlike the uploader it is gated: every request is
+// billed to the lounge's OpenAI account, so only someone trusted to edit
+// services may make one, and each person is capped per hour.
+router.get(
+  '/media/images/generator',
+  may(AdminResource.SERVICES, VIEW),
+  mediaController.imageGenerator,
+);
+router.post(
+  '/media/images/generate',
+  may(AdminResource.SERVICES, EDIT),
+  aiImageLimiter,
+  validate({ body: generateImageSchema }),
+  mediaController.generateImage,
+);
 
 // --- Services --------------------------------------------------------------
 router.post(

@@ -15,6 +15,8 @@ export const ErrorCode = {
   EMAIL_IN_USE: 'EMAIL_IN_USE',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   RATE_LIMITED: 'RATE_LIMITED',
+  /** A service we depend on (OpenAI, Meta) failed or refused — not our fault, not the caller's. */
+  UPSTREAM_ERROR: 'UPSTREAM_ERROR',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 

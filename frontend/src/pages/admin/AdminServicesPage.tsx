@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
 import { ImageField } from '@/components/admin/ImageField';
+import { ServicePhotoBatch } from '@/components/admin/ServicePhotoBatch';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { SelectField, TextAreaField, TextField } from '@/components/ui/Field';
@@ -158,6 +159,8 @@ export function AdminServicesPage() {
         the booking engine uses it to work out available slots.
       </div>
 
+      {can('SERVICES', 'EDIT') && <ServicePhotoBatch services={data.services} />}
+
       {data.categories.map((category) => (
         <section key={category.slug} className="nu-panel" style={{ marginBottom: 'var(--nu-space-5)' }}>
           <div className="nu-panel__head">
@@ -302,7 +305,8 @@ export function AdminServicesPage() {
             onChange={(imageUrl) => setForm({ ...form, imageUrl })}
             fallbackSrc={categoryImage(form.category)}
             fallbackNote="Showing the default artwork for this category."
-            hint="Appears on the treatment cards and the treatment page. Wide images work best — they are cropped to a band."
+            hint="Appears on the treatment cards, cropped wide, and on the treatment page, cropped tall — keep the subject in the centre."
+            aiSubject={can('SERVICES', 'EDIT') ? { name: form.name, category: form.category } : undefined}
           />
           <fieldset className="nu-field nu-field--group">
             <legend className="nu-label">Available days</legend>

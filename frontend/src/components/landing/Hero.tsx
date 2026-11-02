@@ -1,20 +1,11 @@
 import { useScroll, useTransform, motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { HERO, categoryImage } from '@/content/brand';
+import { Icon } from '@/components/ui/Icon';
+import { HERO, categoryIcon, categoryImage } from '@/content/brand';
 import { BUSINESS } from '@/content/business';
 import { useServices } from '@/hooks/queries';
 import { formatDayRange } from '@/lib/geo.js';
 import { formatDuration, formatPrice } from '@/utils/format';
-
-const CATEGORY_ICONS: Partial<Record<string, IconName>> = {
-  laser: 'laser',
-  'skin-care': 'leaf',
-  'facial-aesthetics': 'sparkle',
-  'skin-boosters-rejuvenation': 'droplet',
-};
-
-const categoryIcon = (slug: string): IconName => CATEGORY_ICONS[slug] ?? 'sparkle';
 
 /**
  * Entrance timing. The stagger is deliberately short — the primary CTA is the

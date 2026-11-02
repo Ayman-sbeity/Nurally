@@ -386,6 +386,13 @@ export interface ClientForm {
   updatedAt: string;
 }
 
+/** Whether the server can make AI treatment photos, and with what. */
+export interface ImageGeneratorStatus {
+  enabled: boolean;
+  model: string;
+  quality: string;
+}
+
 export interface ClientFormSignaturePayload {
   image: string;
   signerName: string;

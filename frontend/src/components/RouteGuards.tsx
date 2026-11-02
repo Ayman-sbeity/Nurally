@@ -117,12 +117,22 @@ export function RedirectIfAuthenticated({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Restores scroll position on navigation, which a SPA does not do by default. */
+/**
+ * Restores scroll position on navigation, which a SPA does not do by default.
+ *
+ * A link into a section of the new page (`/services#category-laser`) lands on
+ * that section instead. Content that renders only once its data arrives finds
+ * no target here and scrolls itself into view when it appears — see
+ * `ServicesSection`.
+ */
 export function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
+  // Page changes only: a hash change within a page is the browser's job.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    const target = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [pathname]);
 
   return null;

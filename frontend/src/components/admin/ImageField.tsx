@@ -2,8 +2,11 @@ import { useId, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { adminApi } from '@/api/admin.api';
 import { ApiRequestError } from '@/api/client';
+import { AiImagePanel } from '@/components/admin/AiImagePanel';
 import { Button } from '@/components/ui/Button';
+import { useImageGenerator } from '@/hooks/queries';
 import { mediaSrc } from '@/utils/media';
+import type { ServiceCategorySlug } from '@/types/api';
 
 /** Mirrors the formats the API verifies by signature; anything else is refused. */
 const ACCEPTED = 'image/jpeg,image/png,image/webp';
@@ -22,6 +25,11 @@ interface ImageFieldProps {
   fallbackSrc?: string;
   fallbackNote?: string;
   hint?: string;
+  /**
+   * The treatment this picture is for. When given, and the server has AI images
+   * switched on, the field also offers to create the photo with AI.
+   */
+  aiSubject?: { name: string; category: ServiceCategorySlug };
 }
 
 /**
@@ -36,10 +44,14 @@ export function ImageField({
   fallbackSrc,
   fallbackNote,
   hint,
+  aiSubject,
 }: ImageFieldProps) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const { data: generator } = useImageGenerator(Boolean(aiSubject));
+  const canGenerate = Boolean(aiSubject && generator?.enabled);
 
   const upload = useMutation({
     mutationFn: (file: File) => adminApi.uploadImage(file),
@@ -95,6 +107,18 @@ export function ImageField({
             >
               {value ? 'Replace image' : 'Upload image'}
             </Button>
+            {canGenerate && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!aiSubject?.name.trim() || aiOpen}
+                title={aiSubject?.name.trim() ? undefined : 'Name the treatment first'}
+                aria-expanded={aiOpen}
+                onClick={() => setAiOpen(true)}
+              >
+                Create with AI
+              </Button>
+            )}
             {value && (
               <Button
                 size="sm"
@@ -142,6 +166,18 @@ export function ImageField({
         <p className="nu-error" role="alert">
           {error}
         </p>
+      )}
+
+      {aiSubject && canGenerate && aiOpen && (
+        <AiImagePanel
+          service={aiSubject}
+          onCancel={() => setAiOpen(false)}
+          onUse={(url) => {
+            setError(null);
+            onChange(url);
+            setAiOpen(false);
+          }}
+        />
       )}
     </div>
   );

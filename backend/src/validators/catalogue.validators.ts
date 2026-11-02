@@ -52,6 +52,15 @@ export const updateServiceSchema = createServiceSchema.partial().refine(
   { message: 'Nothing to update.' },
 );
 
+/**
+ * What an admin may say about an AI image: the treatment's name and the scene.
+ * The art direction is added by the server and cannot be overridden here.
+ */
+export const generateImageSchema = z.object({
+  title: z.string().trim().min(2, 'Give the treatment a name first.').max(160),
+  scene: z.string().trim().min(10, 'Describe the photo in a sentence or two.').max(1000),
+});
+
 export const listServicesQuerySchema = z.object({
   category: categorySchema.optional(),
   includeInactive: z

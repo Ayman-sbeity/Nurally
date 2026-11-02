@@ -16,6 +16,7 @@ import type {
   DashboardData,
   DayAvailability,
   GalleryImage,
+  ImageGeneratorStatus,
   InstagramReel,
   Paginated,
   PermissionSchema,
@@ -60,6 +61,9 @@ export interface ClientFormUpdatePayload {
   appointmentId?: string | null;
   signature?: ClientFormSignaturePayload;
 }
+
+/** Just over the server's own 170 s limit on OpenAI, so the server's answer arrives first. */
+const AI_IMAGE_TIMEOUT_MS = 180_000;
 
 /** Client photos and files are up to MAX_UPLOAD_MB (15 MB), so 20s is not enough. */
 const TRANSFER_TIMEOUT_MS = 120_000;
@@ -232,6 +236,24 @@ export const adminApi = {
       }),
     );
   },
+
+  /** Whether AI treatment photos are switched on for this lounge. */
+  imageGenerator: () =>
+    request<ImageGeneratorStatus>(
+      api.get<ApiEnvelope<ImageGeneratorStatus>>('/admin/media/images/generator'),
+    ),
+
+  /**
+   * Creates a treatment photo with OpenAI and returns its URL, like an upload:
+   * nothing is saved onto the service until the admin chooses to. Generation
+   * takes tens of seconds, so this call waits far longer than the default.
+   */
+  generateImage: (payload: { title: string; scene: string }) =>
+    request<{ url: string }>(
+      api.post<ApiEnvelope<{ url: string }>>('/admin/media/images/generate', payload, {
+        timeout: AI_IMAGE_TIMEOUT_MS,
+      }),
+    ),
 
   /**
    * Uploads a reel video. Videos are large enough that the progress callback is

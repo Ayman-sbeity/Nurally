@@ -1,8 +1,8 @@
 import type { Readable } from 'node:stream';
 import { Service } from '../models/Service';
-import { ApiError } from '../utils/ApiError';
+import { ApiError, ErrorCode } from '../utils/ApiError';
 import { logger } from '../utils/logger';
-import { encodeImage } from './image.service';
+import { encodeImage, readImageInfo } from './image.service';
 import { storage } from './storage';
 import type { ByteRange } from './storage';
 import type { VerifiedUpload } from '../middleware/upload';
@@ -69,6 +69,29 @@ export async function savePublicImage(upload: VerifiedUpload): Promise<{ url: st
 }
 
 const toPublicUrl = (key: string) => `${MEDIA_URL_PREFIX}/${key.slice(PUBLIC_PREFIX.length + 1)}`;
+
+/**
+ * Stores an AI-generated image and returns its URL, exactly as an upload does.
+ *
+ * Unlike an upload it is kept byte-for-byte when it already arrives as a
+ * web-sized WebP: there is no camera metadata to strip, a second compression
+ * would only cost quality, and keeping the file intact preserves whatever
+ * provenance metadata OpenAI embeds to mark it as AI-made. Anything else goes
+ * through the usual web encoding.
+ */
+export async function saveGeneratedImage(bytes: Buffer): Promise<{ url: string }> {
+  const info = await readImageInfo(bytes);
+  if (!info) {
+    throw new ApiError(502, ErrorCode.UPSTREAM_ERROR, 'OpenAI returned an image that could not be read. Please try again.');
+  }
+
+  const webReady = info.format === 'webp' && Math.max(info.width, info.height) <= 2400;
+  const stored = await storage.save(webReady ? bytes : (await encodeImage(bytes, 'web')).buffer, {
+    extension: '.webp',
+    prefix: PUBLIC_PREFIX,
+  });
+  return { url: toPublicUrl(stored.key) };
+}
 
 /** Stores an uploaded reel video and returns the URL to persist on the reel. */
 export async function savePublicVideo(upload: VerifiedUpload): Promise<{ url: string }> {

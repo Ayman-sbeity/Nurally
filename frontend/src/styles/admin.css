@@ -2029,3 +2029,92 @@ body.is-dragging-appointment {
     break-after: avoid;
   }
 }
+
+/* --- AI treatment photos -------------------------------------------------- */
+
+/* Opens inside the service form's image field. */
+.nu-ai-panel {
+  display: grid;
+  gap: var(--nu-space-3);
+  margin-top: var(--nu-space-3);
+  padding: var(--nu-space-4);
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius);
+}
+
+.nu-ai-panel__status {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  font-size: var(--nu-text-sm);
+  color: var(--nu-text-muted);
+}
+
+/* The photo as the card (2:1) and the treatment page (4:5) crop it — the two
+   shapes it must survive. */
+.nu-ai-crops {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--nu-space-3);
+  align-items: start;
+}
+
+.nu-ai-crops figure {
+  display: grid;
+  gap: var(--nu-space-1);
+  margin: 0;
+}
+
+.nu-ai-crops img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: var(--nu-radius-sm);
+  background: var(--nu-surface);
+}
+
+.nu-ai-crops__card img {
+  aspect-ratio: 2 / 1;
+}
+
+.nu-ai-crops__page img {
+  aspect-ratio: 4 / 5;
+}
+
+/* Review grid for a whole catalogue run. */
+.nu-ai-batch__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--nu-space-4);
+  list-style: none;
+  margin: 0;
+}
+
+.nu-ai-batch__item {
+  display: grid;
+  gap: var(--nu-space-2);
+  align-content: start;
+}
+
+.nu-ai-batch__media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius);
+}
+
+.nu-ai-batch__media a,
+.nu-ai-batch__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nu-ai-batch__media img {
+  object-fit: cover;
+}
+
+.nu-ai-batch__name {
+  font-weight: 500;
+}

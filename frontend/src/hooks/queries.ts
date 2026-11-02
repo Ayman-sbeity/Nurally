@@ -32,6 +32,7 @@ export const qk = {
   clientPhotoSets: (clientId: string) => ['admin', 'client', clientId, 'photo-sets'] as const,
   clientDocuments: (clientId: string) => ['admin', 'client', clientId, 'documents'] as const,
   clientForms: (clientId: string) => ['admin', 'client', clientId, 'forms'] as const,
+  imageGenerator: ['admin', 'image-generator'] as const,
   clientForm: (formId: string) => ['admin', 'client-form', formId] as const,
 };
 
@@ -205,6 +206,16 @@ export function useClientDocuments(clientId: string | undefined) {
     queryFn: () => adminApi.listDocuments(clientId as string),
     enabled: Boolean(clientId),
     ...signedMediaRefresh,
+  });
+}
+
+/** Server configuration, which only changes on a redeploy. */
+export function useImageGenerator(enabled = true) {
+  return useQuery({
+    queryKey: qk.imageGenerator,
+    queryFn: () => adminApi.imageGenerator(),
+    enabled,
+    staleTime: Infinity,
   });
 }
 

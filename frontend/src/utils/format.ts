@@ -99,10 +99,27 @@ export function formatDuration(minutes: number): string {
 /**
  * Price is only ever shown when the lounge has configured one — the system
  * never displays a placeholder that could read as a real price.
+ *
+ * "$50" or "$49.50" for a currency code the browser knows; anything else the
+ * admin typed as a currency prints as entered, "LBP 50". Cents appear only
+ * when there are some.
  */
 export function formatPrice(price?: number, currency?: string): string | null {
   if (price === undefined || price === null) return null;
-  return currency ? `${currency} ${price.toFixed(2)}` : price.toFixed(2);
+  const digits = Number.isInteger(price) ? 0 : 2;
+  if (!currency) return price.toFixed(digits);
+
+  try {
+    return new Intl.NumberFormat('en', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(price);
+  } catch {
+    // Not an ISO 4217 code — Intl throws rather than guessing.
+    return `${currency} ${price.toFixed(digits)}`;
+  }
 }
 
 export const WEEKDAY_NAMES = [

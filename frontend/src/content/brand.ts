@@ -6,6 +6,7 @@
  * provided (address, phone number, prices, staff, reviews, statistics) is
  * deliberately absent rather than invented — see `MISSING_INFORMATION`.
  */
+import type { IconName } from '@/components/ui/Icon';
 
 export const BRAND = {
   name: 'NURELLA BEAUTY LOUNGE',
@@ -91,8 +92,21 @@ export const BOOKING_CTA = {
 
 /** Section intro for the Collagen & Biostimulation category. */
 export const COLLAGEN_INTRO = {
-  title: 'Restore. Regenerate. Rejuvenate.',
+  /** "Restore. Regenerate. Rejuvenate." — split so the last word can carry the gold italic. */
+  title: { lead: 'Restore. Regenerate.', accent: 'Rejuvenate.' },
   body: 'Advanced treatments designed to support collagen production and gradually improve skin firmness, texture, and overall quality.',
+} as const;
+
+/** The banner that opens the Treatments page. */
+export const SERVICES_HERO = {
+  eyebrow: 'Our Treatments & Services',
+  title: COLLAGEN_INTRO.title,
+  body: COLLAGEN_INTRO.body,
+  /**
+   * Background artwork. Swap for real Nurella photography (≥2400px wide, the
+   * subject on the right third) — no other change needed.
+   */
+  image: { src: '/images/hero.svg', width: 1920, height: 1280, position: '70% center' },
 } as const;
 
 export const CONCERNS = {
@@ -132,10 +146,39 @@ export const CONCERN_CATEGORIES: Record<string, string[]> = {
   'Skin Rejuvenation': ['skin-boosters-rejuvenation', 'collagen-biostimulation'],
 };
 
-/** Section intros keyed by category slug, using the lounge's own wording. */
+/**
+ * One line under each category's name. Collagen uses the lounge's own intro;
+ * the rest are the lines from the treatments-page design. A category with no
+ * line here shows none — nothing is written in for it.
+ */
 export const CATEGORY_INTROS: Partial<Record<string, string>> = {
+  laser: 'Advanced laser solutions for smoother, clearer, hair-free skin.',
+  'skin-care': 'Targeted care for healthy, clear, and glowing skin.',
+  'permanent-makeup': 'Long-lasting, natural results that enhance your features.',
   'collagen-biostimulation': COLLAGEN_INTRO.body,
+  'skin-boosters-rejuvenation':
+    'Deep hydration and skin-quality treatments for a fresher, more youthful look.',
+  'advanced-skin-treatments': 'Innovative treatments to renew, resurface, and tighten the skin.',
+  'lifting-contouring': 'Non-surgical solutions to lift, define, and contour your features.',
+  'beauty-nails': 'Complete nail care and beauty services for a polished look.',
 };
+
+/** The line icon that stands for each category, in badges, tiles and the category bar. */
+export const CATEGORY_ICONS: Partial<Record<string, IconName>> = {
+  laser: 'laser',
+  'skin-care': 'leaf',
+  'permanent-makeup': 'lips',
+  nails: 'nail',
+  'facial-aesthetics': 'face',
+  'collagen-biostimulation': 'molecule',
+  'skin-boosters-rejuvenation': 'droplet',
+  'advanced-skin-treatments': 'flask',
+  'lifting-contouring': 'lift',
+  'beauty-nails': 'sparkle',
+  piercing: 'earring',
+};
+
+export const categoryIcon = (slug: string): IconName => CATEGORY_ICONS[slug] ?? 'sparkle';
 
 /**
  * Card artwork per category, used when a service carries no `imageUrl` of its

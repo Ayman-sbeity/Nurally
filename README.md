@@ -877,6 +877,10 @@ Deployment checklist:
    real client IPs.
 10. **Install dependencies on the server itself.** `sharp` ships a native binary for each platform,
     so a `node_modules` copied from a Windows machine will not load on Linux.
+11. **AI treatment photos (optional).** Set `OPENAI_API_KEY` — an API key from
+    platform.openai.com, which is billed separately from any ChatGPT subscription. Creating one
+    photo takes up to three minutes, so the reverse proxy in front of the API must allow that
+    (nginx: `proxy_read_timeout 180s;` — its default of 60 s cuts long generations off).
 
 Notifications are in-app today. The schema already carries `channels` and per-channel `deliveries`
 rows, so email / SMS / WhatsApp / push become a worker that drains `PENDING` deliveries — no schema
@@ -900,7 +904,7 @@ Nothing was invented to fill a gap. What is deliberately missing:
 | **Working hours**           | An **example** schedule (Mon–Sat) is seeded so the engine has something to work with. Configure the real one in Admin → Availability. |
 | **Address, phone, email**   | Not present. Configurable via `VITE_BUSINESS_*` in `frontend/.env`; until set they are omitted from the footer, the structured data, the FAQ and `llms.txt` rather than guessed. See [`docs/GEO-NAP-AUDIT.md`](docs/GEO-NAP-AUDIT.md). |
 | **Staff, reviews, statistics** | Not present. Reviews have a home (`reviews` in `frontend/src/content/geo/business.json`) that drives both the on-page section and the `Review`/`AggregateRating` markup — empty until real ones exist. |
-| **Photography**             | Generated abstract brand-coloured placeholders, each labelled as such.  |
+| **Photography**             | Generated abstract brand-coloured placeholders per category, each labelled as such. With an OpenAI key, **Admin → Services** creates a photo per treatment — one at a time from the service form, or all missing ones at once — for review before anything is published. The house style and its rules (no before/after, nothing graphic, no text) live in [`backend/src/services/aiImage/treatmentPhoto.ts`](backend/src/services/aiImage/treatmentPhoto.ts); what each treatment's photo shows is in [`frontend/src/content/serviceImageScenes.ts`](frontend/src/content/serviceImageScenes.ts). |
 
 The outstanding items are also listed in `MISSING_INFORMATION` and surfaced on the admin **Settings**
 page, so they are visible in the product rather than buried in a README.

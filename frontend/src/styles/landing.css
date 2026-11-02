@@ -682,6 +682,56 @@
   }
 }
 
+/* --- Hero: page banner ----------------------------------------------------
+   The landing hero's surface, scrim and type at banner height, for pages that
+   open on a title rather than a pitch (Treatments). */
+.nu-hero--page {
+  min-height: 0;
+}
+
+.nu-hero--page .nu-hero__media {
+  inset: 0;
+}
+
+.nu-hero--page .nu-hero__layout {
+  padding-block: 8rem var(--nu-space-8);
+}
+
+.nu-hero--page .nu-hero__title {
+  font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+  margin-block: 0 var(--nu-space-4);
+}
+
+/* An eyebrow inside the h1 keeps the heading descriptive; it must still look
+   like the eyebrow, not inherit the display face. */
+.nu-hero__title .nu-eyebrow {
+  font-family: var(--nu-font-sans);
+  line-height: 1.6;
+  margin-bottom: var(--nu-space-4);
+}
+
+.nu-hero__body {
+  max-width: 46ch;
+  font-size: var(--nu-text-md);
+  color: rgb(var(--nu-cream-rgb) / 0.85);
+}
+
+.nu-hero--page .nu-hero__pillars {
+  margin-top: var(--nu-space-6);
+}
+
+@media (min-width: 1080px) {
+  .nu-hero--page .nu-hero__layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: none;
+    padding-block: 9rem var(--nu-space-8);
+  }
+
+  .nu-hero--page .nu-hero__content {
+    grid-area: auto;
+  }
+}
+
 /* --- Editorial sections -------------------------------------------------- */
 .nu-editorial {
   display: grid;
@@ -781,11 +831,6 @@
   margin-top: var(--nu-space-4);
 }
 
-.nu-about__title em {
-  font-weight: 300;
-  color: var(--nu-champagne-text);
-}
-
 .nu-about__quote {
   font-family: var(--nu-font-display);
   font-size: clamp(1.6rem, 3vw, 2.25rem);
@@ -795,10 +840,8 @@
   color: var(--nu-champagne-text);
 }
 
-/* Foil lettering where the browser can clip a gradient to text; the bronzed
-   text gold above otherwise. */
+/* Foil lettering, as on the heading above (see `.nu-heading em`). */
 @supports (background-clip: text) or (-webkit-background-clip: text) {
-  .nu-about__title em,
   .nu-about__quote {
     background: var(--nu-gilded-deep);
     -webkit-background-clip: text;
@@ -958,108 +1001,296 @@
   margin-block: var(--nu-space-3) var(--nu-space-4);
 }
 
-/* --- Category / service cards -------------------------------------------- */
-.nu-category {
-  margin-bottom: var(--nu-space-8);
+/* --- Catalogue ------------------------------------------------------------
+   The treatment menu: the landing page's preview and the Treatments page's
+   full list share every rule below. */
+.nu-catalogue--menu {
+  padding-top: var(--nu-space-6);
 }
 
-.nu-category__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+.nu-catalogue__intro {
+  display: grid;
   gap: var(--nu-space-4);
-  padding-bottom: var(--nu-space-4);
-  margin-bottom: var(--nu-space-5);
-  border-bottom: 1px solid var(--nu-line);
-  flex-wrap: wrap;
+  margin-bottom: var(--nu-space-6);
+  color: var(--nu-text-muted);
+}
+
+@media (min-width: 900px) {
+  .nu-catalogue__intro {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--nu-space-7);
+  }
+}
+
+.nu-catalogue__all {
+  margin-top: var(--nu-space-7);
+  text-align: center;
+}
+
+/* --- Catalogue: category bar --------------------------------------------- */
+/* A solid band in the page colour, stuck just under the fixed 5rem header:
+   the cards disappear beneath it cleanly instead of showing through the gap
+   between the header and the pill. */
+.nu-category-nav {
+  position: sticky;
+  top: 5rem;
+  /* Above the cards, which lift into their own layer on hover. */
+  z-index: 2;
+  margin-bottom: var(--nu-space-3);
+  padding-block: var(--nu-space-3);
+  background: var(--nu-bg);
+}
+
+.nu-category-nav__list {
+  /* The offset parent the active chip is centred against. */
+  position: relative;
+  display: flex;
+  gap: var(--nu-space-1);
+  padding: var(--nu-space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border: 1px solid rgb(var(--nu-champagne-rgb) / 0.35);
+  border-radius: var(--nu-radius-pill);
+  background: var(--nu-surface);
+  box-shadow: var(--nu-shadow);
+}
+
+.nu-category-nav__list::-webkit-scrollbar {
+  display: none;
+}
+
+.nu-category-nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  min-height: 2.75rem;
+  padding-inline: var(--nu-space-4);
+  border-radius: var(--nu-radius-pill);
+  font-size: var(--nu-text-sm);
+  white-space: nowrap;
+  color: var(--nu-ink-soft);
+  transition:
+    background-color var(--nu-duration) var(--nu-ease),
+    color var(--nu-duration) var(--nu-ease);
+}
+
+/* Inset, because the scrolling list would clip a ring drawn outside. */
+.nu-category-nav__link:focus-visible {
+  outline-offset: -2px;
+  border-radius: var(--nu-radius-pill);
+}
+
+.nu-category-nav__link svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+  color: var(--nu-champagne-deep);
+}
+
+.nu-category-nav__link:hover {
+  background: rgb(var(--nu-champagne-rgb) / 0.16);
+  color: var(--nu-ink);
+}
+
+.nu-category-nav__link[aria-current] {
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+}
+
+.nu-category-nav__link[aria-current] svg {
+  color: var(--nu-champagne);
+}
+
+/* --- Catalogue: category rows -------------------------------------------- */
+.nu-category {
+  padding-block: var(--nu-space-6);
+  border-top: 1px solid var(--nu-line);
+}
+
+.nu-category:first-of-type {
+  border-top: 0;
+}
+
+/* Lands below the header and the sticky category bar (about 5rem of band),
+   with room to breathe — `html` already allows for the header itself. */
+.nu-catalogue--menu .nu-category {
+  scroll-margin-top: 5.5rem;
+}
+
+.nu-category__inner {
+  display: grid;
+  gap: var(--nu-space-5);
+}
+
+.nu-category__aside {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nu-space-4);
+}
+
+.nu-category__badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 1px solid rgb(var(--nu-champagne-rgb) / 0.6);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--nu-white), var(--nu-sand));
+  color: var(--nu-champagne-deep);
+  box-shadow:
+    0 0 0 4px rgb(var(--nu-champagne-rgb) / 0.12),
+    0 6px 18px rgb(var(--nu-champagne-rgb) / 0.25);
+}
+
+.nu-category__badge svg {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .nu-category__title {
-  font-size: var(--nu-text-xl);
-  font-family: var(--nu-font-display);
-}
-
-.nu-category__count {
-  font-size: var(--nu-text-xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--nu-text-muted);
+  font-size: var(--nu-text-2xl);
 }
 
 .nu-category__intro {
+  max-width: 40ch;
+  margin-top: var(--nu-space-2);
+  font-size: var(--nu-text-sm);
   color: var(--nu-text-muted);
-  max-width: 62ch;
-  margin-bottom: var(--nu-space-5);
 }
 
-/*
- * Column count is decided by the space available, not by breakpoints: the
- * track floor is 17rem, and `min(100%, …)` keeps that floor from overflowing a
- * viewport narrower than one card.
- */
+.nu-category__count {
+  margin-top: var(--nu-space-3);
+  font-size: var(--nu-text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--nu-accent-text);
+}
+
+.nu-category__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  min-height: 2.5rem;
+  margin-top: var(--nu-space-4);
+  padding-inline: var(--nu-space-4);
+  border: 1px solid rgb(var(--nu-champagne-rgb) / 0.7);
+  border-radius: var(--nu-radius-pill);
+  font-size: var(--nu-text-sm);
+  font-weight: 500;
+  transition:
+    background-color var(--nu-duration) var(--nu-ease),
+    color var(--nu-duration) var(--nu-ease),
+    border-color var(--nu-duration) var(--nu-ease);
+}
+
+.nu-category__more svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform var(--nu-duration) var(--nu-ease);
+}
+
+.nu-category__more:hover {
+  border-color: var(--nu-ink);
+  background: var(--nu-ink);
+  color: var(--nu-cream);
+}
+
+.nu-category__more:hover svg {
+  transform: translateX(3px);
+}
+
+.nu-category__facts {
+  margin-top: var(--nu-space-5);
+}
+
+.nu-category__facts summary {
+  width: fit-content;
+  padding-block: var(--nu-space-2);
+  font-size: var(--nu-text-sm);
+  font-weight: 500;
+  color: var(--nu-accent-text);
+  cursor: pointer;
+}
+
+.nu-category__facts .nu-facts {
+  margin-top: var(--nu-space-3);
+}
+
+@media (min-width: 1024px) {
+  .nu-category__inner {
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--nu-space-7);
+    align-items: start;
+  }
+
+  .nu-category__aside {
+    flex-direction: column;
+  }
+}
+
+/* Used outside the menu too — the "More in …" row on a treatment's own page. */
+.nu-category__head {
+  padding-bottom: var(--nu-space-4);
+  margin-bottom: var(--nu-space-5);
+  border-bottom: 1px solid var(--nu-line);
+}
+
+/* --- Catalogue: service cards --------------------------------------------
+   A fixed column count per breakpoint rather than auto-fill: a category
+   previews four treatments, and four should always read as one full row. */
 .nu-service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
-  gap: clamp(var(--nu-space-3), 2.5vw, var(--nu-space-5));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--nu-space-3), 2vw, var(--nu-space-5));
+}
+
+@media (min-width: 640px) {
+  .nu-service-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .nu-service-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /*
  * Each card is a container, so its contents respond to the width of the card
- * rather than of the window. The same card then reads correctly full-width on
- * a phone, two-up on a tablet and three-up on a desktop — including inside any
- * narrower column it is dropped into later.
+ * rather than of the window — the same card reads correctly two-up on a phone
+ * and four-up on a desktop.
  */
 .nu-service-card {
-  container-type: inline-size;
-  container-name: service-card;
+  container: service-card / inline-size;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--nu-space-3);
-  padding: var(--nu-space-5);
-  background: var(--nu-surface);
-  border: 1px solid var(--nu-line);
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(var(--nu-champagne-rgb) / 0.35);
   border-radius: var(--nu-radius-lg);
+  background: linear-gradient(to bottom, var(--nu-white), var(--nu-cream));
+  box-shadow: 0 8px 24px rgb(var(--nu-champagne-rgb) / 0.12);
   transition:
     transform var(--nu-duration) var(--nu-ease),
     box-shadow var(--nu-duration) var(--nu-ease),
     border-color var(--nu-duration) var(--nu-ease);
-  height: 100%;
 }
 
-.nu-service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--nu-shadow-lg);
-  border-color: var(--nu-champagne-soft);
-}
+/* Hover only where there is a pointer to hover with; on touch it would stick. */
+@media (hover: hover) {
+  .nu-service-card:hover {
+    transform: translateY(-4px);
+    border-color: rgb(var(--nu-champagne-rgb) / 0.7);
+    box-shadow: var(--nu-shadow-lg);
+  }
 
-/*
- * A picture bled to the card edges, so it always spans the full card width.
- * Its height comes from a ratio rather than a fixed value, so it grows and
- * shrinks with the card at every size — one rule instead of a breakpoint per
- * layout. The cap stops a full-width card on a tablet becoming a poster.
- */
-.nu-service-card__media {
-  display: block;
-  aspect-ratio: 2 / 1;
-  max-height: 15rem;
-  flex: none;
-  overflow: hidden;
-  background: var(--nu-sand);
-  margin: calc(var(--nu-space-5) * -1) calc(var(--nu-space-5) * -1) 0;
-  border-radius: var(--nu-radius-lg) var(--nu-radius-lg) 0 0;
-}
-
-.nu-service-card__media img,
-.nu-service-card__media svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--nu-duration) var(--nu-ease);
-}
-
-.nu-service-card:hover .nu-service-card__media img {
-  transform: scale(1.04);
+  .nu-service-card:hover .nu-service-card__media img {
+    transform: scale(1.05);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1068,51 +1299,117 @@
   }
 }
 
+/* The whole card shows the ring when its (stretched) link has focus. */
+@supports selector(:has(a)) {
+  .nu-service-card:has(.nu-service-card__link:focus-visible) {
+    outline: 2px solid var(--nu-accent);
+    outline-offset: 3px;
+  }
+
+  .nu-service-card__link:focus-visible {
+    outline: none;
+  }
+}
+
+/* 4:3 keeps most of a square treatment photo in frame. */
+.nu-service-card__media {
+  aspect-ratio: 4 / 3;
+  flex: none;
+  overflow: hidden;
+  background: var(--nu-sand);
+}
+
+.nu-service-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--nu-ease);
+}
+
+.nu-service-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  padding: var(--nu-space-4);
+}
+
 .nu-service-card__name {
-  font-family: var(--nu-font-display);
-  font-size: var(--nu-text-lg);
-  line-height: 1.2;
+  font-family: var(--nu-font-sans);
+  font-size: var(--nu-text-base);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+/* Stretched over the card: the picture and the text are one link. */
+.nu-service-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 .nu-service-card__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   font-size: var(--nu-text-sm);
+  line-height: 1.5;
   color: var(--nu-text-muted);
-  flex: 1;
 }
 
-.nu-service-card__foot {
+/* Pushed to the foot, so meta and button line up across a row of cards. */
+.nu-service-card__meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--nu-space-3);
-  padding-top: var(--nu-space-3);
-  border-top: 1px solid var(--nu-line);
-  flex-wrap: wrap;
-}
-
-/*
- * Below this width the duration and the button no longer sit side by side
- * comfortably. Rather than let them wrap into a ragged row, stack them and
- * give the action the card's full width.
- *
- * Flex wrapping above is the fallback wherever container queries are missing.
- */
-@container service-card (max-width: 20rem) {
-  .nu-service-card__foot {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .nu-service-card__foot .nu-btn {
-    width: 100%;
-  }
-}
-
-.nu-service-card__meta {
+  gap: var(--nu-space-2);
+  margin-top: auto;
   font-size: var(--nu-text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--nu-text-muted);
+}
+
+.nu-service-card__meta > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.nu-service-card__meta svg {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  color: var(--nu-champagne-deep);
+}
+
+.nu-service-card__price {
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--nu-radius-pill);
+  background: var(--nu-gilded);
+  color: var(--nu-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Above the stretched link, so it books rather than opens the page. */
+.nu-service-card__book {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  margin-top: var(--nu-space-1);
+}
+
+@container service-card (max-width: 13rem) {
+  .nu-service-card__body {
+    padding: var(--nu-space-3);
+  }
+
+  .nu-service-card__book {
+    align-self: stretch;
+    padding-inline: var(--nu-space-3);
+  }
 }
 
 /* --- Concerns ------------------------------------------------------------ */

@@ -1,4 +1,7 @@
 import type { Request, Response } from 'express';
+import { env } from '../config/env';
+import * as openai from '../services/aiImage/openai';
+import { treatmentPhotoPrompt } from '../services/aiImage/treatmentPhoto';
 import * as mediaService from '../services/media.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
@@ -15,6 +18,29 @@ export const uploadImage = asyncHandler(async (req: Request, res: Response) => {
   // `imagesOnly` — a PDF must never end up rendered as service photography.
   const upload = verifyUpload(req.file, { imagesOnly: true });
   const { url } = await mediaService.savePublicImage(upload);
+  ok(res, { url }, 201);
+});
+
+/** Whether AI images are available, so the admin only offers what will work. */
+export const imageGenerator = asyncHandler(async (_req: Request, res: Response) => {
+  ok(res, {
+    enabled: env.aiImagesEnabled,
+    model: env.OPENAI_IMAGE_MODEL,
+    quality: env.OPENAI_IMAGE_QUALITY,
+  });
+});
+
+/**
+ * Creates a treatment photograph with OpenAI and returns its URL.
+ *
+ * Like `uploadImage`, nothing is attached to a record here: the admin reviews
+ * the picture and saves the URL onto the service only if they want it. A
+ * rejected picture is an orphan in the public media area, which is harmless.
+ */
+export const generateImage = asyncHandler(async (req: Request, res: Response) => {
+  const { title, scene } = req.body as { title: string; scene: string };
+  const image = await openai.generateImage(treatmentPhotoPrompt({ title, scene }));
+  const { url } = await mediaService.saveGeneratedImage(image);
   ok(res, { url }, 201);
 });
 

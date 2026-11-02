@@ -83,6 +83,25 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
 
+  /**
+   * Treatment photography generated with OpenAI's image model. Optional, like
+   * the assistant above: without a key the admin simply offers upload only.
+   * Every generation is billed to the OpenAI account behind the key.
+   */
+  OPENAI_API_KEY: z.string().optional(),
+  /** `gpt-image-2.5-flare` is OpenAI's fast, high-quality everyday image model. */
+  OPENAI_IMAGE_MODEL: z.string().default('gpt-image-2.5-flare'),
+  /** Cost rises steeply with quality; medium is sharp enough for the website. */
+  OPENAI_IMAGE_QUALITY: z.enum(['low', 'medium', 'high', 'xhigh', 'max', 'auto']).default('medium'),
+  /**
+   * Square on purpose: the treatment cards crop to 2:1 and the treatment page
+   * to 4:5, and only a square with a centred subject survives both.
+   */
+  OPENAI_IMAGE_SIZE: z
+    .string()
+    .regex(/^\d{3,4}x\d{3,4}$/, 'OPENAI_IMAGE_SIZE must look like 1536x1536')
+    .default('1536x1536'),
+
   /** Turns of history sent to the model. Cost and latency scale with this. */
   WA_HISTORY_TURNS: positiveInt.default(20),
   /** How long the AI stays quiet on a thread after a staff member replies. */
@@ -127,6 +146,8 @@ export const env = {
   whatsappEnabled: Boolean(
     raw.WA_TOKEN && raw.WA_PHONE_NUMBER_ID && raw.WA_VERIFY_TOKEN && raw.GEMINI_API_KEY,
   ),
+  /** Whether treatment images can be generated — an OpenAI key is all it takes. */
+  aiImagesEnabled: Boolean(raw.OPENAI_API_KEY),
   /** Every origin allowed to call the API with credentials. */
   corsOrigins: [
     raw.CLIENT_URL,
