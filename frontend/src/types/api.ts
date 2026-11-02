@@ -356,6 +356,15 @@ export interface ClientAsset {
   originalName: string;
   mimeType: string;
   sizeBytes: number;
+  /** Upright pixel size, images only. Absent on photos not yet viewed since variants were introduced. */
+  width?: number;
+  height?: number;
+  /**
+   * Images only: signed addresses of the re-encoded thumbnail and preview,
+   * usable directly as an `<img src>`. They expire within one to two hours, so
+   * they are read from a fresh listing rather than stored. See `AuthImage`.
+   */
+  urls?: { thumb: string; display: string };
   caption?: string;
   createdAt: string;
   updatedAt: string;

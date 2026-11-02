@@ -27,6 +27,7 @@ import { SlotLock } from '../models/SlotLock';
 import { User, type UserDocument } from '../models/User';
 import { WorkingHours } from '../models/WorkingHours';
 import { computeDayAvailability } from '../services/availability.service';
+import { storedKeysOf } from '../services/clientAsset.service';
 import { acquireSlot } from '../services/slotLock.service';
 import { storage } from '../services/storage';
 import { AppointmentStatus, AssetKind, PhotoPhase, UserRole } from '../types/domain';
@@ -446,8 +447,8 @@ async function reset(): Promise<void> {
 
   // Remove the stored objects before the rows that point at them, otherwise the
   // keys are lost and the files are orphaned on disk forever.
-  const assets = await ClientAsset.find().select('+storageKey').lean();
-  await Promise.all(assets.map((asset) => storage.remove(asset.storageKey)));
+  const assets = await ClientAsset.find().select('+storageKey +variantKeys').lean();
+  await Promise.all(assets.flatMap(storedKeysOf).map((key) => storage.remove(key)));
 
   await Promise.all([
     Appointment.deleteMany({}),

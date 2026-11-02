@@ -3,8 +3,9 @@ import type { Request, Response } from 'express';
 import { ClientAsset } from '../models/ClientAsset';
 import { ClientPhotoSet } from '../models/ClientPhotoSet';
 import { User, normalizePhone } from '../models/User';
+import { verifyAssetUrl } from '../services/assetUrl.service';
 import * as assetService from '../services/clientAsset.service';
-import { AssetKind, UserRole, type PhotoPhase } from '../types/domain';
+import { AssetKind, UserRole, type AssetVariant, type PhotoPhase } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 import { ok } from '../utils/respond';
@@ -135,7 +136,7 @@ export const uploadPhoto = asyncHandler(async (req: Request, res: Response) => {
     caption: req.body.caption,
   });
 
-  ok(res, { asset: asset.toJSON() }, 201);
+  ok(res, { asset: assetService.presentAsset(asset.toJSON()) }, 201);
 });
 
 export const uploadDocument = asyncHandler(async (req: Request, res: Response) => {
@@ -151,7 +152,7 @@ export const uploadDocument = asyncHandler(async (req: Request, res: Response) =
     caption: req.body.caption,
   });
 
-  ok(res, { asset: asset.toJSON() }, 201);
+  ok(res, { asset: assetService.presentAsset(asset.toJSON()) }, 201);
 });
 
 export const listDocuments = asyncHandler(async (req: Request, res: Response) => {
@@ -159,16 +160,16 @@ export const listDocuments = asyncHandler(async (req: Request, res: Response) =>
   const documents = await ClientAsset.find({ client: clientId, kind: AssetKind.DOCUMENT })
     .sort({ createdAt: -1 })
     .lean();
-  ok(res, { documents });
+  ok(res, { documents: documents.map(assetService.presentAsset) });
 });
 
 /**
- * Streams the bytes behind an asset.
+ * Streams the original bytes behind an asset, for download.
  *
- * This is the only way to read an uploaded file: nothing is served statically,
- * so a client photograph cannot be reached without an admin access token. The
- * response is marked private and `nosniff` so it is never cached by a shared
- * proxy nor re-interpreted as another content type.
+ * Authenticated with the admin's bearer token like the rest of the admin API.
+ * Nothing is served statically, so an original cannot be reached any other
+ * way. The response is marked private and `nosniff` so it is never cached by a
+ * shared proxy nor re-interpreted as another content type.
  */
 export const streamAsset = asyncHandler(async (req: Request, res: Response) => {
   const { asset, stream } = await assetService.openAsset(req.params.assetId as string);
@@ -180,6 +181,34 @@ export const streamAsset = asyncHandler(async (req: Request, res: Response) => {
   res.setHeader('Content-Length', String(asset.sizeBytes));
   res.setHeader('Content-Disposition', `${inline ? 'inline' : 'attachment'}; filename="${safeName}"`);
   res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  stream.on('error', () => res.destroy());
+  stream.pipe(res);
+});
+
+/**
+ * Serves a thumbnail or preview through a signed URL — what every `<img>` of a
+ * client photo in the admin points at. See `assetUrl.service.ts`.
+ *
+ * The signature is the authorisation: it was issued by a listing that had
+ * already checked this admin's permission, and it is checked here before the
+ * database is touched. The browser may keep the response until the URL itself
+ * expires, which is what makes a second visit to a client instant; `private`
+ * keeps it out of every shared cache between here and the browser.
+ */
+export const streamVariant = asyncHandler(async (req: Request, res: Response) => {
+  const { assetId, variant } = req.params as { assetId: string; variant: AssetVariant };
+  const { exp, sig } = req.query as unknown as { exp: number; sig: string };
+
+  const maxAge = verifyAssetUrl(assetId, variant, exp, sig);
+  if (maxAge === null) throw ApiError.forbidden('This photo link has expired. Reload the page.');
+
+  const { stream, sizeBytes } = await assetService.openVariant(assetId, variant);
+
+  res.setHeader('Content-Type', 'image/webp');
+  res.setHeader('Content-Length', String(sizeBytes));
+  res.setHeader('Cache-Control', `private, max-age=${maxAge}, immutable`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
   stream.on('error', () => res.destroy());

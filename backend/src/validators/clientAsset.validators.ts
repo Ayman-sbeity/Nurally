@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PhotoPhase } from '../types/domain';
+import { AssetVariant, PhotoPhase } from '../types/domain';
 import { objectIdSchema } from './appointment.validators';
 import { optionalEmail, phone } from './common';
 
@@ -48,4 +48,15 @@ export const uploadDocumentSchema = z.object({
 });
 
 export const assetIdParamSchema = z.object({ assetId: objectIdSchema });
+
+export const signedVariantParamsSchema = z.object({
+  assetId: objectIdSchema,
+  variant: z.nativeEnum(AssetVariant),
+});
+
+export const signedVariantQuerySchema = z.object({
+  exp: z.coerce.number().int().positive(),
+  // A SHA-256 HMAC in base64url is 43 characters; anything else is not ours.
+  sig: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+});
 export const setIdParamSchema = z.object({ setId: objectIdSchema });

@@ -175,11 +175,25 @@ export function useAdminClient(id: string | undefined) {
   });
 }
 
+/**
+ * The image URLs in these listings are signed and expire one to two hours
+ * after they are issued. Refreshing every quarter hour while the page is open,
+ * and on return to a tab left long enough to go stale, keeps every URL on
+ * screen valid. Within the same hour the server returns identical URLs, so a
+ * refresh never downloads a photo twice.
+ */
+const signedMediaRefresh = {
+  staleTime: 10 * 60_000,
+  refetchInterval: 15 * 60_000,
+  refetchOnWindowFocus: true,
+} as const;
+
 export function useClientPhotoSets(clientId: string | undefined) {
   return useQuery({
     queryKey: qk.clientPhotoSets(clientId ?? ''),
     queryFn: () => adminApi.listPhotoSets(clientId as string),
     enabled: Boolean(clientId),
+    ...signedMediaRefresh,
   });
 }
 
@@ -188,6 +202,7 @@ export function useClientDocuments(clientId: string | undefined) {
     queryKey: qk.clientDocuments(clientId ?? ''),
     queryFn: () => adminApi.listDocuments(clientId as string),
     enabled: Boolean(clientId),
+    ...signedMediaRefresh,
   });
 }
 

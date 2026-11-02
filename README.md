@@ -464,8 +464,10 @@ share one `ClientAsset` collection because their lifecycle is identical; only `k
 | Where files live   | A `StorageAdapter` interface; `local` writes to `UPLOAD_DIR`. Swap the driver for S3/Cloudinary without touching a controller, model or route. |
 | Stored names       | `<yyyy>/<mm>/<uuid><ext>` — never derived from the uploaded filename, which is kept as metadata only. |
 | Type checking      | **Magic bytes**, not the extension or the browser's `Content-Type`. Both are attacker-controlled; a `.jpg` that is really HTML is the classic stored-XSS vector. JPEG, PNG, WebP and PDF are accepted; photo routes reject non-images. |
-| Reading files back | There is **no static file route**. Bytes stream from `/admin/assets/:id/file` behind the admin guard, marked `private, no-store` and `nosniff`. Guessing a path reaches nothing. |
-| In the browser     | Because the access token lives in memory rather than a cookie, an `<img src>` would arrive unauthenticated. `AuthImage` fetches the blob through the API client and renders an object URL, revoking it on unmount. |
+| Image variants     | Every image is decoded with `sharp` at upload and re-encoded as WebP: a **thumbnail** (short edge 400px, ~25 KB) and a **preview** (long edge 2048px, ~200–400 KB). EXIF orientation is applied and metadata — GPS included — is dropped. The original is kept untouched for download. A file that is not a readable image is refused before anything is written. Photos uploaded before variants existed get theirs rendered on first view. |
+| Reading files back | There is **no static file route**. Originals stream from `/admin/assets/:id/file` behind the admin guard, marked `private, no-store` and `nosniff`. Thumbnails and previews are served from `/api/assets/:id/:variant` by **signed, expiring URL**: the authenticated listing signs each one (HMAC over asset, variant and expiry), and the route checks that signature before touching the database. Guessing a path reaches nothing. |
+| In the browser     | Signed URLs let `AuthImage` be a plain `<img>`, so the browser lazy-loads, decodes off-thread and caches photos itself. Expiry is rounded to the hour, so listings within the same hour return identical URLs and a second visit to a client is served from cache (`private, max-age` ≤ 2 h, `immutable`). The preview paints over its already-cached thumbnail and sharpens when the full image lands; it is prefetched on hover, focus or the start of a tap. |
+| Other images       | Profile photos are stored only as a 320px WebP; website artwork as a WebP of at most 2400px. Both strip metadata. |
 | Write ordering     | Bytes first, then the row; a failed insert removes the stored object, so a failed upload never leaves an orphan. Deleting a record removes its photographs and their bytes together. |
 | Size               | Capped by `MAX_UPLOAD_MB` (default 15); reel videos by `MAX_VIDEO_UPLOAD_MB` (default 80). |
 | Reel videos        | Public marketing clips, so they take the opposite route to client media: stored under `public/videos`, served unauthenticated from `/api/media/video/…` with `Accept-Ranges` so the player can seek, and cached `immutable`. Accepted formats are MP4 (an allowlist of ISO brands, so a renamed `.mov` is refused) and WebM. |
@@ -856,6 +858,8 @@ Deployment checklist:
    so indexes (notably the unique `slotlocks` index) exist.
 9. Put the API behind a reverse proxy — `trust proxy` is enabled in production so rate limiting sees
    real client IPs.
+10. **Install dependencies on the server itself.** `sharp` ships a native binary for each platform,
+    so a `node_modules` copied from a Windows machine will not load on Linux.
 
 Notifications are in-app today. The schema already carries `channels` and per-channel `deliveries`
 rows, so email / SMS / WhatsApp / push become a worker that drains `PENDING` deliveries — no schema

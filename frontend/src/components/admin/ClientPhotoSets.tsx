@@ -13,6 +13,7 @@ import { useServices } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { formatDate } from '@/utils/format';
+import { prefetchImage } from '@/utils/media';
 import type { ClientAsset, ClientPhotoSet, PhotoPhase } from '@/types/api';
 
 interface Props {
@@ -21,6 +22,11 @@ interface Props {
 }
 
 const todayKey = () => new Date().toISOString().slice(0, 10);
+
+/** Starts the full-size download as the pointer arrives, ahead of the click. */
+const warmPreview = (photo: ClientAsset) => {
+  if (photo.urls) prefetchImage(photo.urls.display);
+};
 
 export function ClientPhotoSets({ clientId, clientName }: Props) {
   const queryClient = useQueryClient();
@@ -300,9 +306,12 @@ function PhaseColumn({
                 type="button"
                 className="nu-phase__open"
                 onClick={() => setPreview(photo)}
+                onPointerEnter={() => warmPreview(photo)}
+                onPointerDown={() => warmPreview(photo)}
+                onFocus={() => warmPreview(photo)}
                 aria-label={`View ${label.toLowerCase()} photo full size`}
               >
-                <AuthImage assetId={photo._id} alt={`${label} — ${clientName}`} />
+                <AuthImage asset={photo} variant="thumb" alt={`${label} — ${clientName}`} />
               </button>
               {/* Asks first: the bytes are deleted with the row, so a stray tap
                   on a phone would otherwise lose the photograph for good. */}
@@ -334,7 +343,8 @@ function PhaseColumn({
       >
         {preview && (
           <AuthImage
-            assetId={preview._id}
+            asset={preview}
+            variant="display"
             alt={`${label} — ${clientName}`}
             className="nu-phase__preview"
           />

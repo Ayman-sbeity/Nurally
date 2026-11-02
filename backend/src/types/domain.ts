@@ -301,3 +301,13 @@ export const PhotoPhase = {
   AFTER: 'AFTER',
 } as const;
 export type PhotoPhase = (typeof PhotoPhase)[keyof typeof PhotoPhase];
+
+/**
+ * The re-encoded copies of a client image the browser is shown. The original
+ * is kept untouched beside them and is only ever downloaded, never displayed.
+ */
+export const AssetVariant = {
+  THUMB: 'thumb',
+  DISPLAY: 'display',
+} as const;
+export type AssetVariant = (typeof AssetVariant)[keyof typeof AssetVariant];

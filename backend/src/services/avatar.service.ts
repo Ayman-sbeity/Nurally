@@ -1,6 +1,7 @@
 import { User, type UserDocument } from '../models/User';
 import { ApiError } from '../utils/ApiError';
 import { logger } from '../utils/logger';
+import { encodeImage } from './image.service';
 import { storage } from './storage';
 import type { VerifiedUpload } from '../middleware/upload';
 
@@ -31,11 +32,16 @@ const CONTENT_TYPES: Record<string, string> = {
  * leave an orphan on disk. The previous object is discarded only after the row
  * points at the new one, so a crash in between costs a stale file rather than
  * a user whose avatar 404s.
+ *
+ * Only the re-encoded copy is kept. An avatar is never shown larger than a
+ * thumbnail, and the clients table draws one per row, so storing the phone's
+ * multi-megabyte original would make that table download all of them.
  */
 export async function saveAvatar(user: UserDocument, upload: VerifiedUpload): Promise<Date> {
   const previousKey = user.avatarKey;
-  const stored = await storage.save(upload.buffer, {
-    extension: upload.extension,
+  const image = await encodeImage(upload.buffer, 'avatar');
+  const stored = await storage.save(image.buffer, {
+    extension: image.extension,
     prefix: AVATAR_PREFIX,
   });
 

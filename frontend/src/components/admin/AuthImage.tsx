@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import { adminApi } from '@/api/admin.api';
+import { useState } from 'react';
+import { mediaSrc } from '@/utils/media';
+import type { ClientAsset } from '@/types/api';
 
 interface AuthImageProps {
-  assetId: string;
+  asset: ClientAsset;
+  /** `thumb` for grids and lists, `display` for the full-size preview. */
+  variant: 'thumb' | 'display';
   alt: string;
   className?: string;
 }
@@ -10,44 +13,26 @@ interface AuthImageProps {
 /**
  * Renders a client photograph that only an authenticated admin may read.
  *
- * Uploaded files are never served statically, and the access token is held in
- * memory rather than a cookie, so `<img src="/api/admin/assets/…">` would be
- * sent without credentials and 401. Instead the bytes are fetched through the
- * API client and handed to the `<img>` as an object URL.
+ * The admin API lists every image with signed, expiring URLs (see
+ * `assetUrl.service.ts` on the server), so this is a plain `<img>`. The
+ * browser schedules, lazy-loads, decodes off the main thread and caches it —
+ * none of which happened when the bytes were fetched as a blob. Both variants
+ * are WebP re-encodes: a thumbnail is tens of kilobytes rather than the
+ * camera's several megabytes.
  *
- * Every created object URL is revoked when the component unmounts or the asset
- * changes — without that, browsing a client with many photos leaks the whole
- * set into memory until a full page reload.
+ * The preview paints over its own thumbnail, which the grid has already put
+ * in the browser's cache. So a preview shows a picture the moment it opens,
+ * and sharpens when the full-size image lands.
+ *
+ * Load and failure are tracked per URL rather than reset in an effect: when a
+ * refreshed listing brings a newly signed URL, the image simply tries again.
  */
-export function AuthImage({ assetId, alt, className }: AuthImageProps) {
-  const [src, setSrc] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+export function AuthImage({ asset, variant, alt, className }: AuthImageProps) {
+  const url = asset.urls?.[variant];
+  const [loaded, setLoaded] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
 
-  useEffect(() => {
-    let objectUrl: string | null = null;
-    let cancelled = false;
-
-    setSrc(null);
-    setFailed(false);
-
-    adminApi
-      .fetchAssetBlob(assetId)
-      .then((blob) => {
-        if (cancelled) return;
-        objectUrl = URL.createObjectURL(blob);
-        setSrc(objectUrl);
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-
-    return () => {
-      cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [assetId]);
-
-  if (failed) {
+  if (!url || failed === url) {
     return (
       <div className={`nu-authimg nu-authimg--failed ${className ?? ''}`.trim()} role="img" aria-label={alt}>
         <span>Unavailable</span>
@@ -55,9 +40,30 @@ export function AuthImage({ assetId, alt, className }: AuthImageProps) {
     );
   }
 
-  if (!src) {
-    return <div className={`nu-authimg nu-authimg--loading ${className ?? ''}`.trim()} aria-hidden="true" />;
-  }
+  // Dropped once loaded, so it cannot show through a transparent PNG scan.
+  const placeholder = variant === 'display' && loaded !== url ? asset.urls?.thumb : undefined;
+  const classes = [
+    'nu-authimg',
+    variant === 'display' ? 'nu-authimg--progressive' : loaded !== url ? 'nu-authimg--loading' : '',
+    className ?? '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
-  return <img src={src} alt={alt} className={`nu-authimg ${className ?? ''}`.trim()} loading="lazy" />;
+  return (
+    <img
+      src={mediaSrc(url)}
+      alt={alt}
+      className={classes}
+      // The preview's box is sized before a byte arrives, so the dialog opens at
+      // its final size instead of jumping when the image lands.
+      width={variant === 'display' ? asset.width : undefined}
+      height={variant === 'display' ? asset.height : undefined}
+      loading={variant === 'thumb' ? 'lazy' : 'eager'}
+      decoding="async"
+      style={placeholder ? { backgroundImage: `url("${mediaSrc(placeholder)}")` } : undefined}
+      onLoad={() => setLoaded(url)}
+      onError={() => setFailed(url)}
+    />
+  );
 }

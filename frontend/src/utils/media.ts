@@ -16,3 +16,27 @@ export function mediaSrc(url: string): string {
 
   return `${base.replace(/\/+$/, '')}${url.slice('/api'.length)}`;
 }
+
+const prefetched = new Set<string>();
+
+/**
+ * Starts downloading an image the user is about to open.
+ *
+ * Called on hover, focus or the start of a tap — a few hundred milliseconds
+ * before the click lands, which is most of a preview's download on a decent
+ * connection. The browser caches the response, so the `<img>` that follows is
+ * served from that cache rather than starting from nothing.
+ *
+ * `decode()` holds the request open until the image is ready; a failure is
+ * forgotten so the next hover can try again.
+ */
+export function prefetchImage(url: string): void {
+  const src = mediaSrc(url);
+  if (prefetched.has(src)) return;
+  prefetched.add(src);
+
+  const image = new Image();
+  image.decoding = 'async';
+  image.src = src;
+  image.decode().catch(() => prefetched.delete(src));
+}

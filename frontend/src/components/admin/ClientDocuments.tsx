@@ -11,6 +11,7 @@ import { useClientDocuments } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { formatShortDateTime } from '@/utils/format';
+import { prefetchImage } from '@/utils/media';
 import type { ClientAsset } from '@/types/api';
 
 interface Props {
@@ -25,6 +26,11 @@ function humanSize(bytes: number): string {
 }
 
 const isImage = (asset: ClientAsset) => asset.mimeType.startsWith('image/');
+
+/** Starts an image's full-size download as the pointer arrives, ahead of the click. */
+const warmPreview = (asset: ClientAsset) => {
+  if (asset.urls) prefetchImage(asset.urls.display);
+};
 
 export function ClientDocuments({ clientId }: Props) {
   const queryClient = useQueryClient();
@@ -129,9 +135,12 @@ export function ClientDocuments({ clientId }: Props) {
                     type="button"
                     className="nu-filelist__thumb"
                     onClick={() => setPreview(doc)}
+                    onPointerEnter={() => warmPreview(doc)}
+                    onPointerDown={() => warmPreview(doc)}
+                    onFocus={() => warmPreview(doc)}
                     aria-label={`View ${doc.originalName}`}
                   >
-                    <AuthImage assetId={doc._id} alt="" />
+                    <AuthImage asset={doc} variant="thumb" alt="" />
                   </button>
                 )}
                 <div className="nu-filelist__main">
@@ -139,6 +148,8 @@ export function ClientDocuments({ clientId }: Props) {
                     type="button"
                     className="nu-filelist__name"
                     onClick={() => (isImage(doc) ? setPreview(doc) : void download(doc))}
+                    onPointerEnter={() => warmPreview(doc)}
+                    onFocus={() => warmPreview(doc)}
                   >
                     {doc.originalName}
                   </button>
@@ -172,7 +183,12 @@ export function ClientDocuments({ clientId }: Props) {
         }
       >
         {preview && (
-          <AuthImage assetId={preview._id} alt={preview.originalName} className="nu-filelist__preview" />
+          <AuthImage
+            asset={preview}
+            variant="display"
+            alt={preview.originalName}
+            className="nu-filelist__preview"
+          />
         )}
       </Dialog>
 

@@ -2,6 +2,7 @@ import type { Readable } from 'node:stream';
 import { Service } from '../models/Service';
 import { ApiError } from '../utils/ApiError';
 import { logger } from '../utils/logger';
+import { encodeImage } from './image.service';
 import { storage } from './storage';
 import type { ByteRange } from './storage';
 import type { VerifiedUpload } from '../middleware/upload';
@@ -50,10 +51,18 @@ const CONTENT_TYPES: Record<string, string> = {
   webm: 'video/webm',
 };
 
-/** Stores an uploaded image and returns the URL the front end should persist. */
+/**
+ * Stores an uploaded image and returns the URL the front end should persist.
+ *
+ * The image is re-encoded for the web rather than stored as uploaded: these
+ * are what every visitor to the website downloads, often on mobile data, and a
+ * camera original is many times the size a page can use. Re-encoding also
+ * strips the GPS position phones write into a photo, before it is published.
+ */
 export async function savePublicImage(upload: VerifiedUpload): Promise<{ url: string }> {
-  const stored = await storage.save(upload.buffer, {
-    extension: upload.extension,
+  const image = await encodeImage(upload.buffer, 'web');
+  const stored = await storage.save(image.buffer, {
+    extension: image.extension,
     prefix: PUBLIC_PREFIX,
   });
   return { url: toPublicUrl(stored.key) };

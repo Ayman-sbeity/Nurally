@@ -1188,6 +1188,8 @@ body.is-dragging-appointment {
 .nu-phase__preview {
   display: block;
   width: 100%;
+  /* With the width/height attributes, reserves the image's own aspect ratio. */
+  height: auto;
   max-height: 70vh;
   min-height: 200px;
   object-fit: contain;
@@ -1206,6 +1208,16 @@ body.is-dragging-appointment {
 
 .nu-authimg--loading {
   animation: nu-authimg-pulse 1.4s ease-in-out infinite;
+}
+
+/* The thumbnail, already cached, stands in under the preview until it loads.
+   Laid out exactly as `object-fit: contain` lays out the image, so the sharp
+   version lands on top of the soft one without a shift. Two classes, so the
+   preview classes' `background` shorthand cannot reset it whatever the order. */
+.nu-authimg.nu-authimg--progressive {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .nu-authimg--failed {
@@ -1313,6 +1325,7 @@ body.is-dragging-appointment {
 .nu-filelist__preview {
   display: block;
   width: 100%;
+  height: auto;
   max-height: 70vh;
   min-height: 200px;
   object-fit: contain;

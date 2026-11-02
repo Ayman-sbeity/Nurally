@@ -8,6 +8,7 @@ import { User, normalizePhone, type UserDocument } from '../models/User';
 import { UserRole } from '../types/domain';
 import { ApiError, ErrorCode } from '../utils/ApiError';
 import { logger } from '../utils/logger';
+import { storedKeysOf } from './clientAsset.service';
 import { storage } from './storage';
 import { releaseSlot } from './slotLock.service';
 
@@ -142,7 +143,9 @@ export async function deleteClient(
    * subject — so they are no part of erasing a client, and the rows carrying
    * them are removed wholesale below regardless.
    */
-  const assets = await ClientAsset.find({ client: client._id }).select('+storageKey').lean();
+  const assets = await ClientAsset.find({ client: client._id })
+    .select('+storageKey +variantKeys')
+    .lean();
 
   const [appointmentResult, photoSetResult] = await Promise.all([
     Appointment.deleteMany({ client: client._id }),
@@ -159,7 +162,7 @@ export async function deleteClient(
   await Promise.all(
     assets.map(async (asset) => {
       try {
-        await storage.remove(asset.storageKey);
+        await Promise.all(storedKeysOf(asset).map((key) => storage.remove(key)));
       } catch (error) {
         logger.error('Failed to remove a deleted client file', {
           assetId: asset._id.toString(),

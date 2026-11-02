@@ -29,8 +29,8 @@ interface AvatarProps {
  *
  * Deliberately never evicted during a session: the entries are small, the key
  * changes whenever a photo is replaced, and a full reload clears it. Revoking
- * on unmount — as the single-image AuthImage does — would be wrong here,
- * because the same URL may still be mounted elsewhere in the table.
+ * on unmount would be wrong here, because the same URL may still be mounted
+ * elsewhere in the table.
  */
 const cache = new Map<string, Promise<string>>();
 

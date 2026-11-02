@@ -442,11 +442,12 @@ export const adminApi = {
     ),
 
   /**
-   * Fetches an asset's bytes as a blob.
+   * Fetches an asset's original bytes as a blob, for download.
    *
-   * Uploaded files are not served statically and the access token lives in
-   * memory, so an `<img src>` pointing at the API would arrive unauthenticated.
-   * Everything that displays a client photo goes through here instead.
+   * The access token lives in memory, so a plain link to the API would arrive
+   * unauthenticated. Displaying an image does not come through here — that
+   * uses the signed thumbnail and preview URLs on the asset (see `AuthImage`),
+   * which are a fraction of the original's size.
    */
   fetchAssetBlob: async (assetId: string): Promise<Blob> => {
     const response = await api.get<Blob>(`/admin/assets/${assetId}/file`, {
