@@ -269,7 +269,7 @@ export const deleteClient = asyncHandler(async (req: Request, res: Response) => 
   if (!req.user) throw ApiError.unauthorized();
   const summary = await clientService.deleteClient(req.params.id as string, req.user._id);
   ok(res, {
-    message: `Client deleted, along with ${summary.appointments} appointment(s) and ${summary.files} file(s).`,
+    message: `Client deleted, along with ${summary.appointments} appointment(s), ${summary.forms} form(s) and ${summary.files} file(s).`,
     ...summary,
   });
 });

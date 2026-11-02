@@ -346,6 +346,52 @@ export interface AuthResponse {
 export type AssetKind = 'PHOTO' | 'DOCUMENT';
 export type PhotoPhase = 'BEFORE' | 'AFTER';
 
+/** The health form a client signs, or the provider's record of one session. */
+export type ClientFormType = 'HEALTH_INTAKE' | 'SESSION_RECORD';
+export type ClientFormStatus = 'DRAFT' | 'SIGNED';
+/** The language a form was filled in. Its answers are stored as written. */
+export type FormLocale = 'ar' | 'en';
+export type SignerRole = 'CLIENT' | 'GUARDIAN' | 'PROVIDER';
+
+/**
+ * Answers keyed by question (see `content/clientForms.ts`). Choices are
+ * language-neutral codes, so a form reads correctly in either language; free
+ * text is exactly what was typed. Unanswered questions are absent.
+ */
+export type FormAnswers = Record<string, string | string[] | undefined>;
+
+type Author = { _id: string; fullName: string } | string;
+
+export interface ClientForm {
+  _id: string;
+  client: string;
+  type: ClientFormType;
+  locale: FormLocale;
+  status: ClientFormStatus;
+  /** The client's name when the form was started. */
+  clientName: string;
+  appointment?: string;
+  answers: FormAnswers;
+  signature?: {
+    signerName: string;
+    signerRole: SignerRole;
+    signedAt: string;
+    recordedBy: Author;
+  };
+  /** PNG data URL. Only present when a single form is fetched, never in lists. */
+  signatureImage?: string;
+  createdBy: Author;
+  updatedBy: Author;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ClientFormSignaturePayload {
+  image: string;
+  signerName: string;
+  signerRole: SignerRole;
+}
+
 export interface ClientAsset {
   _id: string;
   client: string;

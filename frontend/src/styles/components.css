@@ -85,6 +85,27 @@
   font-weight: 500;
 }
 
+/* Framed by two gold hairlines, for the opening line of a feature section. */
+.nu-eyebrow--ruled {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-4);
+  /* The rules give way on a narrow screen; the label never breaks. */
+  white-space: nowrap;
+}
+
+.nu-eyebrow--ruled::before,
+.nu-eyebrow--ruled::after {
+  content: '';
+  flex: 0 1 4.5rem;
+  height: 1px;
+  background: linear-gradient(to left, var(--nu-accent), transparent);
+}
+
+.nu-eyebrow--ruled::after {
+  background: linear-gradient(to right, var(--nu-accent), transparent);
+}
+
 .nu-heading {
   font-size: var(--nu-text-section);
   font-family: var(--nu-font-display);
@@ -212,6 +233,29 @@
 .nu-btn--on-dark-outline:hover:not(:disabled) {
   --btn-bg: var(--nu-cream);
   --btn-fg: var(--nu-ink);
+}
+
+/* Gold foil on brown, for the one action a dark section exists to sell. */
+.nu-btn--gilded {
+  --btn-bg: var(--nu-gilded);
+  --btn-fg: var(--nu-ink);
+  --btn-border: var(--nu-champagne-soft);
+  box-shadow: 0 10px 32px rgb(var(--nu-champagne-rgb) / 0.28);
+}
+
+.nu-btn--gilded:hover:not(:disabled) {
+  box-shadow: 0 16px 44px rgb(var(--nu-champagne-rgb) / 0.42);
+}
+
+.nu-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+}
+
+.nu-btn--lg {
+  padding: 1rem 2rem;
+  min-height: 3.5rem;
 }
 
 .nu-btn--sm {

@@ -1531,3 +1531,501 @@ body.is-dragging-appointment {
   word-break: break-all;
   user-select: all;
 }
+
+/* --- Clinical forms ------------------------------------------------------- */
+/* The health form and session records: a paper-like document that fills in
+   on a tablet, switches between Arabic and English, and prints on A4. */
+
+.nu-cforms {
+  display: grid;
+  gap: var(--nu-space-5);
+  margin-top: var(--nu-space-6);
+}
+
+@media (min-width: 1100px) {
+  .nu-cforms {
+    grid-template-columns: 1fr 1.6fr;
+    align-items: start;
+  }
+}
+
+.nu-cforms__current {
+  display: grid;
+  gap: var(--nu-space-3);
+}
+
+.nu-cforms__history summary {
+  cursor: pointer;
+  font-size: var(--nu-text-sm);
+  color: var(--nu-text-muted);
+}
+
+.nu-cforms__history ul {
+  display: grid;
+  gap: var(--nu-space-2);
+  margin-top: var(--nu-space-3);
+}
+
+.nu-cforms__treatment {
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nu-cforms__followup {
+  display: block;
+  margin-top: var(--nu-space-1);
+}
+
+.nu-badge--form-draft {
+  background: var(--nu-status-pending-bg);
+  color: var(--nu-status-pending);
+}
+
+.nu-badge--form-signed {
+  background: var(--nu-status-confirmed-bg);
+  color: var(--nu-status-confirmed);
+}
+
+/* Allergies and contraindications, at the top of the client page. */
+.nu-cform-notice {
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-cform-notice:empty {
+  display: none;
+}
+
+.nu-health-alerts__title {
+  font-weight: 500;
+  margin-bottom: var(--nu-space-2);
+}
+
+.nu-health-alerts__source {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.nu-health-alerts__list {
+  display: grid;
+  gap: var(--nu-space-1);
+  padding-inline-start: 1.1rem;
+  list-style: disc;
+}
+
+/* Page toolbar: back link, language, print. Staff chrome — never printed. */
+.nu-cform-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--nu-space-5);
+}
+
+.nu-cform-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  flex-wrap: wrap;
+}
+
+.nu-langtoggle {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius-pill);
+}
+
+.nu-langtoggle button {
+  min-height: 2.25rem;
+  padding: 0.4rem 1rem;
+  font-size: var(--nu-text-sm);
+  font-weight: 500;
+  color: var(--nu-text-muted);
+  border-radius: var(--nu-radius-pill);
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-langtoggle button:lang(ar) {
+  font-family: 'IBM Plex Sans Arabic', var(--nu-font-sans);
+}
+
+.nu-langtoggle button[aria-pressed='true'] {
+  background: var(--nu-surface);
+  color: var(--nu-ink);
+  box-shadow: var(--nu-shadow-sm);
+}
+
+/* The document itself. */
+.nu-cform {
+  max-width: 60rem;
+  margin-inline: auto;
+  padding: var(--nu-space-6) var(--nu-space-5);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line);
+  border-radius: var(--nu-radius-lg);
+  box-shadow: var(--nu-shadow-sm);
+}
+
+@media (min-width: 720px) {
+  .nu-cform {
+    padding: var(--nu-space-7);
+  }
+}
+
+.nu-cform__masthead {
+  display: grid;
+  justify-items: center;
+  gap: var(--nu-space-2);
+  padding-bottom: var(--nu-space-5);
+  margin-bottom: var(--nu-space-5);
+  text-align: center;
+  border-bottom: 1px solid var(--nu-line-strong);
+}
+
+.nu-cform__brand {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-md);
+  letter-spacing: var(--nu-tracking-wider);
+  color: var(--nu-accent-text);
+}
+
+.nu-cform__title {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-xl);
+  font-weight: 500;
+}
+
+.nu-cform__subtitle,
+.nu-cform__intro,
+.nu-cform__note,
+.nu-cform__disclaimer {
+  font-size: var(--nu-text-sm);
+  color: var(--nu-text-muted);
+}
+
+.nu-cform__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--nu-space-4);
+  padding: var(--nu-space-4);
+  margin-bottom: var(--nu-space-5);
+  background: var(--nu-sand);
+  border-radius: var(--nu-radius);
+}
+
+.nu-cform__section {
+  padding-top: var(--nu-space-5);
+  margin-top: var(--nu-space-5);
+  border-top: 1px solid var(--nu-line);
+}
+
+.nu-cform__meta + .nu-cform__section {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.nu-cform__heading {
+  font-family: var(--nu-font-display);
+  font-size: var(--nu-text-lg);
+  font-weight: 500;
+  margin-bottom: var(--nu-space-3);
+}
+
+.nu-cform__intro {
+  margin-bottom: var(--nu-space-3);
+}
+
+.nu-cform__note {
+  margin-top: var(--nu-space-3);
+  font-style: italic;
+}
+
+.nu-cform__grid {
+  display: grid;
+  gap: var(--nu-space-4) var(--nu-space-5);
+}
+
+@media (min-width: 720px) {
+  .nu-cform__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.nu-cform__q {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.nu-cform__q--full {
+  grid-column: 1 / -1;
+}
+
+/* Questions are sentences, so they read as text — not the small capitals the
+   admin uses for short field labels. */
+.nu-cform__label {
+  padding: 0;
+  font-size: var(--nu-text-sm);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--nu-ink-soft);
+}
+
+.nu-cform__req {
+  margin-inline-start: 0.2em;
+  color: var(--nu-danger);
+}
+
+.nu-cform__answer {
+  font-size: var(--nu-text-base);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.nu-cform__answer.is-empty {
+  color: var(--nu-ink-faint);
+}
+
+/* Choices as large tap targets, every option visible as on the paper form. */
+.nu-cform__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-2);
+}
+
+.nu-cform__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  font-size: var(--nu-text-sm);
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-line-strong);
+  border-radius: var(--nu-radius-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--nu-duration-fast) var(--nu-ease),
+    border-color var(--nu-duration-fast) var(--nu-ease);
+}
+
+.nu-cform__option input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  accent-color: var(--nu-champagne-deep);
+}
+
+.nu-cform__option:has(input:checked) {
+  background: var(--nu-champagne-soft);
+  border-color: var(--nu-champagne-deep);
+}
+
+.nu-cform__option:has(input:focus-visible) {
+  outline: 2px solid var(--nu-champagne-deep);
+  outline-offset: 2px;
+}
+
+.nu-cform__q.is-invalid .nu-cform__option {
+  border-color: var(--nu-danger);
+}
+
+.nu-cform__declaration {
+  padding: var(--nu-space-4);
+  margin-bottom: var(--nu-space-4);
+  font-size: var(--nu-text-sm);
+  background: var(--nu-sand);
+  border-inline-start: 3px solid var(--nu-champagne-deep);
+  border-radius: var(--nu-radius-sm);
+}
+
+.nu-cform__sign .nu-cform__grid {
+  margin-bottom: var(--nu-space-4);
+}
+
+.nu-cform__signed {
+  display: grid;
+  gap: var(--nu-space-1);
+  justify-items: start;
+}
+
+.nu-cform__signature {
+  max-width: 20rem;
+  max-height: 7rem;
+  margin-block: var(--nu-space-2);
+  border-bottom: 1px solid var(--nu-line-strong);
+}
+
+/* Save and sign stay in reach at the bottom of the screen while scrolling. */
+.nu-cform__actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--nu-space-3);
+  padding: var(--nu-space-4) 0;
+  margin-top: var(--nu-space-5);
+  background: var(--nu-surface);
+  border-top: 1px solid var(--nu-line);
+}
+
+.nu-cform__summary {
+  flex: 1 1 100%;
+}
+
+.nu-cform__disclaimer {
+  margin-top: var(--nu-space-6);
+  text-align: center;
+}
+
+.nu-cform__footer {
+  margin-top: var(--nu-space-3);
+  font-size: var(--nu-text-xs);
+  letter-spacing: var(--nu-tracking-wide);
+  text-align: center;
+  color: var(--nu-ink-faint);
+}
+
+/* Signature pad. */
+.nu-sigpad {
+  display: grid;
+  gap: var(--nu-space-2);
+}
+
+.nu-sigpad__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-3);
+  max-width: 36rem;
+}
+
+.nu-sigpad__clear {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--nu-text-sm);
+  color: var(--nu-accent-text);
+}
+
+.nu-sigpad__clear:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nu-sigpad__canvas {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  aspect-ratio: 3 / 1;
+  /* A faint signing line, as on paper. */
+  background:
+    linear-gradient(var(--nu-line-strong), var(--nu-line-strong)) left 6% bottom 22% / 88% 1px no-repeat,
+    var(--nu-cream);
+  border: 1px dashed var(--nu-line-strong);
+  border-radius: var(--nu-radius);
+  /* A finger drawing a signature must not scroll the page instead. */
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.nu-sigpad__canvas[aria-invalid='true'] {
+  border-color: var(--nu-danger);
+}
+
+/* --- Arabic and right-to-left --- */
+/* Jost and Cormorant have no Arabic letters, so Arabic gets a face that does.
+   Letter-spacing is removed throughout: Arabic letters join, and any tracking
+   pulls them apart. Uppercase means nothing in Arabic either. */
+.nu-cform:lang(ar),
+.nu-cform:lang(ar) .nu-cform__title,
+.nu-cform:lang(ar) .nu-cform__heading,
+.nu-cform:lang(ar) .nu-btn,
+.nu-cform:lang(ar) .nu-input,
+.nu-cform:lang(ar) .nu-textarea,
+.nu-cform:lang(ar) .nu-select {
+  font-family: 'IBM Plex Sans Arabic', var(--nu-font-sans);
+}
+
+.nu-cform:lang(ar) *:not(.nu-cform__brand) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.nu-cform:lang(ar) .nu-cform__label,
+.nu-cform:lang(ar) .nu-cform__answer {
+  line-height: 1.8;
+}
+
+.nu-cform[dir='rtl'] .nu-select {
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+  background-position: left 1rem center;
+}
+
+/* Phone numbers and dates stay left-to-right, but sit on the reading side. */
+.nu-cform[dir='rtl'] .nu-input[dir='ltr'],
+.nu-cform[dir='rtl'] .nu-input[type='date'] {
+  text-align: right;
+}
+
+/* --- Print --- */
+/* A form prints as the paper original: the admin around it, and every control
+   that only makes sense on screen, are left out. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  .nu-admin__sidebar,
+  .nu-admin__topbar,
+  .nu-admin__scrim,
+  .nu-noprint {
+    display: none !important;
+  }
+
+  .nu-admin,
+  .nu-admin__main {
+    display: block;
+    padding: 0;
+    background: none;
+  }
+
+  .nu-cform {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .nu-cform__meta {
+    background: none;
+    border: 1px solid var(--nu-line-strong);
+  }
+
+  .nu-cform__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nu-cform__q,
+  .nu-cform__sign {
+    break-inside: avoid;
+  }
+
+  .nu-cform__heading {
+    break-after: avoid;
+  }
+}

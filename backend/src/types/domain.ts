@@ -311,3 +311,36 @@ export const AssetVariant = {
   DISPLAY: 'display',
 } as const;
 export type AssetVariant = (typeof AssetVariant)[keyof typeof AssetVariant];
+
+/**
+ * The lounge's two clinical forms. The health form is the client's own
+ * declaration, re-signed as a new version whenever it is updated; a session
+ * record is the provider's notes for one treatment.
+ */
+export const ClientFormType = {
+  HEALTH_INTAKE: 'HEALTH_INTAKE',
+  SESSION_RECORD: 'SESSION_RECORD',
+} as const;
+export type ClientFormType = (typeof ClientFormType)[keyof typeof ClientFormType];
+
+/** A form is editable until it is signed, and never after. */
+export const ClientFormStatus = {
+  DRAFT: 'DRAFT',
+  SIGNED: 'SIGNED',
+} as const;
+export type ClientFormStatus = (typeof ClientFormStatus)[keyof typeof ClientFormStatus];
+
+/** The language a form was filled in. Answers are stored as written. */
+export const FormLocale = {
+  AR: 'ar',
+  EN: 'en',
+} as const;
+export type FormLocale = (typeof FormLocale)[keyof typeof FormLocale];
+
+/** Who signed: the client or their guardian sign the health form, the provider a session. */
+export const SignerRole = {
+  CLIENT: 'CLIENT',
+  GUARDIAN: 'GUARDIAN',
+  PROVIDER: 'PROVIDER',
+} as const;
+export type SignerRole = (typeof SignerRole)[keyof typeof SignerRole];

@@ -3,6 +3,7 @@ import * as adminController from '../controllers/admin.controller';
 import * as appointmentController from '../controllers/appointment.controller';
 import * as availabilityController from '../controllers/availability.controller';
 import * as clientAssetController from '../controllers/clientAsset.controller';
+import * as clientFormController from '../controllers/clientForm.controller';
 import * as galleryController from '../controllers/gallery.controller';
 import * as instagramController from '../controllers/instagram.controller';
 import * as mediaController from '../controllers/media.controller';
@@ -57,6 +58,11 @@ import {
   uploadDocumentSchema,
   uploadPhotoSchema,
 } from '../validators/clientAsset.validators';
+import {
+  createClientFormSchema,
+  formIdParamSchema,
+  updateClientFormSchema,
+} from '../validators/clientForm.validators';
 
 const router = Router();
 
@@ -290,6 +296,42 @@ router.delete(
   may(AdminResource.CLIENTS, DELETE),
   validate({ params: assetIdParamSchema }),
   clientAssetController.removeAsset,
+);
+
+// --- Clinical forms --------------------------------------------------------
+// The health form and per-session records. Clinical data, so the same client
+// permission as the photographs: VIEW to read, CREATE to start or sign a new
+// form, EDIT to save or sign a draft, DELETE to discard a draft. A signed form
+// cannot be changed or deleted by anyone — the service refuses it.
+router.get(
+  '/clients/:id/forms',
+  may(AdminResource.CLIENTS, VIEW),
+  validate({ params: idParamSchema }),
+  clientFormController.listForms,
+);
+router.post(
+  '/clients/:id/forms',
+  may(AdminResource.CLIENTS, CREATE),
+  validate({ params: idParamSchema, body: createClientFormSchema }),
+  clientFormController.createForm,
+);
+router.get(
+  '/forms/:formId',
+  may(AdminResource.CLIENTS, VIEW),
+  validate({ params: formIdParamSchema }),
+  clientFormController.getForm,
+);
+router.patch(
+  '/forms/:formId',
+  may(AdminResource.CLIENTS, EDIT),
+  validate({ params: formIdParamSchema, body: updateClientFormSchema }),
+  clientFormController.updateForm,
+);
+router.delete(
+  '/forms/:formId',
+  may(AdminResource.CLIENTS, DELETE),
+  validate({ params: formIdParamSchema }),
+  clientFormController.deleteForm,
 );
 
 // --- Website media ---------------------------------------------------------

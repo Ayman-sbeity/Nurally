@@ -10,10 +10,12 @@ import { Seo } from '@/components/ui/Seo';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { ClientDocuments } from '@/components/admin/ClientDocuments';
+import { ClientForms } from '@/components/admin/ClientForms';
 import { ClientPhotoSets } from '@/components/admin/ClientPhotoSets';
 import { CreateAppointmentDialog } from '@/components/admin/CreateAppointmentDialog';
+import { HealthAlerts } from '@/components/admin/forms/HealthAlerts';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import { useAdminClient } from '@/hooks/queries';
+import { useAdminClient, useClientForms } from '@/hooks/queries';
 import { useToast } from '@/context/ToastContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { formatDate, formatShortDateTime } from '@/utils/format';
@@ -36,6 +38,7 @@ export function AdminClientDetailPage() {
   const [bookOpen, setBookOpen] = useState(false);
 
   const { data, isPending, isError, error, refetch } = useAdminClient(id);
+  const { data: formsData } = useClientForms(id);
 
   // Seed the notes field once the client loads.
   useEffect(() => {
@@ -132,6 +135,11 @@ export function AdminClientDetailPage() {
       {bookOpen && (
         <CreateAppointmentDialog client={client} onClose={() => setBookOpen(false)} />
       )}
+
+      {/* Allergies and contraindications first, before anything else on the page. */}
+      <div className="nu-cform-notice">
+        <HealthAlerts clientId={client._id} forms={formsData?.forms} />
+      </div>
 
       <div className="nu-detail">
         <section className="nu-panel">
@@ -356,8 +364,8 @@ export function AdminClientDetailPage() {
                       Delete permanently
                     </Button>
                     <p className="nu-hint" style={{ marginTop: 'var(--nu-space-2)' }}>
-                      Erases the client with every appointment, photograph and document. Cannot be
-                      undone.
+                      Erases the client with every appointment, form, photograph and document.
+                      Cannot be undone.
                     </p>
                   </div>
                 )}
@@ -366,6 +374,8 @@ export function AdminClientDetailPage() {
           </section>
         </div>
       </div>
+
+      <ClientForms clientId={client._id} />
 
       {/* Full width: before/after comparison needs the room. */}
       <ClientPhotoSets clientId={client._id} clientName={client.fullName} />
@@ -412,7 +422,7 @@ export function AdminClientDetailPage() {
           setDeleteConfirmation('');
         }}
         title={`Delete ${client.fullName}?`}
-        description="This erases the client together with every appointment, before/after photograph and document. It cannot be undone."
+        description="This erases the client together with every appointment, health form, session record, before/after photograph and document. It cannot be undone."
         footer={
           <>
             <Button

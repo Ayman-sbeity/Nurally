@@ -6,7 +6,12 @@ import type {
   AppointmentStatus,
   BlockedPeriod,
   ClientAsset,
+  ClientForm,
+  ClientFormSignaturePayload,
+  ClientFormType,
   ClientListItem,
+  FormAnswers,
+  FormLocale,
   ClientPhotoSet,
   DashboardData,
   DayAvailability,
@@ -37,6 +42,23 @@ export interface ReelLookup {
   shortcode: string;
   coverImageUrl?: string;
   caption?: string;
+}
+
+export interface ClientFormCreatePayload {
+  type: ClientFormType;
+  locale: FormLocale;
+  answers: FormAnswers;
+  appointmentId?: string;
+  signature?: ClientFormSignaturePayload;
+}
+
+export interface ClientFormUpdatePayload {
+  expectedUpdatedAt: string;
+  locale?: FormLocale;
+  answers?: FormAnswers;
+  /** `null` unlinks the appointment. */
+  appointmentId?: string | null;
+  signature?: ClientFormSignaturePayload;
 }
 
 /** Client photos and files are up to MAX_UPLOAD_MB (15 MB), so 20s is not enough. */
@@ -183,9 +205,15 @@ export const adminApi = {
 
   /** Erasure: the client, their appointments, photographs and documents. */
   deleteClient: (id: string) =>
-    request<{ message: string; appointments: number; photoSets: number; files: number }>(
+    request<{ message: string; appointments: number; photoSets: number; forms: number; files: number }>(
       api.delete<
-        ApiEnvelope<{ message: string; appointments: number; photoSets: number; files: number }>
+        ApiEnvelope<{
+          message: string;
+          appointments: number;
+          photoSets: number;
+          forms: number;
+          files: number;
+        }>
       >(`/admin/clients/${id}`),
     ),
 
@@ -440,6 +468,36 @@ export const adminApi = {
     request<{ deleted: boolean }>(
       api.delete<ApiEnvelope<{ deleted: boolean }>>(`/admin/assets/${assetId}`),
     ),
+
+  // --- Clinical forms -------------------------------------------------------
+  listClientForms: (clientId: string) =>
+    request<{ forms: ClientForm[] }>(
+      api.get<ApiEnvelope<{ forms: ClientForm[] }>>(`/admin/clients/${clientId}/forms`),
+    ),
+
+  /** One form, including its signature image. */
+  getClientForm: (formId: string) =>
+    request<{ form: ClientForm }>(api.get<ApiEnvelope<{ form: ClientForm }>>(`/admin/forms/${formId}`)),
+
+  /** Starts a form; with `signature` it is created already signed. */
+  createClientForm: (clientId: string, payload: ClientFormCreatePayload) =>
+    request<{ form: ClientForm }>(
+      api.post<ApiEnvelope<{ form: ClientForm }>>(`/admin/clients/${clientId}/forms`, payload),
+    ),
+
+  /**
+   * Saves a draft; with `signature` it is signed in the same write.
+   * `expectedUpdatedAt` is the copy the editor loaded — the server refuses the
+   * save if someone else has saved since.
+   */
+  updateClientForm: (formId: string, payload: ClientFormUpdatePayload) =>
+    request<{ form: ClientForm }>(
+      api.patch<ApiEnvelope<{ form: ClientForm }>>(`/admin/forms/${formId}`, payload),
+    ),
+
+  /** Drafts only — a signed form cannot be deleted. */
+  deleteClientForm: (formId: string) =>
+    request<{ deleted: boolean }>(api.delete<ApiEnvelope<{ deleted: boolean }>>(`/admin/forms/${formId}`)),
 
   /**
    * Fetches an asset's original bytes as a blob, for download.

@@ -62,6 +62,26 @@
   --nu-champagne-text: #855f1c;
   --nu-champagne-soft: #ecd9ae;
 
+  /* Foil: the wordmark gold as a gradient, kept for the few surfaces meant to
+     catch the eye first (the hero CTA, price and hours chips). Ink on its
+     darkest stop still clears 5:1. */
+  --nu-gilded: linear-gradient(
+    135deg,
+    var(--nu-champagne-soft) 0%,
+    var(--nu-champagne) 55%,
+    color-mix(in srgb, var(--nu-champagne) 70%, var(--nu-champagne-deep)) 100%
+  );
+
+  /* The same foil for type on a light surface. Brand-chroma gold cannot carry
+     text on cream, so this runs between the bronzed stops; its lightest point
+     holds 3.2:1 on sand — display sizes only. */
+  --nu-gilded-deep: linear-gradient(
+    100deg,
+    var(--nu-champagne-text) 0%,
+    var(--nu-champagne-deep) 50%,
+    var(--nu-champagne-text) 100%
+  );
+
   /* --- Brand: blush + wine ----------------------------------------------- */
   --nu-blush: #e4cac1;
   --nu-blush-deep: #c2998c;
@@ -192,6 +212,7 @@
    bronzed --nu-champagne-text exists only to clear 4.5:1 on cream; over ink it
    would read as mud. Anything with a dark background belongs in this list, or
    can opt in with data-tone="dark". */
+.nu-hero,
 .nu-philosophy,
 .nu-cta,
 .nu-auth__aside,

@@ -31,7 +31,8 @@ export function AboutPage() {
       <JsonLd id="breadcrumb" data={breadcrumb} />
 
       <div style={{ paddingTop: '5rem' }} />
-      <AboutSection />
+      {/* Opens the page, so its title is the page's only h1. */}
+      <AboutSection headingLevel="h1" />
       {/* The entity block: one unambiguous statement of who this business is,
           which is what an AI assistant anchors a recommendation to. */}
       <EntitySection />

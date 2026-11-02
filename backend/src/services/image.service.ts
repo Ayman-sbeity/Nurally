@@ -100,6 +100,38 @@ export async function encodeImage(input: Buffer, preset: ImagePreset): Promise<E
 }
 
 /**
+ * Re-encodes a signature drawn on a form's signature pad, returned as a PNG
+ * data URL ready to store.
+ *
+ * Kept as PNG rather than WebP: a signature is a few dark strokes on a
+ * transparent ground, which PNG stores losslessly in a few kilobytes and
+ * prints crisply. A uniform image — nothing drawn — is refused, so an
+ * accidental tap on "Sign" cannot record an empty signature.
+ */
+export async function renderSignature(input: Buffer): Promise<string> {
+  try {
+    // A pad is at most a few thousand pixels a side; anything larger is not one.
+    const image = sharp(input, { failOn: 'error', limitInputPixels: 8_000_000 });
+    const [metadata, stats] = await Promise.all([image.metadata(), image.clone().stats()]);
+    if (metadata.format !== 'png') throw unreadableSignature();
+    if (stats.channels.every((channel) => channel.min === channel.max)) {
+      throw ApiError.badRequest('Please sign in the box before signing the form.');
+    }
+
+    const png = await image
+      .resize({ width: 1200, height: 400, fit: 'inside', withoutEnlargement: true })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+    return `data:image/png;base64,${png.toString('base64')}`;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw unreadableSignature();
+  }
+}
+
+const unreadableSignature = () => ApiError.badRequest('The signature could not be read. Please sign again.');
+
+/**
  * Renders the thumbnail and preview of a client photograph from one decode.
  * Throws a 400 when the bytes are not a readable image.
  */

@@ -41,6 +41,7 @@ const AdminAppointmentsPage = lazy(() => import('@/pages/admin/AdminAppointments
 const AdminAppointmentDetailPage = lazy(() => import('@/pages/admin/AdminAppointmentDetailPage'));
 const AdminClientsPage = lazy(() => import('@/pages/admin/AdminClientsPage'));
 const AdminClientDetailPage = lazy(() => import('@/pages/admin/AdminClientDetailPage'));
+const AdminClientFormPage = lazy(() => import('@/pages/admin/AdminClientFormPage'));
 const AdminServicesPage = lazy(() => import('@/pages/admin/AdminServicesPage'));
 const AdminAvailabilityPage = lazy(() => import('@/pages/admin/AdminAvailabilityPage'));
 const AdminGalleryPage = lazy(() => import('@/pages/admin/AdminGalleryPage'));
@@ -172,6 +173,22 @@ export function App() {
               element={
                 <RequirePermission resource="CLIENTS">
                   <AdminClientDetailPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="clients/:id/forms/new/:formSlug"
+              element={
+                <RequirePermission resource="CLIENTS">
+                  <AdminClientFormPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="clients/:id/forms/:formId"
+              element={
+                <RequirePermission resource="CLIENTS">
+                  <AdminClientFormPage />
                 </RequirePermission>
               }
             />

@@ -1,6 +1,7 @@
 import type { Types } from 'mongoose';
 import { Appointment } from '../models/Appointment';
 import { ClientAsset } from '../models/ClientAsset';
+import { ClientForm } from '../models/ClientForm';
 import { ClientPhotoSet } from '../models/ClientPhotoSet';
 import { Notification } from '../models/Notification';
 import { PushSubscription } from '../models/PushSubscription';
@@ -103,6 +104,7 @@ export async function updateClient(
 export interface DeleteClientSummary {
   appointments: number;
   photoSets: number;
+  forms: number;
   files: number;
 }
 
@@ -147,9 +149,11 @@ export async function deleteClient(
     .select('+storageKey +variantKeys')
     .lean();
 
-  const [appointmentResult, photoSetResult] = await Promise.all([
+  const [appointmentResult, photoSetResult, formResult] = await Promise.all([
     Appointment.deleteMany({ client: client._id }),
     ClientPhotoSet.deleteMany({ client: client._id }),
+    // Signed forms included: erasure is the one way a signed form is removed.
+    ClientForm.deleteMany({ client: client._id }),
     ClientAsset.deleteMany({ client: client._id }),
     Notification.deleteMany({ recipient: client._id }),
     PushSubscription.deleteMany({ user: client._id }),
@@ -175,12 +179,14 @@ export async function deleteClient(
   logger.info('Client erased', {
     clientId: client._id.toString(),
     appointments: appointmentResult.deletedCount,
+    forms: formResult.deletedCount,
     files: assets.length,
   });
 
   return {
     appointments: appointmentResult.deletedCount ?? 0,
     photoSets: photoSetResult.deletedCount ?? 0,
+    forms: formResult.deletedCount ?? 0,
     files: assets.length,
   };
 }

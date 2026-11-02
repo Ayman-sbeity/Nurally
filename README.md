@@ -457,6 +457,23 @@ per photo could let a "before" and its "after" disagree.
 Any client can carry documents — consent forms, patch-test records, scans. Photos and documents
 share one `ClientAsset` collection because their lifecycle is identical; only `kind` differs.
 
+### Clinical forms
+
+The lounge's two paper forms are filled in on screen from the client's page — the **health form**
+(personal details, allergies, medical history, medications, products and previous treatments) and a
+**session record** per treatment (request, assessment and decision, products with batch and expiry,
+consent, aftercare and follow-up).
+
+| Concern       | Approach                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| Language      | Each form is filled in **Arabic or English**, switched at the top of the form; nothing typed is lost when switching. The questions, their order and the Arabic wording live once in [`frontend/src/content/clientForms.ts`](frontend/src/content/clientForms.ts). Choices are stored as codes (`YES`, `LATEX`), so a form filled in Arabic reads correctly in English; free text is kept exactly as written. |
+| Lifecycle     | A form is a **draft** until it is signed on screen — the client or guardian signs the health form, the provider signs a session record — and is **immutable** once signed. Updating the health form creates a new version from the last one; earlier versions stay readable. Signed forms cannot be deleted, except by erasing the client. |
+| Completeness  | Drafts save half-filled. Signing requires the safety questions (allergies, severe reactions, pregnancy, breastfeeding; for a session the date, provider, history check and decision). The rule is enforced by the server in `clientForm.validators.ts` and mirrored in the form definitions. |
+| Safety        | Allergies, past severe reactions, pregnancy and contraindicating conditions from the current signed health form are shown at the top of the client page and above every new session record. |
+| Integrity     | Saves are conditional on the copy the editor loaded, so two people editing one draft get a conflict instead of overwriting each other. Signatures are decoded and re-encoded server-side; a blank pad is refused. |
+| Printing      | A signed form prints on A4 as the paper original, without the admin around it. |
+| Storage       | One `ClientForm` collection; answers are validated against the form type's schema before they are written. Signature images are excluded from listings. |
+
 ### How the bytes are handled
 
 | Concern            | Approach                                                                     |

@@ -31,6 +31,8 @@ export const qk = {
   blockedPeriods: (params: Record<string, unknown>) => ['admin', 'blocked', params] as const,
   clientPhotoSets: (clientId: string) => ['admin', 'client', clientId, 'photo-sets'] as const,
   clientDocuments: (clientId: string) => ['admin', 'client', clientId, 'documents'] as const,
+  clientForms: (clientId: string) => ['admin', 'client', clientId, 'forms'] as const,
+  clientForm: (formId: string) => ['admin', 'client-form', formId] as const,
 };
 
 export function useServices(params?: { category?: string; includeInactive?: boolean }) {
@@ -203,6 +205,22 @@ export function useClientDocuments(clientId: string | undefined) {
     queryFn: () => adminApi.listDocuments(clientId as string),
     enabled: Boolean(clientId),
     ...signedMediaRefresh,
+  });
+}
+
+export function useClientForms(clientId: string | undefined) {
+  return useQuery({
+    queryKey: qk.clientForms(clientId ?? ''),
+    queryFn: () => adminApi.listClientForms(clientId as string),
+    enabled: Boolean(clientId),
+  });
+}
+
+export function useClientForm(formId: string | undefined) {
+  return useQuery({
+    queryKey: qk.clientForm(formId ?? ''),
+    queryFn: () => adminApi.getClientForm(formId as string),
+    enabled: Boolean(formId),
   });
 }
 

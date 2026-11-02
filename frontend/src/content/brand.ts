@@ -15,29 +15,61 @@ export const BRAND = {
 
 export const instagramUrl = `https://instagram.com/${BRAND.instagramHandle}`;
 
+/** The three promises shown under the hero headline and again in About. */
+export const PILLARS = [
+  { icon: 'diamond', label: 'Advanced Technology' },
+  { icon: 'lotus', label: 'Personalized Care' },
+  { icon: 'shield', label: 'Safe & Effective' },
+] as const;
+
 export const HERO = {
   eyebrow: BRAND.name,
-  title: 'Beauty, Refined.',
+  /** "Beauty, Refined." — split so the second word can carry the gold italic. */
+  title: { lead: 'Beauty,', accent: 'Refined.' },
   subtitle:
     'Where advanced aesthetics meet elegance, precision, and personalized care.',
-  body: 'At Nurella Beauty Lounge, every treatment is thoughtfully selected to enhance your natural features while preserving your individuality.',
-  statement: 'Natural Results. Refined Beauty. Personalized Care.',
+  pillars: PILLARS,
   primaryCta: 'BOOK YOUR APPOINTMENT',
   secondaryCta: 'Explore treatments',
+  /**
+   * Background artwork. Swap for real Nurella photography (≥2400px wide, the
+   * subject on the right third) and set `position` so the subject stays in
+   * frame as the viewport narrows — no other change needed.
+   */
+  image: { src: '/images/hero.svg', width: 1920, height: 1280, position: '70% center' },
+  /**
+   * The card lists the first few treatments of one category, in the order set
+   * in Admin → Services. A price appears only once the lounge has set one.
+   */
+  featured: { title: 'Featured Treatments', category: 'laser', limit: 4 },
+  hoursTitle: 'Opening Hours',
+  /** Shortcut tiles under the CTAs. Labels mirror the API's category labels. */
+  categories: [
+    { slug: 'laser', label: 'Laser' },
+    { slug: 'skin-care', label: 'Skin Care' },
+    { slug: 'facial-aesthetics', label: 'Facial Aesthetics' },
+    { slug: 'skin-boosters-rejuvenation', label: 'Skin Boosters & Rejuvenation' },
+  ],
 } as const;
 
 export const ABOUT = {
   eyebrow: 'ABOUT NURELLA',
-  title: 'The Art of Natural Enhancement',
-  paragraphs: [
+  /** "The Art of Natural Enhancement" — split so the last word can carry the gold italic. */
+  title: { lead: 'The Art of Natural', accent: 'Enhancement' },
+  intro:
     'Welcome to Nurella Beauty Lounge, a destination dedicated to advanced aesthetics, skin rejuvenation, and beauty.',
-    'Our philosophy is simple:',
-  ],
+  philosophyLead: 'Our philosophy is simple:',
   pullQuote: 'Enhance, never change.',
   paragraphsAfter: [
     'Every face is unique. That is why each treatment begins with a personalized consultation and a carefully designed plan based on your features, skin needs, and desired results.',
     'From facial rejuvenation and contouring to advanced skin and collagen treatments, our approach combines experience, precision, and attention to detail to create elegant, natural-looking results.',
   ],
+  /**
+   * Placeholder artwork until real photography arrives (4:5 portrait, ≥1200px
+   * wide). The alt is empty while the image is decorative; describe what the
+   * photograph shows once it is a real one.
+   */
+  image: { src: '/images/about.svg', alt: '', width: 1200, height: 1500 },
 } as const;
 
 export const PHILOSOPHY = {

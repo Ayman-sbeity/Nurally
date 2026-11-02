@@ -19,6 +19,7 @@ import { env } from '../config/env';
 import { Appointment } from '../models/Appointment';
 import { BlockedPeriod } from '../models/BlockedPeriod';
 import { ClientAsset } from '../models/ClientAsset';
+import { ClientForm } from '../models/ClientForm';
 import { ClientPhotoSet } from '../models/ClientPhotoSet';
 import { GalleryImage } from '../models/GalleryImage';
 import { Notification } from '../models/Notification';
@@ -459,6 +460,7 @@ async function reset(): Promise<void> {
     BlockedPeriod.deleteMany({}),
     Notification.deleteMany({}),
     ClientAsset.deleteMany({}),
+    ClientForm.deleteMany({}),
     ClientPhotoSet.deleteMany({}),
     User.deleteMany({ role: UserRole.CLIENT }),
   ]);

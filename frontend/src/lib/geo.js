@@ -207,15 +207,18 @@ function padTime(value) {
 /** "Monday to Friday 09:00–19:00, Saturday 10:00–18:00" — for prose and FAQ answers. */
 export function formatHoursLine(blocks) {
   if (!blocks || blocks.length === 0) return null;
-  return blocks
-    .map((block) => {
-      const days =
-        block.days.length > 2 && isConsecutive(block.days)
-          ? `${block.days[0]} to ${block.days[block.days.length - 1]}`
-          : block.days.join(', ');
-      return `${days} ${block.opens}–${block.closes}`;
-    })
-    .join(', ');
+  return blocks.map((block) => `${formatDayRange(block.days)} ${block.opens}–${block.closes}`).join(', ');
+}
+
+/**
+ * "Monday to Saturday", or "Monday, Wednesday" when the days are not a run.
+ *
+ * @param {string[]} days
+ */
+export function formatDayRange(days) {
+  return days.length > 2 && isConsecutive(days)
+    ? `${days[0]} to ${days[days.length - 1]}`
+    : days.join(', ');
 }
 
 function isConsecutive(days) {
